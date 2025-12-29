@@ -1,0 +1,293 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, Button, ScrollView, Alert, TouchableOpacity, Modal } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useLanguage } from '../context/LanguageContext';
+import { useHistory } from '../context/HistoryContext';
+
+export default function EditScreen() {
+  const { i18n } = useLanguage();
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { addToHistory } = useHistory();
+  const [permission, requestPermission] = useCameraPermissions();
+
+  const [itemName, setItemName] = useState('');
+  const [itemCode, setItemCode] = useState('');
+  const [ocrText, setOcrText] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+
+  useEffect(() => {
+    if (params.ocrText) {
+      setOcrText(params.ocrText);
+    }
+  }, [params.ocrText]);
+
+  useEffect(() => {
+    // Generate 13-digit code
+    const generatedCode = generate13DigitCode();
+    setItemCode(generatedCode);
+  }, []);
+
+  const generate13DigitCode = () => {
+    // Simple generation: timestamp + random to make 13 digits
+    // Date.now() is 13 digits usually, but let's be safe
+    const timestamp = Date.now().toString();
+    const random = Math.floor(Math.random() * 1000).toString();
+    return (timestamp + random).slice(0, 13);
+  };
+
+  const handleBarcodeScanned = ({ data }) => {
+    setItemCode(data);
+    setIsScanning(false);
+  };
+
+  const startScanning = async () => {
+    if (!permission?.granted) {
+      const { status } = await requestPermission();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Camera permission is required to scan barcodes.');
+        return;
+      }
+    }
+    setIsScanning(true);
+  };
+
+  const handleSave = async () => {
+    if (!itemName.trim()) {
+      Alert.alert('Error', 'Please enter an item name');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Save to backend
+      // Use your computer's local IP address instead of localhost/10.0.2.2 for physical devices
+      const response = await fetch('http://192.168.50.124:3000/api/SaveScanHistory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          itemName: itemName,
+          itemCode: itemCode,
+          nutritionInformation: ocrText,
+          userId: 'user_123' // Placeholder user ID
+        }),
+      });
+
+      if (response.ok) {
+        // Also add to local history context for immediate display
+        addToHistory({
+          itemName: itemName,
+          itemCode: itemCode,
+          nutritionInformation: ocrText
+        });
+        
+        Alert.alert('Success', i18n.saveSuccess, [
+          { text: 'OK', onPress: () => router.push('/scan') }
+        ]);
+      } else {
+        Alert.alert('Error', i18n.saveError);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to connect to server');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>{i18n.editScan}</Text>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>{i18n.itemName}</Text>
+        <TextInput
+          style={styles.input}
+          value={itemName}
+          onChangeText={setItemName}
+          placeholder={i18n.itemName}
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>{i18n.itemCode}</Text>
+        <View style={styles.codeContainer}>
+          <TextInput
+            style={[styles.input, styles.disabledInput, { flex: 1 }]}
+            value={itemCode}
+            editable={false}
+          />
+          <TouchableOpacity style={styles.scanButton} onPress={startScanning}>
+            <Ionicons name="barcode-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.helperText}>Default: Auto-generated. Scan to replace.</Text>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>{i18n.ocrResult}</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={ocrText}
+          onChangeText={setOcrText}
+          multiline
+          numberOfLines={10}
+          textAlignVertical="top"
+        />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={[styles.button, styles.returnButton]} 
+          onPress={() => router.push('/scan')}
+        >
+          <Text style={styles.buttonText}>{i18n.return}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.button, styles.saveButton]} 
+          onPress={handleSave}
+          disabled={isSaving}
+        >
+          <Text style={styles.buttonText}>{isSaving ? i18n.saving : i18n.save}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal visible={isScanning} animationType="slide">
+        <View style={styles.cameraContainer}>
+          <CameraView
+            style={styles.camera}
+            onBarcodeScanned={handleBarcodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr", "ean13", "upc_e"],
+            }}
+          >
+            <View style={styles.cameraOverlay}>
+              <Text style={styles.cameraText}>Scan Barcode</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setIsScanning(false)}>
+                <Text style={styles.closeButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </CameraView>
+        </View>
+      </Modal>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: '#fff',
+    flexGrow: 1,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: '600',
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  disabledInput: {
+    backgroundColor: '#eee',
+    color: '#666',
+  },
+  textArea: {
+    height: 200,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  returnButton: {
+    backgroundColor: '#6c757d',
+  },
+  saveButton: {
+    backgroundColor: '#007AFF',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  codeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  scanButton: {
+    backgroundColor: '#333',
+    padding: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+  },
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  camera: {
+    flex: 1,
+  },
+  cameraOverlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 50,
+  },
+  cameraText: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    position: 'absolute',
+    top: 100,
+  },
+  closeButton: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 30,
+    width: 120,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});

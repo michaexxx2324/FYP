@@ -6,12 +6,17 @@ import * as ImagePicker from 'expo-image-picker';
 import { useLanguage } from '../../context/LanguageContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getProductByBarcode } from '../../services/productService';
+import { useHistory } from '../../context/HistoryContext';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gpt-5-nano'; // User requested model
 
+import { useRouter } from 'expo-router';
+
 export default function ScanScreen() {
   const { i18n } = useLanguage();
+  const { addToHistory } = useHistory();
+  const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [mode, setMode] = useState('barcode'); // 'barcode' or 'ocr'
@@ -19,6 +24,7 @@ export default function ScanScreen() {
   const [imageUri, setImageUri] = useState(null);
   const [productData, setProductData] = useState(null);
   const [loadingProduct, setLoadingProduct] = useState(false);
+  const [processingOcr, setProcessingOcr] = useState(false);
   const cameraRef = useRef(null);
 
   if (!permission) return <View />;
@@ -44,33 +50,61 @@ export default function ScanScreen() {
       const product = await getProductByBarcode(data);
       
       if (product) {
-        setProductData(product);
+        addToHistory(product);
+        // Navigate directly to product details
+        router.push({
+          pathname: '/product-details',
+          params: { 
+            itemName: product.itemName, 
+            itemCode: product.itemCode, 
+            nutritionInformation: product.nutritionInformation 
+          }
+        });
+        // Reset scan state after a short delay so when they come back it's ready
+        setTimeout(() => setScanned(false), 1000);
       } else {
-        Alert.alert("Not Found", "Product not found in database.");
+        Alert.alert("Not Found", "Product not found in database.", [
+          { text: "OK", onPress: () => setScanned(false) }
+        ]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch product data. Check connection.");
+      Alert.alert("Error", "Failed to fetch product data. Check connection.", [
+        { text: "OK", onPress: () => setScanned(false) }
+      ]);
     } finally {
       setLoadingProduct(false);
     }
   };
 
   const takePictureAndRecognize = async () => {
-    if (cameraRef.current) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync({ base64: true });
-        setImageUri(photo.uri);
-        processImage(photo.base64);
-      } catch (error) {
-        console.error(error);
+    try {
+      // Use ImagePicker.launchCameraAsync to enable the system's built-in crop UI (allowsEditing: true)
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Camera permission is required to take photos.');
+        return;
       }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true, // Enable cropping
+        quality: 1,
+        base64: true,
+      });
+
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+        processImage(result.assets[0].base64);
+      }
+    } catch (error) {
+      console.error("Camera Error:", error);
+      Alert.alert("Error", "Failed to open camera.");
     }
   };
 
   const pickImageAndRecognize = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
+      allowsEditing: true, // Enable cropping
       quality: 1,
       base64: true,
     });
@@ -82,6 +116,7 @@ export default function ScanScreen() {
   };
 
   const processImage = async (base64Image) => {
+    setProcessingOcr(true);
     setOcrText(i18n.processing);
     
     try {
@@ -97,7 +132,7 @@ export default function ScanScreen() {
             {
               role: 'user',
               content: [
-                { type: 'text', text: 'Extract the text from this food label image exactly as it appears. Output ONLY the extracted text. Do not add any conversational filler, analysis, or additional feedback.' },
+                { type: 'text', text: 'Extract all text from this image. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations.' },
                 { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
               ]
             }
@@ -112,13 +147,25 @@ export default function ScanScreen() {
       }
 
       if (data.choices && data.choices.length > 0) {
-        setOcrText(data.choices[0].message.content);
+        const content = data.choices[0].message.content;
+        setOcrText(content);
+        
+        // Navigate to Edit Screen with OCR result
+        router.push({
+          pathname: '/edit',
+          params: { ocrText: content }
+        });
       } else {
         setOcrText(i18n.noTextFound);
+        Alert.alert("Info", i18n.noTextFound);
       }
     } catch (error) {
       console.error("AI Error:", error);
       setOcrText("Error: " + error.message);
+      Alert.alert("Error", error.message);
+    } finally {
+      setProcessingOcr(false);
+      setImageUri(null); // Reset image uri so we don't show preview
     }
   };
 
@@ -137,25 +184,19 @@ export default function ScanScreen() {
         />
       </View>
 
-      {imageUri ? (
-        <View style={styles.resultContainer}>
-          <Image source={{ uri: imageUri }} style={styles.previewImage} />
-          <ScrollView style={styles.textScroll}>
-            <Text style={styles.resultText}>{ocrText}</Text>
-          </ScrollView>
-          <Button title={i18n.scanAgain} onPress={() => setImageUri(null)} />
-        </View>
-      ) : (
+      {/* Removed Preview UI Block */}
+      
+      {mode === 'barcode' ? (
         <CameraView
           style={styles.camera}
           ref={cameraRef}
-          onBarcodeScanned={mode === 'barcode' && !scanned ? handleBarcodeScanned : undefined}
+          onBarcodeScanned={!scanned ? handleBarcodeScanned : undefined}
           barcodeScannerSettings={{
             barcodeTypes: ["qr", "ean13", "upc_e"],
           }}
         >
           <View style={styles.buttonContainer}>
-            {mode === 'barcode' && scanned && !productData && !loadingProduct && (
+            {scanned && !productData && !loadingProduct && (
               <Button title={i18n.tapToScanAgain} onPress={() => setScanned(false)} />
             )}
             
@@ -165,29 +206,28 @@ export default function ScanScreen() {
                  <Text style={{color: 'white'}}>Searching Database...</Text>
                </View>
             )}
-
-            {productData && (
-              <View style={styles.productCard}>
-                <Text style={styles.productTitle}>Product Found</Text>
-                <Text>Name: {productData.itemName}</Text>
-                <Text>Code: {productData.itemCode}</Text>
-                <Text>Nutrition: {productData.nutritionInformation}</Text>
-                <Button title="Scan Another" onPress={() => { setScanned(false); setProductData(null); }} />
-              </View>
-            )}
-
-            {mode === 'ocr' && (
-              <View style={styles.ocrControls}>
-                <TouchableOpacity style={styles.captureBtn} onPress={takePictureAndRecognize}>
-                  <Text style={styles.btnText}>{i18n.captureText}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.galleryBtn} onPress={pickImageAndRecognize}>
-                  <Text style={styles.btnText}>{i18n.pickImage}</Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
         </CameraView>
+      ) : (
+        <View style={styles.ocrContainer}>
+          {processingOcr ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+              <Text style={styles.loadingText}>{i18n.processing}</Text>
+            </View>
+          ) : (
+            <View style={styles.ocrControlsCentered}>
+              <TouchableOpacity style={styles.captureBtnLarge} onPress={takePictureAndRecognize}>
+                <Ionicons name="camera" size={40} color="white" />
+                <Text style={styles.btnTextLarge}>{i18n.captureText}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.galleryBtnLarge} onPress={pickImageAndRecognize}>
+                <Ionicons name="images" size={40} color="white" />
+                <Text style={styles.btnTextLarge}>{i18n.pickImage}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       )}
     </View>
   );
@@ -198,6 +238,17 @@ const styles = StyleSheet.create({
   camera: { flex: 1 },
   controls: { flexDirection: 'row', justifyContent: 'space-around', padding: 10, backgroundColor: '#fff' },
   buttonContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'transparent', margin: 64, justifyContent: 'center', alignItems: 'flex-end' },
+  
+  // OCR Styles
+  ocrContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' },
+  ocrControlsCentered: { width: '100%', padding: 20, gap: 20 },
+  captureBtnLarge: { backgroundColor: '#007AFF', padding: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10 },
+  galleryBtnLarge: { backgroundColor: '#34C759', padding: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10 },
+  btnTextLarge: { color: 'white', fontWeight: 'bold', fontSize: 20 },
+  loadingContainer: { alignItems: 'center' },
+  loadingText: { marginTop: 10, fontSize: 18, color: '#666' },
+
+  // Existing Styles
   ocrControls: { flexDirection: 'row', gap: 20 },
   captureBtn: { backgroundColor: 'blue', padding: 15, borderRadius: 10 },
   galleryBtn: { backgroundColor: 'green', padding: 15, borderRadius: 10 },

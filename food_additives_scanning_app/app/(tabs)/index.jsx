@@ -1,10 +1,16 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
+import { useHistory } from '../../context/HistoryContext';
+import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function HomeScreen() {
   const { i18n } = useLanguage();
+  const { history } = useHistory();
+  const router = useRouter();
   const isVip = false; // Mock VIP status
+
+  const recentScans = history.slice(0, 3);
 
   return (
     <ScrollView style={styles.container}>
@@ -31,6 +37,33 @@ export default function HomeScreen() {
            <Text style={styles.cardContent}>{i18n.foodAlert}: Bacterial contamination suspected</Text>
         </View>
       </View>
+
+      {recentScans.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recent Scans</Text>
+          {recentScans.map((scan, index) => (
+            <View key={index} style={styles.card}>
+              <Text style={styles.cardTitle}>{scan.itemCode} - {scan.itemName}</Text>
+              <Button 
+                title="View" 
+                onPress={() => router.push({
+                  pathname: '/product-details',
+                  params: { 
+                    itemName: scan.itemName, 
+                    itemCode: scan.itemCode, 
+                    nutritionInformation: scan.nutritionInformation 
+                  }
+                })} 
+              />
+            </View>
+          ))}
+          {history.length > 3 && (
+            <TouchableOpacity onPress={() => router.push('/history')}>
+              <Text style={styles.viewMoreLink}>View more in History</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -87,5 +120,11 @@ const styles = StyleSheet.create({
   cardContent: {
     fontSize: 14,
     color: '#666',
+  },
+  viewMoreLink: {
+    textAlign: 'center',
+    color: '#007AFF',
+    marginTop: 10,
+    fontSize: 16,
   },
 });

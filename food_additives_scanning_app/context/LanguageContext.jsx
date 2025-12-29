@@ -43,6 +43,17 @@ export const translations = {
     warning: 'Warning',
     productRecall: 'Product Recall',
     foodAlert: 'Food Alert',
+    // Edit Page
+    editScan: 'Edit Scan',
+    itemName: 'Item Name',
+    itemCode: 'Item Code',
+    ocrResult: 'OCR Result',
+    save: 'Save',
+    return: 'Return',
+    saving: 'Saving...',
+    saveSuccess: 'Saved Successfully',
+    saveError: 'Save Failed',
+    searchPlaceholder: 'Search by Name or Code',
   },
   zh: {
     home: '主页',
@@ -84,6 +95,17 @@ export const translations = {
     warning: '警示',
     productRecall: '產品回收',
     foodAlert: '食物警示',
+    // Edit Page
+    editScan: '編輯掃描',
+    itemName: '物品名稱',
+    itemCode: '物品代碼',
+    ocrResult: 'OCR 結果',
+    save: '保存',
+    return: '返回',
+    saving: '保存中...',
+    saveSuccess: '保存成功',
+    saveError: '保存失敗',
+    searchPlaceholder: '按名稱或代碼搜索',
   }
 };
 
