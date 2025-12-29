@@ -200,6 +200,12 @@ const UserSchema = new mongoose.Schema({
   allergies: [String],
   dietPreferences: [String],
   isVip: { type: Boolean, default: false },
+  coupons: [{
+    code: String,
+    discount: String,
+    partner: String,
+    dateWon: { type: Date, default: Date.now }
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -285,7 +291,8 @@ app.post('/api/login', async (req, res) => {
         email: user.email,
         isVip: user.isVip,
         allergies: user.allergies,
-        dietPreferences: user.dietPreferences
+        dietPreferences: user.dietPreferences,
+        coupons: user.coupons || []
       }
     });
   } catch (error) {
@@ -354,6 +361,111 @@ app.post('/api/reset-password', async (req, res) => {
     res.json({ message: "Password reset link sent to your email." });
   } catch (error) {
     console.error("Reset password error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Quiz Questions Endpoint (Simulating AI generation)
+app.get('/api/quiz/questions', (req, res) => {
+  const allQuestions = [
+    {
+      id: 1,
+      question: "What is the common name for the food additive E621?",
+      options: ["Monosodium Glutamate (MSG)", "Sodium Benzoate", "Aspartame", "Tartrazine"],
+      answer: "Monosodium Glutamate (MSG)"
+    },
+    {
+      id: 2,
+      question: "Which additive is commonly used as a preservative in soft drinks?",
+      options: ["E211 (Sodium Benzoate)", "E102 (Tartrazine)", "E300 (Vitamin C)", "E951 (Aspartame)"],
+      answer: "E211 (Sodium Benzoate)"
+    },
+    {
+      id: 3,
+      question: "What is the primary purpose of emulsifiers in food?",
+      options: ["To mix oil and water", "To sweeten the food", "To add color", "To preserve shelf life"],
+      answer: "To mix oil and water"
+    },
+    {
+      id: 4,
+      question: "Which of these is a natural food coloring?",
+      options: ["Beetroot Red (E162)", "Tartrazine (E102)", "Sunset Yellow (E110)", "Brilliant Blue (E133)"],
+      answer: "Beetroot Red (E162)"
+    },
+    {
+      id: 5,
+      question: "E300 is better known as which vitamin?",
+      options: ["Vitamin C", "Vitamin A", "Vitamin D", "Vitamin B12"],
+      answer: "Vitamin C"
+    },
+    {
+      id: 6,
+      question: "Which additive is often used as a sweetener in diet sodas?",
+      options: ["Aspartame (E951)", "Sugar", "Salt", "MSG"],
+      answer: "Aspartame (E951)"
+    },
+    {
+      id: 7,
+      question: "What does the 'E' in E-numbers stand for?",
+      options: ["Europe", "Edible", "Energy", "Essential"],
+      answer: "Europe"
+    },
+    {
+      id: 8,
+      question: "Which additive is used to prevent clumping in powdered foods?",
+      options: ["Anti-caking agent", "Preservative", "Humectant", "Thickener"],
+      answer: "Anti-caking agent"
+    },
+    {
+      id: 9,
+      question: "Nitrates and Nitrites are commonly found in which type of food?",
+      options: ["Processed meats", "Fresh fruits", "Dairy products", "Grains"],
+      answer: "Processed meats"
+    },
+    {
+      id: 10,
+      question: "Which of the following is a flavor enhancer?",
+      options: ["E621", "E102", "E202", "E415"],
+      answer: "E621"
+    }
+  ];
+
+  // Shuffle and pick 5
+  const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 5);
+
+  res.json(selected);
+});
+
+// Add Coupon Endpoint
+app.post('/api/user/coupon', async (req, res) => {
+  const { userId, coupon } = req.body;
+
+  if (!userId || !coupon) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Initialize coupons array if it doesn't exist
+    if (!user.coupons) {
+      user.coupons = [];
+    }
+
+    // Add coupon
+    user.coupons.push(coupon);
+    await user.save();
+
+    res.json({ 
+      message: "Coupon added successfully", 
+      coupons: user.coupons 
+    });
+  } catch (error) {
+    console.error("Add coupon error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });

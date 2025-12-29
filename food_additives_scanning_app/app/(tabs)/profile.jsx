@@ -90,6 +90,25 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Coupons Section */}
+      {user.coupons && user.coupons.length > 0 && (
+        <View style={styles.infoSection}>
+          <Text style={styles.sectionTitle}>{i18n.myCoupons || "My Coupons"}</Text>
+          {user.coupons.map((coupon, index) => (
+            <View key={index} style={styles.couponCard}>
+              <View style={styles.couponLeft}>
+                <Ionicons name="ticket-outline" size={30} color="#4CAF50" />
+              </View>
+              <View style={styles.couponRight}>
+                <Text style={styles.couponDiscount}>{coupon.discount}</Text>
+                <Text style={styles.couponCode}>{coupon.code}</Text>
+                <Text style={styles.couponPartner}>{coupon.partner}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
       <View style={styles.menu}>
         {user.isVip ? (
           <TouchableOpacity 
@@ -206,6 +225,43 @@ const styles = StyleSheet.create({
   tagText: {
     color: '#0277BD',
     fontSize: 14,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  couponCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#eee',
+    alignItems: 'center',
+  },
+  couponLeft: {
+    marginRight: 15,
+  },
+  couponRight: {
+    flex: 1,
+  },
+  couponDiscount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  couponCode: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginVertical: 2,
+  },
+  couponPartner: {
+    fontSize: 12,
+    color: '#666',
   },
   menu: {
     backgroundColor: 'white',

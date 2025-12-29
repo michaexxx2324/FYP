@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button, Image } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
 import { useHistory } from '../../context/HistoryContext';
 import { useAuth } from '../../context/AuthContext';
@@ -28,6 +28,46 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       )}
+
+      {/* Game Promotion Card */}
+      <View style={styles.gameCard}>
+        <View style={styles.gameHeader}>
+          <Ionicons name="game-controller" size={24} color="#FF9800" />
+          <Text style={styles.gameTitle}>Discount Game</Text>
+        </View>
+        
+        <Text style={styles.gameDescription}>
+          Tired of just scanning labels?{"\n"}
+          Do you want some free discount? try this now{"\n"}
+          playing the games to get the 10% off of our Partner Store!!
+        </Text>
+
+        <View style={styles.partnersContainer}>
+          <View style={styles.partnerBox}>
+            <Image source={require('../../assets/HKTVmall.png')} style={styles.partnerLogo} resizeMode="contain" />
+            <Text style={styles.partnerName}>HKTVmall</Text>
+          </View>
+          <View style={styles.partnerBox}>
+            <Image source={require('../../assets/pandamart.jpg')} style={styles.partnerLogo} resizeMode="contain" />
+            <Text style={styles.partnerName}>panda mart</Text>
+          </View>
+          <View style={styles.partnerBox}>
+            <Image source={require('../../assets/PARKnSHOP.png')} style={styles.partnerLogo} resizeMode="contain" />
+            <Text style={styles.partnerName}>PARKnSHOP</Text>
+          </View>
+          <View style={styles.partnerBox}>
+            <Image source={require('../../assets/wellcome.png')} style={styles.partnerLogo} resizeMode="contain" />
+            <Text style={styles.partnerName}>Wellcome</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity 
+          style={styles.playButton}
+          onPress={() => router.push('/quiz-game')}
+        >
+          <Text style={styles.playButtonText}>Play Now</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{i18n.newsTitle}</Text>
@@ -114,6 +154,67 @@ const styles = StyleSheet.create({
   vipButtonSubText: {
     color: 'white',
     fontSize: 12,
+  },
+  gameCard: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  gameHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  gameTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    color: '#333',
+  },
+  gameDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 15,
+    lineHeight: 20,
+  },
+  partnersContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  partnerBox: {
+    width: '23%',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    padding: 5,
+    borderRadius: 8,
+  },
+  partnerLogo: {
+    width: 40,
+    height: 40,
+    marginBottom: 5,
+  },
+  partnerName: {
+    fontSize: 10,
+    textAlign: 'center',
+    color: '#555',
+  },
+  playButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  playButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   section: {
     marginBottom: 20,
