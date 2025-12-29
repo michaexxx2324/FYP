@@ -14,3 +14,6 @@ perf: 改善效能 (A code change that improves performance)。
 test: 增加測試 (when adding missing tests)。
 chore: 建構程序或輔助工具的變動 (maintain)。
 revert: 撤銷回覆先前的 commit 例如：revert: type(scope): subject (回覆版本：xxxx)。
+
+
+ocr.space:k89557491788957

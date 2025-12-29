@@ -30,13 +30,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="info"
-        options={{
-          title: i18n.info,
-          tabBarIcon: ({ color }) => <Ionicons name="information-circle" size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="history"
         options={{
           title: i18n.history,

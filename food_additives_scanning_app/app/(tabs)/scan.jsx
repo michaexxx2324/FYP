@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { useLanguage } from '../../context/LanguageContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ScanScreen() {
   const { i18n } = useLanguage();
