@@ -20,11 +20,11 @@ export default function HistoryScreen() {
 
   const handleDelete = (item) => {
     Alert.alert(
-      "Delete History",
-      `Are you sure you want to remove ${item.itemName} from history?`,
+      i18n.deleteHistory,
+      i18n.deleteConfirm,
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => removeFromHistory(item.itemCode) }
+        { text: i18n.cancel, style: "cancel" },
+        { text: i18n.delete, style: "destructive", onPress: () => removeFromHistory(item.itemCode) }
       ]
     );
   };
@@ -38,7 +38,7 @@ export default function HistoryScreen() {
         </TouchableOpacity>
       </View>
       <Button 
-        title="View" 
+        title={i18n.view} 
         onPress={() => router.push({
           pathname: '/product-details',
           params: { 
@@ -64,7 +64,7 @@ export default function HistoryScreen() {
 
       {filteredHistory.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No matching history found.</Text>
+          <Text style={styles.emptyText}>{i18n.noHistoryFound}</Text>
         </View>
       ) : (
         <FlatList

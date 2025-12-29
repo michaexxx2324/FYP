@@ -3,7 +3,7 @@ install(expo)(need open a new folder and "cd" in then type this):
 "npx create-expo-app@latest --template blank ./"
 
 To start: "npx expo start"
-if scan srror(clear the old cache and run): "npx expo start --tunnel --clear"
+if scan error(clear the old cache and run): "npx expo start --tunnel --clear"
 backend start(connect to the database):cd simple-backend; npm start
 
 feat: 新增/修改功能 (feature)。

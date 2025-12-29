@@ -63,12 +63,12 @@ export default function ScanScreen() {
         // Reset scan state after a short delay so when they come back it's ready
         setTimeout(() => setScanned(false), 1000);
       } else {
-        Alert.alert("Not Found", "Product not found in database.", [
+        Alert.alert(i18n.notFound, i18n.productNotFound, [
           { text: "OK", onPress: () => setScanned(false) }
         ]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch product data. Check connection.", [
+      Alert.alert(i18n.error, i18n.fetchError, [
         { text: "OK", onPress: () => setScanned(false) }
       ]);
     } finally {
@@ -81,7 +81,7 @@ export default function ScanScreen() {
       // Use ImagePicker.launchCameraAsync to enable the system's built-in crop UI (allowsEditing: true)
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Camera permission is required to take photos.');
+        Alert.alert(i18n.permissionNeeded, i18n.permissionNeeded);
         return;
       }
 
@@ -97,7 +97,7 @@ export default function ScanScreen() {
       }
     } catch (error) {
       console.error("Camera Error:", error);
-      Alert.alert("Error", "Failed to open camera.");
+      Alert.alert(i18n.error, i18n.cameraError);
     }
   };
 

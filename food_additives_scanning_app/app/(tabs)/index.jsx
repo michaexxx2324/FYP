@@ -28,24 +28,24 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>{i18n.newsTitle}</Text>
         
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{i18n.recallNotice}: XX Brand Cookies (Batch 2025-10)</Text>
-          <Text style={styles.cardContent}>{i18n.warning}: Contains undeclared allergens</Text>
+          <Text style={styles.cardTitle}>{i18n.recallNotice}: {i18n.mockNews1Title}</Text>
+          <Text style={styles.cardContent}>{i18n.warning}: {i18n.mockNews1Content}</Text>
         </View>
 
         <View style={styles.card}>
-           <Text style={styles.cardTitle}>{i18n.productRecall}: YY Brand Milk (Batch 2025-11)</Text>
-           <Text style={styles.cardContent}>{i18n.foodAlert}: Bacterial contamination suspected</Text>
+           <Text style={styles.cardTitle}>{i18n.productRecall}: {i18n.mockNews2Title}</Text>
+           <Text style={styles.cardContent}>{i18n.foodAlert}: {i18n.mockNews2Content}</Text>
         </View>
       </View>
 
       {recentScans.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Scans</Text>
+          <Text style={styles.sectionTitle}>{i18n.recentScans}</Text>
           {recentScans.map((scan, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>{scan.itemCode} - {scan.itemName}</Text>
               <Button 
-                title="View" 
+                title={i18n.view} 
                 onPress={() => router.push({
                   pathname: '/product-details',
                   params: { 
@@ -59,7 +59,7 @@ export default function HomeScreen() {
           ))}
           {history.length > 3 && (
             <TouchableOpacity onPress={() => router.push('/history')}>
-              <Text style={styles.viewMoreLink}>View more in History</Text>
+              <Text style={styles.viewMoreLink}>{i18n.viewMoreHistory}</Text>
             </TouchableOpacity>
           )}
         </View>

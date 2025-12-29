@@ -48,7 +48,7 @@ export default function EditScreen() {
     if (!permission?.granted) {
       const { status } = await requestPermission();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Camera permission is required to scan barcodes.');
+        Alert.alert(i18n.permissionNeeded, i18n.cameraPermissionBarcode);
         return;
       }
     }
@@ -57,7 +57,7 @@ export default function EditScreen() {
 
   const handleSave = async () => {
     if (!itemName.trim()) {
-      Alert.alert('Error', 'Please enter an item name');
+      Alert.alert(i18n.error, i18n.enterItemName);
       return;
     }
 
@@ -86,15 +86,15 @@ export default function EditScreen() {
           nutritionInformation: ocrText
         });
         
-        Alert.alert('Success', i18n.saveSuccess, [
+        Alert.alert(i18n.success, i18n.saveSuccess, [
           { text: 'OK', onPress: () => router.push('/scan') }
         ]);
       } else {
-        Alert.alert('Error', i18n.saveError);
+        Alert.alert(i18n.error, i18n.saveError);
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to connect to server');
+      Alert.alert(i18n.error, i18n.connectError);
     } finally {
       setIsSaving(false);
     }
