@@ -15,7 +15,10 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       {!isVip && (
-        <TouchableOpacity style={styles.vipButton}>
+        <TouchableOpacity 
+          style={styles.vipButton}
+          onPress={() => router.push('/upgrade-to-vip')}
+        >
           <Ionicons name="star" size={20} color="white" style={{ marginRight: 8 }} />
           <View>
             <Text style={styles.vipButtonText}>{i18n.upgradeVIP}</Text>
