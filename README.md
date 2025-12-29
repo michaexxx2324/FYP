@@ -4,6 +4,7 @@ install(expo)(need open a new folder and "cd" in then type this):
 
 To start: "npx expo start"
 if scan srror(clear the old cache and run): "npx expo start --tunnel --clear"
+backend start(connect to the database):cd simple-backend; npm start
 
 feat: 新增/修改功能 (feature)。
 fix: 修補 bug (bug fix)。
@@ -17,3 +18,4 @@ revert: 撤銷回覆先前的 commit 例如：revert: type(scope): subject (回�
 
 
 ocr.space:k89557491788957
+poe api key:kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk
