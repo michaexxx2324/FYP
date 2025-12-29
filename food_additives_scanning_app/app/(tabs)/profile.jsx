@@ -9,6 +9,10 @@ export default function ProfileScreen() {
   const { user, logout, updateUser } = useAuth();
   const router = useRouter();
 
+  const getLabel = (id) => {
+    return i18n[id] || id;
+  };
+
   const handleResetVip = async () => {
     if (!user) return;
     try {
@@ -19,7 +23,7 @@ export default function ProfileScreen() {
       });
       if (response.ok) {
         updateUser({ isVip: false });
-        alert('VIP status reset');
+        alert(i18n.vipStatusReset);
       }
     } catch (e) {
       console.error(e);
@@ -29,7 +33,7 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <View style={styles.container}>
-        <Text>Please login to view profile</Text>
+        <Text>{i18n.pleaseLoginToViewProfile}</Text>
       </View>
     );
   }
@@ -44,43 +48,43 @@ export default function ProfileScreen() {
         {user.isVip && (
           <View style={styles.vipBadge}>
             <Ionicons name="star" size={16} color="white" style={{ marginRight: 4 }} />
-            <Text style={styles.vipText}>VIP Member</Text>
+            <Text style={styles.vipText}>{i18n.vipMember}</Text>
           </View>
         )}
       </View>
 
       <View style={styles.infoSection}>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Email</Text>
+          <Text style={styles.infoLabel}>{i18n.email}</Text>
           <Text style={styles.infoValue}>{user.email}</Text>
         </View>
 
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Allergies</Text>
+          <Text style={styles.infoLabel}>{i18n.allergies}</Text>
           <View style={styles.tagsContainer}>
             {user.allergies && user.allergies.length > 0 ? (
               user.allergies.map((allergy, index) => (
                 <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{allergy}</Text>
+                  <Text style={styles.tagText}>{getLabel(allergy)}</Text>
                 </View>
               ))
             ) : (
-              <Text style={styles.infoValue}>None</Text>
+              <Text style={styles.infoValue}>{i18n.none}</Text>
             )}
           </View>
         </View>
 
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Diet Preferences</Text>
+          <Text style={styles.infoLabel}>{i18n.dietPreferences}</Text>
           <View style={styles.tagsContainer}>
             {user.dietPreferences && user.dietPreferences.length > 0 ? (
               user.dietPreferences.map((diet, index) => (
                 <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{diet}</Text>
+                  <Text style={styles.tagText}>{getLabel(diet)}</Text>
                 </View>
               ))
             ) : (
-              <Text style={styles.infoValue}>None</Text>
+              <Text style={styles.infoValue}>{i18n.none}</Text>
             )}
           </View>
         </View>
@@ -90,10 +94,10 @@ export default function ProfileScreen() {
         {user.isVip ? (
           <TouchableOpacity 
             style={styles.menuItem} 
-            onPress={() => alert('VIP Functionality Coming Soon!')}
+            onPress={() => alert(i18n.vipFunctionalityComingSoon)}
           >
             <Ionicons name="star" size={24} color="#E68A00" />
-            <Text style={styles.menuText}>VIP Function</Text>
+            <Text style={styles.menuText}>{i18n.vipFunction}</Text>
             <Ionicons name="chevron-forward" size={24} color="#ccc" />
           </TouchableOpacity>
         ) : (
@@ -112,7 +116,7 @@ export default function ProfileScreen() {
           onPress={() => router.push('/settings')}
         >
           <Ionicons name="settings-outline" size={24} color="#666" />
-          <Text style={styles.menuText}>Settings</Text>
+          <Text style={styles.menuText}>{i18n.settings}</Text>
           <Ionicons name="chevron-forward" size={24} color="#ccc" />
         </TouchableOpacity>
         
@@ -121,7 +125,7 @@ export default function ProfileScreen() {
           onPress={logout}
         >
           <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
-          <Text style={[styles.menuText, { color: '#FF3B30' }]}>Logout</Text>
+          <Text style={[styles.menuText, { color: '#FF3B30' }]}>{i18n.logout}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -129,7 +133,7 @@ export default function ProfileScreen() {
           onPress={handleResetVip}
         >
           <Ionicons name="refresh-outline" size={24} color="#666" />
-          <Text style={styles.menuText}>Reset VIP (Debug)</Text>
+          <Text style={styles.menuText}>{i18n.resetVipStatus}</Text>
         </TouchableOpacity>
       </View>
       

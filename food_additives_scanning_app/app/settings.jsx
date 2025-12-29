@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, updateUser } = useAuth();
+  const { i18n } = useLanguage();
   const [loading, setLoading] = useState(false);
   
   const [showPassword, setShowPassword] = useState(false);
@@ -27,22 +29,65 @@ export default function SettingsScreen() {
     dietPreferences: []
   });
 
-  const [allergiesList, setAllergiesList] = useState([
-    { id: 'peanut', label: '花生' },
-    { id: 'nut', label: '堅果' },
-    { id: 'gluten', label: '麩質' },
-    { id: 'dairy', label: '乳製品' },
-    { id: 'egg', label: '雞蛋' },
-    { id: 'shellfish', label: '甲殼類' },
-    { id: 'sulfites', label: '亞硫酸鹽' },
-  ]);
+  const [localCustomAllergies, setLocalCustomAllergies] = useState([]);
+  const [localCustomDiets, setLocalCustomDiets] = useState([]);
 
-  const [dietList, setDietList] = useState([
-    { id: 'none', label: '無特殊要求' },
-    { id: 'vegetarian', label: '素食' },
-    { id: 'vegan', label: '純素' },
-    { id: 'halal', label: '清真' },
-  ]);
+  const defaultAllergies = useMemo(() => [
+    { id: 'peanut', label: i18n.peanut },
+    { id: 'nut', label: i18n.nut },
+    { id: 'gluten', label: i18n.gluten },
+    { id: 'dairy', label: i18n.dairy },
+    { id: 'egg', label: i18n.egg },
+    { id: 'shellfish', label: i18n.shellfish },
+    { id: 'sulfites', label: i18n.sulfites },
+  ], [i18n]);
+
+  const defaultDiets = useMemo(() => [
+    { id: 'none', label: i18n.none },
+    { id: 'vegetarian', label: i18n.vegetarian },
+    { id: 'vegan', label: i18n.vegan },
+    { id: 'halal', label: i18n.halal },
+  ], [i18n]);
+
+  const allergiesList = useMemo(() => {
+    const userCustom = user?.allergies
+      ? user.allergies
+          .filter(id => !defaultAllergies.some(a => a.id === id))
+          .map(id => ({ id, label: id }))
+      : [];
+    
+    const all = [...defaultAllergies, ...userCustom, ...localCustomAllergies];
+    // Deduplicate
+    const unique = [];
+    const seen = new Set();
+    for (const item of all) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        unique.push(item);
+      }
+    }
+    return unique;
+  }, [defaultAllergies, user, localCustomAllergies]);
+
+  const dietList = useMemo(() => {
+    const userCustom = user?.dietPreferences
+      ? user.dietPreferences
+          .filter(id => !defaultDiets.some(d => d.id === id))
+          .map(id => ({ id, label: id }))
+      : [];
+
+    const all = [...defaultDiets, ...userCustom, ...localCustomDiets];
+    // Deduplicate
+    const unique = [];
+    const seen = new Set();
+    for (const item of all) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        unique.push(item);
+      }
+    }
+    return unique;
+  }, [defaultDiets, user, localCustomDiets]);
 
   useEffect(() => {
     if (user) {
@@ -53,48 +98,6 @@ export default function SettingsScreen() {
         allergies: user.allergies || [],
         dietPreferences: user.dietPreferences || []
       });
-
-      // Merge custom allergies from user data into list
-      if (user.allergies) {
-        const defaultIds = allergiesList.map(a => a.id);
-        const customAllergies = user.allergies.filter(id => !defaultIds.includes(id));
-        if (customAllergies.length > 0) {
-          const newCustomItems = customAllergies.map(id => ({ id, label: id })); // Assuming ID is the label for custom ones if we didn't store label separately. 
-          // Actually in register we stored ID as `custom_${timestamp}` and label as text. 
-          // But backend only stores the ID string array? 
-          // Wait, backend schema is `allergies: [String]`. 
-          // In register.jsx: `setAllergiesList([...allergiesList, { id: newId, label: customAllergyText.trim() }]);`
-          // And `toggleAllergy` stores the ID.
-          // So if I save `custom_123`, I lose the label "Kiwi".
-          // This is a flaw in my previous implementation. The backend should probably store objects or I should store the label as the ID for custom ones?
-          // Or I should just assume for now that for custom items, the ID IS the label (or close enough).
-          // Let's fix this: In register.jsx, I should probably use the text as ID for custom items to make it easier, or store {id, label} in backend.
-          // Given the backend is `[String]`, I'll assume for now we just display the ID if it's not in the list.
-          // Ideally, I should have stored the label. 
-          // For now, I will just add them to the list using the ID as the label.
-          
-          setAllergiesList(prev => [
-            ...prev, 
-            ...customAllergies.map(id => ({ id, label: id.startsWith('custom_') ? 'Custom Allergy' : id })) 
-          ]);
-          // Better approach: If it starts with custom_, maybe we can't recover the name easily without changing backend.
-          // BUT, for the user request "add a add sign for user adding extra allergies", I implemented it.
-          // If I want to show them correctly, I should probably change the backend to store the actual names, OR change the ID generation to be the name itself.
-          // Let's assume for this task I will just display them.
-        }
-      }
-
-      // Merge custom diets
-      if (user.dietPreferences) {
-        const defaultIds = dietList.map(d => d.id);
-        const customDiets = user.dietPreferences.filter(id => !defaultIds.includes(id));
-        if (customDiets.length > 0) {
-           setDietList(prev => [
-            ...prev, 
-            ...customDiets.map(id => ({ id, label: id.startsWith('custom_') ? 'Custom Diet' : id })) 
-          ]);
-        }
-      }
     }
   }, [user]);
 
@@ -118,11 +121,8 @@ export default function SettingsScreen() {
 
   const addCustomAllergy = () => {
     if (customAllergyText.trim()) {
-      // Use the text as ID to make it readable, or keep the timestamp pattern but we lose the text.
-      // Let's use the text as ID for new ones to be safe, or just `custom_${text}`.
-      // Actually, let's just use the text itself as the ID for simplicity in display.
       const newId = customAllergyText.trim(); 
-      setAllergiesList([...allergiesList, { id: newId, label: newId }]);
+      setLocalCustomAllergies(prev => [...prev, { id: newId, label: newId }]);
       toggleAllergy(newId);
       setCustomAllergyText('');
       setShowCustomAllergy(false);
@@ -132,7 +132,7 @@ export default function SettingsScreen() {
   const addCustomDiet = () => {
     if (customDietText.trim()) {
       const newId = customDietText.trim();
-      setDietList([...dietList, { id: newId, label: newId }]);
+      setLocalCustomDiets(prev => [...prev, { id: newId, label: newId }]);
       toggleDiet(newId);
       setCustomDietText('');
       setShowCustomDiet(false);
@@ -197,7 +197,7 @@ export default function SettingsScreen() {
 
       <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
         
-        <Text style={styles.label}>電郵 | Email</Text>
+        <Text style={styles.label}>{i18n.email}</Text>
         <TextInput
           style={styles.input}
           value={formData.email}
@@ -206,7 +206,7 @@ export default function SettingsScreen() {
           keyboardType="email-address"
         />
 
-        <Text style={styles.label}>用戶名 | Username</Text>
+        <Text style={styles.label}>{i18n.username}</Text>
         <TextInput
           style={styles.input}
           value={formData.username}
@@ -214,11 +214,11 @@ export default function SettingsScreen() {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>新密碼 | New Password (Optional)</Text>
+        <Text style={styles.label}>{i18n.newPasswordOptional}</Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="Leave blank to keep current"
+            placeholder={i18n.leaveBlankToKeep}
             value={formData.password}
             onChangeText={(text) => setFormData({...formData, password: text})}
             secureTextEntry={!showPassword}
@@ -228,7 +228,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.label}>過敏原 | Allergies</Text>
+        <Text style={styles.label}>{i18n.allergies}</Text>
         <View style={styles.checkboxContainer}>
           {allergiesList.map((item) => (
             <TouchableOpacity 
@@ -247,11 +247,11 @@ export default function SettingsScreen() {
             onPress={() => setShowCustomAllergy(true)}
           >
             <Ionicons name="add-circle-outline" size={20} color="#00A0E9" />
-            <Text style={styles.addItemText}>Add Other</Text>
+            <Text style={styles.addItemText}>{i18n.addOther}</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.label}>飲食偏好 | Diet Preferences</Text>
+        <Text style={styles.label}>{i18n.diets}</Text>
         <View style={styles.checkboxContainer}>
           {dietList.map((item) => (
             <TouchableOpacity 
@@ -270,7 +270,7 @@ export default function SettingsScreen() {
             onPress={() => setShowCustomDiet(true)}
           >
             <Ionicons name="add-circle-outline" size={20} color="#00A0E9" />
-            <Text style={styles.addItemText}>Add Other</Text>
+            <Text style={styles.addItemText}>{i18n.addOther}</Text>
           </TouchableOpacity>
         </View>
 
@@ -282,7 +282,7 @@ export default function SettingsScreen() {
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.updateButtonText}>Update Profile</Text>
+            <Text style={styles.updateButtonText}>{i18n.updateProfile}</Text>
           )}
         </TouchableOpacity>
 

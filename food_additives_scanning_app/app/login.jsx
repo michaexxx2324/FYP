@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Acti
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { useUser } from '../context/UserContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -13,10 +14,11 @@ export default function LoginScreen() {
   const router = useRouter();
   const { login: authLogin } = useAuth();
   const { setVipStatus } = useUser();
+  const { i18n } = useLanguage();
 
   const handleLogin = async () => {
     if (!login || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(i18n.error, i18n.fillAllFields);
       return;
     }
 
@@ -35,10 +37,10 @@ export default function LoginScreen() {
         setVipStatus(data.user.isVip); // Sync VIP status
         router.replace('/(tabs)');
       } else {
-        Alert.alert('Login Failed', data.message || 'Invalid credentials');
+        Alert.alert(i18n.loginFailed, data.message || i18n.invalidCredentials);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to server');
+      Alert.alert(i18n.error, i18n.connectError);
       console.error(error);
     } finally {
       setLoading(false);
@@ -48,24 +50,24 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.headerTitle}>登入 | Login</Text>
+        <Text style={styles.headerTitle}>{i18n.loginTitle}</Text>
         
         <View style={styles.formContainer}>
-          <Text style={styles.title}>登入 | Login</Text>
+          <Text style={styles.title}>{i18n.loginTitle}</Text>
           
-          <Text style={styles.label}>電郵或用戶名 | Email/Username</Text>
+          <Text style={styles.label}>{i18n.emailOrUsername}</Text>
           <TextInput
             style={styles.input}
-            placeholder="輸入電郵或用戶名"
+            placeholder={i18n.enterEmailOrUsername}
             value={login}
             onChangeText={setLogin}
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>密碼 | Password</Text>
+          <Text style={styles.label}>{i18n.password}</Text>
           <TextInput
             style={styles.input}
-            placeholder="輸入密碼"
+            placeholder={i18n.enterPassword}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -79,7 +81,7 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.loginButtonText}>登入</Text>
+              <Text style={styles.loginButtonText}>{i18n.loginButton}</Text>
             )}
           </TouchableOpacity>
 
@@ -87,16 +89,16 @@ export default function LoginScreen() {
             style={styles.registerButton}
             onPress={() => router.push('/register')}
           >
-            <Text style={styles.registerButtonText}>註冊新帳戶</Text>
+            <Text style={styles.registerButtonText}>{i18n.registerNewAccount}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/forgot-password')}>
-            <Text style={styles.forgotPassword}>忘記密碼 ?</Text>
+            <Text style={styles.forgotPassword}>{i18n.forgotPassword}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.socialContainer}>
-          <Text style={styles.socialTitle}>社交登入 | Social Login</Text>
+          <Text style={styles.socialTitle}>{i18n.socialLogin}</Text>
           <View style={styles.socialButtons}>
             <TouchableOpacity style={styles.socialButton}>
               <Text style={styles.socialButtonText}>Google</Text>

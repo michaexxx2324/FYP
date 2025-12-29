@@ -15,7 +15,7 @@ export default function UpgradeToVipScreen() {
 
   const handleUpgrade = async () => {
     if (!user) {
-      Alert.alert('Error', 'Please login first');
+      Alert.alert(i18n.error, i18n.pleaseLoginFirst);
       return;
     }
 
@@ -35,15 +35,15 @@ export default function UpgradeToVipScreen() {
       if (response.ok) {
         // Update local context
         updateUser({ isVip: true });
-        Alert.alert('Success', 'You are now a VIP member!', [
+        Alert.alert(i18n.success, i18n.youAreNowVip, [
           { text: 'OK', onPress: () => router.back() }
         ]);
       } else {
-        Alert.alert('Error', data.message || 'Failed to upgrade');
+        Alert.alert(i18n.error, data.message || i18n.failedToUpgrade);
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Network error');
+      Alert.alert(i18n.error, i18n.networkError);
     }
   };
 
@@ -206,7 +206,7 @@ export default function UpgradeToVipScreen() {
               style={[styles.upgradeButton, { marginTop: 15, width: '100%', marginRight: 0, backgroundColor: '#4CAF50' }]}
               onPress={() => {}}
             >
-              <Text style={styles.upgradeButtonText}>VIP Function (Active)</Text>
+              <Text style={styles.upgradeButtonText}>{i18n.vipFunctionActive}</Text>
             </TouchableOpacity>
           )}
         </View>

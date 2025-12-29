@@ -1,20 +1,22 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductDetailsScreen() {
+  const { i18n } = useLanguage();
   const params = useLocalSearchParams();
   const { itemName, itemCode, nutritionInformation } = params;
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.label}>Item Name:</Text>
+        <Text style={styles.label}>{i18n.itemName}:</Text>
         <Text style={styles.value}>{itemName}</Text>
         
-        <Text style={styles.label}>Item Code:</Text>
+        <Text style={styles.label}>{i18n.itemCode}:</Text>
         <Text style={styles.value}>{itemCode}</Text>
         
-        <Text style={styles.label}>Nutrition Information:</Text>
+        <Text style={styles.label}>{i18n.nutritionInfo}:</Text>
         <Text style={styles.value}>{nutritionInformation}</Text>
       </View>
     </ScrollView>

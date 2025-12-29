@@ -59,7 +59,7 @@ export default function PaymentScreen() {
       // For showcase purposes, we simulate a successful transaction
       const isShowcase = selectedMethod === 'visa' || selectedMethod === 'alipay' || selectedMethod === 'wechat';
       const message = isShowcase
-        ? "Transaction ID: " + Math.floor(Math.random() * 1000000000) 
+        ? i18n.transactionId + Math.floor(Math.random() * 1000000000) 
         : `${i18n.paymentDummy} (${selectedMethod})`;
 
       Alert.alert(
@@ -74,7 +74,7 @@ export default function PaymentScreen() {
 
   const activateVip = async () => {
     if (!user) {
-      Alert.alert('Error', 'Please login first');
+      Alert.alert(i18n.error, i18n.pleaseLoginFirst);
       return;
     }
 
@@ -99,11 +99,11 @@ export default function PaymentScreen() {
           ]
         );
       } else {
-        Alert.alert('Error', 'Failed to activate VIP on server');
+        Alert.alert(i18n.error, i18n.failedToActivateVip);
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Network error');
+      Alert.alert(i18n.error, i18n.networkError);
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -8,10 +9,11 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { i18n } = useLanguage();
 
   const handleReset = async () => {
     if (!email) {
-      Alert.alert('Error', 'Please enter your email');
+      Alert.alert(i18n.error, i18n.enterEmailAlert);
       return;
     }
 
@@ -26,14 +28,14 @@ export default function ForgotPasswordScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Success', data.message, [
-          { text: 'Back to Login', onPress: () => router.back() }
+        Alert.alert(i18n.success, data.message || i18n.resetLinkSent, [
+          { text: i18n.backToLogin, onPress: () => router.back() }
         ]);
       } else {
-        Alert.alert('Error', data.message || 'Failed to send reset link');
+        Alert.alert(i18n.error, data.message || i18n.failedToSendResetLink);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to server');
+      Alert.alert(i18n.error, i18n.connectError);
       console.error(error);
     } finally {
       setLoading(false);
@@ -43,13 +45,13 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.headerTitle}>重設密碼 | Reset</Text>
+        <Text style={styles.headerTitle}>{i18n.resetPasswordTitle}</Text>
         
         <View style={styles.formContainer}>
-          <Text style={styles.title}>重設密碼 | Reset Password</Text>
-          <Text style={styles.subtitle}>輸入你的電郵地址，我們會發送重設連結給你。</Text>
+          <Text style={styles.title}>{i18n.resetPasswordTitle}</Text>
+          <Text style={styles.subtitle}>{i18n.resetPasswordSubtitle}</Text>
           
-          <Text style={styles.label}>電郵 | Email</Text>
+          <Text style={styles.label}>{i18n.email}</Text>
           <TextInput
             style={styles.input}
             placeholder="your@email.com"
@@ -67,7 +69,7 @@ export default function ForgotPasswordScreen() {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.resetButtonText}>發送重設連結</Text>
+              <Text style={styles.resetButtonText}>{i18n.sendResetLink}</Text>
             )}
           </TouchableOpacity>
 
@@ -75,7 +77,7 @@ export default function ForgotPasswordScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>返回登入</Text>
+            <Text style={styles.backButtonText}>{i18n.backToLogin}</Text>
           </TouchableOpacity>
         </View>
       </View>

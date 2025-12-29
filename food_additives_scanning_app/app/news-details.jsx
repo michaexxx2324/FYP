@@ -61,11 +61,11 @@ export default function NewsDetailsScreen() {
         fetchComments();
         setNewComment('');
       } else {
-        Alert.alert("Error", "Failed to save comment");
+        Alert.alert(i18n.error, i18n.saveError);
       }
     } catch (error) {
       console.error("Error saving comment:", error);
-      Alert.alert("Error", "Failed to connect to server");
+      Alert.alert(i18n.error, i18n.connectError);
     }
   };
 

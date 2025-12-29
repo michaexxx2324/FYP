@@ -157,12 +157,12 @@ export default function ScanScreen() {
         });
       } else {
         setOcrText(i18n.noTextFound);
-        Alert.alert("Info", i18n.noTextFound);
+        Alert.alert(i18n.info, i18n.noTextFound);
       }
     } catch (error) {
       console.error("AI Error:", error);
       setOcrText("Error: " + error.message);
-      Alert.alert("Error", error.message);
+      Alert.alert(i18n.error, error.message);
     } finally {
       setProcessingOcr(false);
       setImageUri(null); // Reset image uri so we don't show preview
@@ -203,7 +203,7 @@ export default function ScanScreen() {
             {loadingProduct && (
                <View style={styles.loadingOverlay}>
                  <ActivityIndicator size="large" color="#0000ff" />
-                 <Text style={{color: 'white'}}>Searching Database...</Text>
+                 <Text style={{color: 'white'}}>{i18n.searchingDatabase}</Text>
                </View>
             )}
           </View>

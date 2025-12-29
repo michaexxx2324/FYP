@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, Modal, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { i18n } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -33,22 +35,27 @@ export default function RegisterScreen() {
     dietPreferences: [] // Changed to array to support multiple/custom
   });
 
-  const [allergiesList, setAllergiesList] = useState([
-    { id: 'peanut', label: '花生' },
-    { id: 'nut', label: '堅果' },
-    { id: 'gluten', label: '麩質' },
-    { id: 'dairy', label: '乳製品' },
-    { id: 'egg', label: '雞蛋' },
-    { id: 'shellfish', label: '甲殼類' },
-    { id: 'sulfites', label: '亞硫酸鹽' },
-  ]);
+  const [allergiesList, setAllergiesList] = useState([]);
+  const [dietList, setDietList] = useState([]);
 
-  const [dietList, setDietList] = useState([
-    { id: 'none', label: '無特殊要求' },
-    { id: 'vegetarian', label: '素食' },
-    { id: 'vegan', label: '純素' },
-    { id: 'halal', label: '清真' },
-  ]);
+  useEffect(() => {
+    setAllergiesList([
+      { id: 'peanut', label: i18n.peanut },
+      { id: 'nut', label: i18n.nut },
+      { id: 'gluten', label: i18n.gluten },
+      { id: 'dairy', label: i18n.dairy },
+      { id: 'egg', label: i18n.egg },
+      { id: 'shellfish', label: i18n.shellfish },
+      { id: 'sulfites', label: i18n.sulfites },
+    ]);
+
+    setDietList([
+      { id: 'none', label: i18n.none },
+      { id: 'vegetarian', label: i18n.vegetarian },
+      { id: 'vegan', label: i18n.vegan },
+      { id: 'halal', label: i18n.halal },
+    ]);
+  }, [i18n]);
 
   const toggleAllergy = (id) => {
     setFormData(prev => {
@@ -98,24 +105,24 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword || !formData.dob) {
-      Alert.alert('Error', 'Please fill in all required fields (including Date of Birth)');
+      Alert.alert(i18n.error, i18n.fillAllRequiredFields);
       return;
     }
 
     if (formData.dietPreferences.length === 0) {
-      Alert.alert('Error', 'Please select at least one Diet Preference (select "無特殊要求" if none)');
+      Alert.alert(i18n.error, i18n.selectDietPreference);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(i18n.error, i18n.passwordMismatch);
       return;
     }
 
     // Password Validation: At least 8 chars, at least 1 letter
     const passwordRegex = /^(?=.*[a-zA-Z]).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      Alert.alert('Weak Password', 'Password must be at least 8 characters long and contain at least one English letter.');
+      Alert.alert(i18n.weakPassword, i18n.passwordRequirements);
       return;
     }
 
@@ -137,8 +144,8 @@ export default function RegisterScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Success', 'Account created successfully', [
-          { text: 'Login', onPress: () => router.replace('/login') }
+        Alert.alert(i18n.success, i18n.accountCreated, [
+          { text: i18n.loginButton, onPress: () => router.replace('/login') }
         ]);
       } else {
         Alert.alert('Registration Failed', data.message || 'Something went wrong');
@@ -154,12 +161,12 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.headerTitle}>註冊 | Register</Text>
+        <Text style={styles.headerTitle}>{i18n.registerTitle}</Text>
         
         <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>註冊 | Register</Text>
+          <Text style={styles.title}>{i18n.registerTitle}</Text>
           
-          <Text style={styles.label}>電郵 | Email *</Text>
+          <Text style={styles.label}>{i18n.emailLabel}</Text>
           <TextInput
             style={styles.input}
             placeholder="your@email.com"
@@ -169,21 +176,21 @@ export default function RegisterScreen() {
             keyboardType="email-address"
           />
 
-          <Text style={styles.label}>用戶名 | Username *</Text>
+          <Text style={styles.label}>{i18n.usernameLabel}</Text>
           <TextInput
             style={styles.input}
-            placeholder="選擇用戶名"
+            placeholder={i18n.enterUsername}
             value={formData.username}
             onChangeText={(text) => setFormData({...formData, username: text})}
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>密碼 | Password *</Text>
-          <Text style={styles.helperText}>至少8位字符，包含至少一個英文字母</Text>
+          <Text style={styles.label}>{i18n.passwordLabel}</Text>
+          <Text style={styles.helperText}>{i18n.passwordHelper}</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="輸入密碼"
+              placeholder={i18n.enterPassword}
               value={formData.password}
               onChangeText={(text) => setFormData({...formData, password: text})}
               secureTextEntry={!showPassword}
@@ -193,11 +200,11 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>確認密碼 | Confirm Password *</Text>
+          <Text style={styles.label}>{i18n.confirmPasswordLabel}</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="再次輸入密碼"
+              placeholder={i18n.enterConfirmPassword}
               value={formData.confirmPassword}
               onChangeText={(text) => setFormData({...formData, confirmPassword: text})}
               secureTextEntry={!showConfirmPassword}
@@ -207,10 +214,10 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>出生日期 | Date of Birth</Text>
+          <Text style={styles.label}>{i18n.dobLabel}</Text>
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
             <Text style={{ color: dobSelected ? '#000' : '#999' }}>
-              {dobSelected ? formData.dob : '選擇出生日期'}
+              {dobSelected ? formData.dob : i18n.selectDob}
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
@@ -223,7 +230,7 @@ export default function RegisterScreen() {
             />
           )}
 
-          <Text style={styles.label}>過敏原 | Allergies</Text>
+          <Text style={styles.label}>{i18n.allergiesLabel}</Text>
           <View style={styles.checkboxContainer}>
             {allergiesList.map((item) => (
               <TouchableOpacity 
@@ -242,11 +249,11 @@ export default function RegisterScreen() {
               onPress={() => setShowCustomAllergy(true)}
             >
               <Ionicons name="add-circle-outline" size={20} color="#00A0E9" />
-              <Text style={styles.addItemText}>Add Other</Text>
+              <Text style={styles.addItemText}>{i18n.addOther}</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>飲食偏好 | Diet Preferences</Text>
+          <Text style={styles.label}>{i18n.dietLabel}</Text>
           <View style={styles.checkboxContainer}>
             {dietList.map((item) => (
               <TouchableOpacity 
@@ -265,7 +272,7 @@ export default function RegisterScreen() {
               onPress={() => setShowCustomDiet(true)}
             >
               <Ionicons name="add-circle-outline" size={20} color="#00A0E9" />
-              <Text style={styles.addItemText}>Add Other</Text>
+              <Text style={styles.addItemText}>{i18n.addOther}</Text>
             </TouchableOpacity>
           </View>
 
@@ -277,7 +284,7 @@ export default function RegisterScreen() {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.registerButtonText}>建立帳戶</Text>
+              <Text style={styles.registerButtonText}>{i18n.createAccountButton}</Text>
             )}
           </TouchableOpacity>
 
@@ -285,7 +292,7 @@ export default function RegisterScreen() {
             style={styles.loginButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.loginButtonText}>已有帳戶？登入</Text>
+            <Text style={styles.loginButtonText}>{i18n.alreadyHaveAccountButton}</Text>
           </TouchableOpacity>
           
           <View style={{ height: 50 }} />
