@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
-import { useUser } from '../context/UserContext';
 import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = 'http://192.168.50.124:3000/api';
@@ -13,7 +12,6 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login: authLogin } = useAuth();
-  const { setVipStatus } = useUser();
   const { i18n } = useLanguage();
 
   const handleLogin = async () => {
@@ -34,7 +32,6 @@ export default function LoginScreen() {
 
       if (response.ok) {
         await authLogin(data.token, data.user);
-        setVipStatus(data.user.isVip); // Sync VIP status
         router.replace('/(tabs)');
       } else {
         Alert.alert(i18n.loginFailed, data.message || i18n.invalidCredentials);

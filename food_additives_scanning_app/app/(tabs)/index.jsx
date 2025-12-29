@@ -1,14 +1,16 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
 import { useHistory } from '../../context/HistoryContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function HomeScreen() {
   const { i18n } = useLanguage();
   const { history } = useHistory();
+  const { user } = useAuth();
   const router = useRouter();
-  const isVip = false; // Mock VIP status
+  const isVip = user?.isVip || false;
 
   const recentScans = history.slice(0, 3);
 

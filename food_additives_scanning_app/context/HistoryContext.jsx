@@ -1,20 +1,25 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from './AuthContext';
 
 const HistoryContext = createContext();
 
 export const HistoryProvider = ({ children }) => {
+  const { user } = useAuth();
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
     loadHistory();
-  }, []);
+  }, [user]);
 
   const loadHistory = async () => {
     try {
-      const storedHistory = await AsyncStorage.getItem('scanHistory');
+      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+      const storedHistory = await AsyncStorage.getItem(key);
       if (storedHistory) {
         setHistory(JSON.parse(storedHistory));
+      } else {
+        setHistory([]);
       }
     } catch (error) {
       console.error("Failed to load history", error);
@@ -26,7 +31,9 @@ export const HistoryProvider = ({ children }) => {
       // Avoid duplicates at the top of the list
       const newHistory = [item, ...history.filter(h => h.itemCode !== item.itemCode)];
       setHistory(newHistory);
-      await AsyncStorage.setItem('scanHistory', JSON.stringify(newHistory));
+      
+      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+      await AsyncStorage.setItem(key, JSON.stringify(newHistory));
     } catch (error) {
       console.error("Failed to save history", error);
     }
@@ -37,7 +44,9 @@ export const HistoryProvider = ({ children }) => {
       // 1. Remove locally
       const newHistory = history.filter(h => h.itemCode !== itemCode);
       setHistory(newHistory);
-      await AsyncStorage.setItem('scanHistory', JSON.stringify(newHistory));
+      
+      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+      await AsyncStorage.setItem(key, JSON.stringify(newHistory));
 
       // 2. Remove from backend (ScanHistory collection)
       // Using the same IP as configured in other files

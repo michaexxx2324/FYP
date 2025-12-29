@@ -5,12 +5,14 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLanguage } from '../context/LanguageContext';
 import { useHistory } from '../context/HistoryContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function EditScreen() {
   const { i18n } = useLanguage();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { addToHistory } = useHistory();
+  const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
 
   const [itemName, setItemName] = useState('');
@@ -74,7 +76,7 @@ export default function EditScreen() {
           itemName: itemName,
           itemCode: itemCode,
           nutritionInformation: ocrText,
-          userId: 'user_123' // Placeholder user ID
+          userId: user ? user.userId : 'anonymous'
         }),
       });
 

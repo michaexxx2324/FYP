@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function NewsDetailsScreen() {
   const { i18n } = useLanguage();
+  const { user } = useAuth();
   const params = useLocalSearchParams();
   const router = useRouter();
   
@@ -33,9 +35,14 @@ export default function NewsDetailsScreen() {
   const handleSendComment = async () => {
     if (!newComment.trim()) return;
 
+    if (!user) {
+      Alert.alert(i18n.error, i18n.pleaseLoginFirst);
+      return;
+    }
+
     const commentData = {
-      userId: 'user_123', // Mock user ID
-      userName: 'CurrentUser', // Mock user name
+      userId: user.userId,
+      userName: user.username,
       comments: newComment,
       time: new Date().toLocaleString(),
       district: 'Hong Kong', // Mock district
@@ -43,10 +50,6 @@ export default function NewsDetailsScreen() {
     };
 
     try {
-      const response = await fetch('http://192.168.50.124:3000/api/SaveScanHistory', { // Wait, wrong endpoint
-        // I need to use the new endpoint
-      });
-      
       // Correcting the fetch call below
       const saveResponse = await fetch('http://192.168.50.124:3000/api/SaveComment', {
         method: 'POST',

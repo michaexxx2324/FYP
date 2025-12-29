@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Lin
 import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { useUser } from '../context/UserContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const API_URL = 'http://192.168.50.124:3000/api';
@@ -11,7 +10,6 @@ const API_URL = 'http://192.168.50.124:3000/api';
 export default function PaymentScreen() {
   const { i18n } = useLanguage();
   const { user, updateUser } = useAuth();
-  const { setVipStatus } = useUser();
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState('yearly');
   const [selectedMethod, setSelectedMethod] = useState('paypal');
@@ -90,7 +88,6 @@ export default function PaymentScreen() {
 
       if (response.ok) {
         updateUser({ isVip: true });
-        setVipStatus(true);
         Alert.alert(
           i18n.vipActivated,
           i18n.vipActivatedMsg,
