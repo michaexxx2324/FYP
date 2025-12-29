@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Linking } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { useUser } from '../context/UserContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+const API_URL = 'http://192.168.50.124:3000/api';
+
 export default function PaymentScreen() {
   const { i18n } = useLanguage();
+  const { user, updateUser } = useAuth();
   const { setVipStatus } = useUser();
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState('yearly');
@@ -68,15 +72,39 @@ export default function PaymentScreen() {
     }
   };
 
-  const activateVip = () => {
-    setVipStatus(true);
-    Alert.alert(
-      i18n.vipActivated,
-      i18n.vipActivatedMsg,
-      [
-        { text: "OK", onPress: () => router.replace('/(tabs)/profile') }
-      ]
-    );
+  const activateVip = async () => {
+    if (!user) {
+      Alert.alert('Error', 'Please login first');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/user/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.userId,
+          isVip: true
+        }),
+      });
+
+      if (response.ok) {
+        updateUser({ isVip: true });
+        setVipStatus(true);
+        Alert.alert(
+          i18n.vipActivated,
+          i18n.vipActivatedMsg,
+          [
+            { text: "OK", onPress: () => router.replace('/(tabs)/profile') }
+          ]
+        );
+      } else {
+        Alert.alert('Error', 'Failed to activate VIP on server');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Network error');
+    }
   };
 
   return (

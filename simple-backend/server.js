@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3000;
+const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure'; // In production, use env var
 
 // Middleware
 app.use(cors());
@@ -184,6 +187,174 @@ app.delete('/api/DeleteScanHistory', async (req, res) => {
   } catch (error) {
     console.error("Error deleting history:", error);
     res.status(500).send("Internal Server Error: " + error.message);
+  }
+});
+
+// User Schema
+const UserSchema = new mongoose.Schema({
+  userId: { type: String, unique: true },
+  email: { type: String, unique: true, required: true },
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  dob: String,
+  allergies: [String],
+  dietPreferences: [String],
+  isVip: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const User = mongoose.model('User', UserSchema, 'users');
+
+// Register Endpoint
+app.post('/api/register', async (req, res) => {
+  const { email, username, password, dob, allergies, dietPreferences } = req.body;
+
+  if (!email || !username || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    // Check if user exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      if (existingUser.username === username) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate User ID
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+    const newUser = new User({
+      userId,
+      email,
+      username,
+      password: hashedPassword,
+      dob,
+      allergies,
+      dietPreferences, // Now an array
+      isVip: false
+    });
+
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully", userId });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Login Endpoint
+app.post('/api/login', async (req, res) => {
+  const { login, password } = req.body; // login can be email or username
+
+  if (!login || !password) {
+    return res.status(400).json({ message: "Missing credentials" });
+  }
+
+  try {
+    const user = await User.findOne({ $or: [{ email: login }, { username: login }] });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Generate Token
+    const token = jwt.sign(
+      { userId: user.userId, isVip: user.isVip },
+      JWT_SECRET,
+      { expiresIn: '30m' }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        userId: user.userId,
+        username: user.username,
+        email: user.email,
+        isVip: user.isVip,
+        allergies: user.allergies,
+        dietPreferences: user.dietPreferences
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Update User Profile Endpoint
+app.put('/api/user/update', async (req, res) => {
+  const { userId, username, email, password, allergies, dietPreferences, isVip } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (allergies) user.allergies = allergies;
+    if (dietPreferences) user.dietPreferences = dietPreferences;
+    if (typeof isVip !== 'undefined') user.isVip = isVip; // Allow updating VIP status
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        userId: user.userId,
+        username: user.username,
+        email: user.email,
+        isVip: user.isVip,
+        allergies: user.allergies,
+        dietPreferences: user.dietPreferences
+      }
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Reset Password Endpoint
+app.post('/api/reset-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // In a real app, send an email. Here we just simulate success.
+    res.json({ message: "Password reset link sent to your email." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

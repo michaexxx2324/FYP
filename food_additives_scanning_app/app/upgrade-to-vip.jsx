@@ -1,15 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
-import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+
+const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function UpgradeToVipScreen() {
   const { i18n, language, toggleLanguage } = useLanguage();
-  const { isVip } = useUser();
+  const { user, updateUser } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('recipe');
+
+  const handleUpgrade = async () => {
+    if (!user) {
+      Alert.alert('Error', 'Please login first');
+      return;
+    }
+
+    try {
+      // Call backend to update VIP status
+      const response = await fetch(`${API_URL}/user/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.userId,
+          isVip: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update local context
+        updateUser({ isVip: true });
+        Alert.alert('Success', 'You are now a VIP member!', [
+          { text: 'OK', onPress: () => router.back() }
+        ]);
+      } else {
+        Alert.alert('Error', data.message || 'Failed to upgrade');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Network error');
+    }
+  };
 
   const renderContent = () => {
     if (activeTab === 'recipe') {
@@ -104,7 +140,13 @@ export default function UpgradeToVipScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header Removed as requested */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{i18n.upgradeVIP}</Text>
+        <View style={{width: 24}} />
+      </View>
       
       <ScrollView style={styles.scrollView}>
         {/* Banner */}
@@ -152,7 +194,7 @@ export default function UpgradeToVipScreen() {
           <Text style={styles.cardTitle}>{i18n.membership}</Text>
           <Text style={styles.priceText}>{i18n.price}</Text>
           
-          {!isVip ? (
+          {!user?.isVip ? (
             <TouchableOpacity 
               style={[styles.upgradeButton, { marginTop: 15, width: '100%', marginRight: 0 }]}
               onPress={() => router.push('/payment')}
@@ -160,9 +202,12 @@ export default function UpgradeToVipScreen() {
               <Text style={styles.upgradeButtonText}>{i18n.upgradeVIP}</Text>
             </TouchableOpacity>
           ) : (
-            <View style={[styles.upgradeButton, { marginTop: 15, width: '100%', marginRight: 0, backgroundColor: '#4CAF50' }]}>
-              <Text style={styles.upgradeButtonText}>{i18n.vipActivated}</Text>
-            </View>
+            <TouchableOpacity 
+              style={[styles.upgradeButton, { marginTop: 15, width: '100%', marginRight: 0, backgroundColor: '#4CAF50' }]}
+              onPress={() => {}}
+            >
+              <Text style={styles.upgradeButtonText}>VIP Function (Active)</Text>
+            </TouchableOpacity>
           )}
         </View>
         
@@ -362,6 +407,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  backButton: {
+    padding: 5,
   },
   // New Styles
   progressBarContainer: {

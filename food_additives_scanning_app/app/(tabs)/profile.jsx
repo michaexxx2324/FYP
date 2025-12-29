@@ -1,22 +1,47 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
-import { useUser } from '../../context/UserContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ProfileScreen() {
   const { i18n } = useLanguage();
-  const { isVip, setVipStatus } = useUser();
+  const { user, logout, updateUser } = useAuth();
   const router = useRouter();
 
+  const handleResetVip = async () => {
+    if (!user) return;
+    try {
+      const response = await fetch('http://192.168.50.124:3000/api/user/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.userId, isVip: false }),
+      });
+      if (response.ok) {
+        updateUser({ isVip: false });
+        alert('VIP status reset');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Please login to view profile</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle-outline" size={80} color="#ccc" />
         </View>
-        <Text style={styles.username}>User 123</Text>
-        {isVip && (
+        <Text style={styles.username}>{user.username}</Text>
+        {user.isVip && (
           <View style={styles.vipBadge}>
             <Ionicons name="star" size={16} color="white" style={{ marginRight: 4 }} />
             <Text style={styles.vipText}>VIP Member</Text>
@@ -24,8 +49,54 @@ export default function ProfileScreen() {
         )}
       </View>
 
+      <View style={styles.infoSection}>
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Email</Text>
+          <Text style={styles.infoValue}>{user.email}</Text>
+        </View>
+
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Allergies</Text>
+          <View style={styles.tagsContainer}>
+            {user.allergies && user.allergies.length > 0 ? (
+              user.allergies.map((allergy, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{allergy}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.infoValue}>None</Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Diet Preferences</Text>
+          <View style={styles.tagsContainer}>
+            {user.dietPreferences && user.dietPreferences.length > 0 ? (
+              user.dietPreferences.map((diet, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{diet}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.infoValue}>None</Text>
+            )}
+          </View>
+        </View>
+      </View>
+
       <View style={styles.menu}>
-        {!isVip && (
+        {user.isVip ? (
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => alert('VIP Functionality Coming Soon!')}
+          >
+            <Ionicons name="star" size={24} color="#E68A00" />
+            <Text style={styles.menuText}>VIP Function</Text>
+            <Ionicons name="chevron-forward" size={24} color="#ccc" />
+          </TouchableOpacity>
+        ) : (
           <TouchableOpacity 
             style={styles.menuItem} 
             onPress={() => router.push('/upgrade-to-vip')}
@@ -35,17 +106,35 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-forward" size={24} color="#ccc" />
           </TouchableOpacity>
         )}
-        
-        {/* Reset VIP for testing */}
+
         <TouchableOpacity 
           style={styles.menuItem} 
-          onPress={() => setVipStatus(false)}
+          onPress={() => router.push('/settings')}
+        >
+          <Ionicons name="settings-outline" size={24} color="#666" />
+          <Text style={styles.menuText}>Settings</Text>
+          <Ionicons name="chevron-forward" size={24} color="#ccc" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.menuItem} 
+          onPress={logout}
+        >
+          <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+          <Text style={[styles.menuText, { color: '#FF3B30' }]}>Logout</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.menuItem} 
+          onPress={handleResetVip}
         >
           <Ionicons name="refresh-outline" size={24} color="#666" />
-          <Text style={styles.menuText}>Reset VIP Status (Debug)</Text>
+          <Text style={styles.menuText}>Reset VIP (Debug)</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      
+      <View style={{height: 30}} />
+    </ScrollView>
   );
 }
 
@@ -58,7 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 30,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   avatarContainer: {
     marginBottom: 10,
@@ -80,6 +169,39 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+  infoSection: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginBottom: 10,
+  },
+  infoItem: {
+    marginBottom: 15,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#333',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    backgroundColor: '#E1F5FE',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    color: '#0277BD',
+    fontSize: 14,
   },
   menu: {
     backgroundColor: 'white',
