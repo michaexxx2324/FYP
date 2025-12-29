@@ -73,10 +73,14 @@ export const translations = {
     connectError: 'Failed to connect to server',
     cameraPermissionBarcode: 'Camera permission is required to scan barcodes.',
     // Mock Data
-    mockNews1Title: 'XX Brand Cookies (Batch 2025-10)',
-    mockNews1Content: 'Contains undeclared allergens',
-    mockNews2Title: 'YY Brand Milk (Batch 2025-11)',
-    mockNews2Content: 'Bacterial contamination suspected',
+    mockNews1Title: 'Prepackaged cookies sample found to contain undeclared allergen (peanut)',
+    mockNews1Content: 'The Centre for Food Safety (CFS) calls on the public not to consume the affected batch.',
+    mockNews2Title: 'Bottled preserved bean curd sample found with excessive Bacillus cereus',
+    mockNews2Content: 'The CFS has ordered the vendor concerned to stop the sale and remove from shelves.',
+    // News Details
+    comments: 'Comments',
+    noComments: 'No one has commented yet',
+    writeComment: 'Write a comment...',
   },
   zh: {
     home: '首頁',
@@ -148,10 +152,14 @@ export const translations = {
     connectError: '無法連接到服務器',
     cameraPermissionBarcode: '掃描條碼需要相機權限。',
     // Mock Data
-    mockNews1Title: 'XX 品牌曲奇 (批次 2025-10)',
-    mockNews1Content: '含有未聲明的過敏原',
-    mockNews2Title: 'YY 品牌牛奶 (批次 2025-11)',
-    mockNews2Content: '懷疑細菌污染',
+    mockNews1Title: '預先包裝曲奇樣本含有未標示致敏物（花生）',
+    mockNews1Content: '食物安全中心（食安中心）呼籲市民不要食用受影響批次。',
+    mockNews2Title: '瓶裝腐乳樣本被檢出含過量蠟樣芽孢桿菌',
+    mockNews2Content: '食安中心已指令有關商戶停售及下架受影響產品。',
+    // News Details
+    comments: '評論',
+    noComments: '暫無評論',
+    writeComment: '寫下你的評論...',
   }
 };
 

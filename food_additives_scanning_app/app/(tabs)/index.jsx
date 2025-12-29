@@ -27,15 +27,33 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{i18n.newsTitle}</Text>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{i18n.recallNotice}: {i18n.mockNews1Title}</Text>
-          <Text style={styles.cardContent}>{i18n.warning}: {i18n.mockNews1Content}</Text>
-        </View>
+        <TouchableOpacity onPress={() => router.push({
+          pathname: '/news-details',
+          params: {
+            newsId: 'news1',
+            title: `${i18n.recallNotice}: ${i18n.mockNews1Title}`,
+            content: `${i18n.warning}: ${i18n.mockNews1Content}`
+          }
+        })}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{i18n.recallNotice}: {i18n.mockNews1Title}</Text>
+            <Text style={styles.cardContent}>{i18n.warning}: {i18n.mockNews1Content}</Text>
+          </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
-           <Text style={styles.cardTitle}>{i18n.productRecall}: {i18n.mockNews2Title}</Text>
-           <Text style={styles.cardContent}>{i18n.foodAlert}: {i18n.mockNews2Content}</Text>
-        </View>
+        <TouchableOpacity onPress={() => router.push({
+          pathname: '/news-details',
+          params: {
+            newsId: 'news2',
+            title: `${i18n.productRecall}: ${i18n.mockNews2Title}`,
+            content: `${i18n.foodAlert}: ${i18n.mockNews2Content}`
+          }
+        })}>
+          <View style={styles.card}>
+             <Text style={styles.cardTitle}>{i18n.productRecall}: {i18n.mockNews2Title}</Text>
+             <Text style={styles.cardContent}>{i18n.foodAlert}: {i18n.mockNews2Content}</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {recentScans.length > 0 && (

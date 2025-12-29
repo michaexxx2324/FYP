@@ -15,7 +15,7 @@ perf: 改善效能 (A code change that improves performance)。
 test: 增加測試 (when adding missing tests)。
 chore: 建構程序或輔助工具的變動 (maintain)。
 revert: 撤銷回覆先前的 commit 例如：revert: type(scope): subject (回覆版本：xxxx)。
-
+i18n: 翻譯/多語言更新 (Internationalization and localization)。
 
 ocr.space:k89557491788957
 poe api key:kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk

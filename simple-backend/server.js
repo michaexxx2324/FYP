@@ -36,6 +36,18 @@ const ScanHistorySchema = new mongoose.Schema({
 
 const ScanHistory = mongoose.model('ScanHistory', ScanHistorySchema, 'ScanHistory');
 
+// Comments Schema
+const CommentSchema = new mongoose.Schema({
+  "user id": String,
+  "user name": String,
+  "comments": String,
+  "time": String,
+  "district": String,
+  "news id": String
+}, { strict: false });
+
+const Comment = mongoose.model('Comment', CommentSchema, 'comments');
+
 // API Endpoint
 app.get('/api/GetProduct', async (req, res) => {
   const barcode = req.query.barcode;
@@ -95,6 +107,57 @@ app.post('/api/SaveScanHistory', async (req, res) => {
     res.status(201).json({ message: "Scan history saved successfully", data: newScan });
   } catch (error) {
     console.error("Error saving scan history:", error);
+    res.status(500).send("Internal Server Error: " + error.message);
+  }
+});
+
+// Save Comment Endpoint
+app.post('/api/SaveComment', async (req, res) => {
+  const { userId, userName, comments, time, district, newsId } = req.body;
+
+  if (!comments || !newsId) {
+    return res.status(400).send("Missing required fields");
+  }
+
+  try {
+    const newComment = new Comment({
+      "user id": userId || "anonymous",
+      "user name": userName || "Anonymous",
+      "comments": comments,
+      "time": time || new Date().toLocaleString(),
+      "district": district || "Unknown",
+      "news id": newsId
+    });
+
+    await newComment.save();
+    console.log('Comment saved for news:', newsId);
+    res.status(201).json({ message: "Comment saved successfully", data: newComment });
+  } catch (error) {
+    console.error("Error saving comment:", error);
+    res.status(500).send("Internal Server Error: " + error.message);
+  }
+});
+
+// Get Comments Endpoint
+app.get('/api/GetComments', async (req, res) => {
+  const newsId = req.query.newsId;
+
+  if (!newsId) {
+    return res.status(400).send("Please pass a newsId on the query string");
+  }
+
+  try {
+    const comments = await Comment.find({ "news id": newsId });
+    res.json(comments.map(c => ({
+      id: c._id,
+      userId: c["user id"],
+      userName: c["user name"],
+      text: c["comments"],
+      time: c["time"],
+      district: c["district"]
+    })));
+  } catch (error) {
+    console.error("Error fetching comments:", error);
     res.status(500).send("Internal Server Error: " + error.message);
   }
 });
