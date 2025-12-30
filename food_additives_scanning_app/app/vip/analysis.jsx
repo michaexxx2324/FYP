@@ -50,6 +50,7 @@ export default function AnalysisScreen() {
         Provide output in BOTH English and Traditional Chinese (繁體中文).
       `;
 
+      console.log("Sending request to AI Service...");
       const response = await fetch('https://api.poe.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -64,19 +65,43 @@ export default function AnalysisScreen() {
         })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log("AI Response Status:", response.status);
+      // console.log("AI Response Body:", text); // Uncomment for debugging
+
+      if (!response.ok) {
+        throw new Error(`AI Service Error (${response.status}): ${text.slice(0, 100)}`);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Invalid JSON from AI Service. Response started with: ${text.slice(0, 20)}`);
+      }
+
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
         const jsonMatch = content.match(/\{[\s\S]*\}/);
+        
         if (jsonMatch) {
-          setAnalysis(JSON.parse(jsonMatch[0]));
+          try {
+            const parsedAnalysis = JSON.parse(jsonMatch[0]);
+            setAnalysis(parsedAnalysis);
+          } catch (e) {
+            console.warn("Failed to parse inner JSON from AI content");
+            setAnalysis({ details: content });
+          }
         } else {
           setAnalysis({ details: content });
         }
+      } else {
+        throw new Error("No content received from AI Service");
       }
+
     } catch (error) {
-      console.error(error);
-      Alert.alert(i18n.error, i18n.networkError);
+      console.error("Analysis Failed:", error);
+      Alert.alert(i18n.error || "Error", error.message || "Failed to analyze product");
     } finally {
       setLoading(false);
     }

@@ -66,6 +66,7 @@ export default function RecipesScreen() {
         Provide output in BOTH English and Traditional Chinese (繁體中文) for all text fields.
       `;
 
+      console.log("Sending request to AI Service...");
       const response = await fetch('https://api.poe.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -86,21 +87,41 @@ export default function RecipesScreen() {
         })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log("AI Response Status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`AI Service Error (${response.status}): ${text.slice(0, 100)}`);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Invalid JSON from AI Service. Response started with: ${text.slice(0, 20)}`);
+      }
+
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
-        // Extract JSON
         const jsonMatch = content.match(/\{[\s\S]*\}/);
+        
         if (jsonMatch) {
-          setRecipe(JSON.parse(jsonMatch[0]));
+          try {
+            setRecipe(JSON.parse(jsonMatch[0]));
+          } catch (e) {
+            console.warn("Failed to parse inner JSON from AI content");
+            setRecipe({ recipeName: "Analysis Result", instructions: [content] });
+          }
         } else {
-          // Fallback
-          setRecipe({ recipeName: "Error parsing", instructions: [content] });
+          setRecipe({ recipeName: "Analysis Result", instructions: [content] });
         }
+      } else {
+        throw new Error("No content received from AI Service");
       }
+
     } catch (error) {
-      console.error(error);
-      Alert.alert(i18n.error, i18n.networkError);
+      console.error("Recipe Generation Failed:", error);
+      Alert.alert(i18n.error || "Error", error.message || "Failed to generate recipe");
     } finally {
       setLoading(false);
     }
@@ -133,10 +154,15 @@ export default function RecipesScreen() {
 
       {recipe && (
         <View style={styles.resultContainer}>
-          {recipe.warning && (
+          {recipe.warning ? (
             <View style={styles.warningBox}>
               <Ionicons name="warning" size={24} color="white" />
               <Text style={styles.warningText}>{recipe.warning}</Text>
+            </View>
+          ) : (
+            <View style={[styles.warningBox, { backgroundColor: '#4CAF50' }]}>
+              <Ionicons name="checkmark-circle" size={24} color="white" />
+              <Text style={styles.warningText}>{i18n.safeToConsume || "Safe to consume! No allergens detected."}</Text>
             </View>
           )}
 

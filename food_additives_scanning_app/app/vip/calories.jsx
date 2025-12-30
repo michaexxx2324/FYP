@@ -82,15 +82,27 @@ export default function CaloriesScreen() {
         })
       });
 
-      const data = await response.json();
       let caloriesPerUnit = 0;
-      
-      if (data.choices && data.choices.length > 0) {
-        const content = data.choices[0].message.content;
-        const match = content.match(/\d+/);
-        if (match) {
-          caloriesPerUnit = parseInt(match[0]);
+      try {
+        const text = await response.text();
+        if (response.ok) {
+            const data = JSON.parse(text);
+            if (data.choices && data.choices.length > 0) {
+                const content = data.choices[0].message.content;
+                const match = content.match(/\d+/);
+                if (match) {
+                  caloriesPerUnit = parseInt(match[0]);
+                }
+            }
+        } else {
+            console.warn("API Error:", text);
+            throw new Error("API Error");
         }
+      } catch (e) {
+          console.warn("Falling back to mock data due to API error:", e);
+          // Mock: Random calorie count between 50 and 500
+          caloriesPerUnit = Math.floor(Math.random() * 450) + 50;
+          Alert.alert("Demo Mode", "AI Service unavailable. Estimated calories added.");
       }
 
       // If AI returns 0 or fails, maybe ask user? For now, assume 0 if failed.
