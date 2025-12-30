@@ -88,16 +88,24 @@ export default function ProductDetailsScreen() {
         2. Analyze for high salt, high sugar, or high fat content.
         3. Identify any dangerous food additives (E-numbers, preservatives, etc.).
         4. CRITICAL: Check if the item contains any ingredients that match the user's allergies or violate their dietary preferences.
-        5. CRITICAL: Specifically look for "Cross-Contamination Warnings" or "Factory Warnings" (e.g., "Produced in a factory that handles...", "May contain traces of...", "生產此食品的廠房亦處理..."). Treat these as potential allergy risks.
+        5. CRITICAL: Specifically look for "Cross-Contamination Warnings" or "Factory Warnings" (e.g., "Produced in a factory that handles...", "May contain traces of...", "生產此食品的廠房亦處理..."). Treat these as potential allergy risks ONLY IF the user has that specific allergy.
 
-        IMPORTANT: Provide the output in BOTH English and Traditional Chinese (繁體中文).
+        IMPORTANT RULES FOR "warning" FIELD:
+        - The "warning" field must be used ONLY for severe alerts related to the User Profile (Allergies or Diet).
+        - If the User Profile has no allergies and no dietary preferences, "warning" MUST be null.
+        - Do NOT put general health warnings (like "High Sugar", "Unhealthy additives") in the "warning" field. Put them in "summary" or "details".
+        - If the item contains an allergen that the user is NOT allergic to, do NOT put it in "warning".
+        - If there is a cross-contamination warning for an ingredient the user is NOT allergic to, do NOT put it in "warning".
+
+        IMPORTANT: Provide the output in BOTH English and Traditional Chinese (繁體中文) for EVERY field.
+        Format each field as: "English text...\n\n(中文翻譯...)"
 
         Return ONLY a JSON object with this format:
         {
-          "labelInfo": "Extracted summary of the food label information (Bilingual)",
-          "summary": "Brief analysis of healthiness (salt/sugar/additives) (Bilingual)",
-          "warning": "URGENT WARNING MESSAGE if allergy/diet violation OR cross-contamination risk found, otherwise null (Bilingual)",
-          "details": "Detailed analysis including additives found and specific cross-contamination warnings if any (Bilingual)"
+          "labelInfo": "Extracted summary of the food label information (English + Chinese)",
+          "summary": "Brief analysis of healthiness (salt/sugar/additives) (English + Chinese)",
+          "warning": "URGENT WARNING MESSAGE if and ONLY IF allergy/diet violation found, otherwise null. (English + Chinese)",
+          "details": "Detailed analysis including additives found and specific cross-contamination warnings if any (English + Chinese)"
         }
       `;
 
@@ -119,10 +127,25 @@ export default function ProductDetailsScreen() {
       
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
-        // Try to parse JSON, sometimes AI adds markdown code blocks
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const result = JSON.parse(jsonMatch[0]);
+        
+        let result = null;
+        try {
+          // 1. Try to find the first JSON object in the string
+          const firstOpen = content.indexOf('{');
+          const lastClose = content.lastIndexOf('}');
+          
+          if (firstOpen !== -1 && lastClose !== -1 && lastClose > firstOpen) {
+            const jsonString = content.substring(firstOpen, lastClose + 1);
+            result = JSON.parse(jsonString);
+          } else {
+            // 2. If no braces found, try parsing the whole string (unlikely but possible)
+            result = JSON.parse(content);
+          }
+        } catch (e) {
+          console.log("JSON Parse failed, falling back to raw text", e);
+        }
+
+        if (result) {
           setAnalysis(result);
           setWarning(result.warning);
           // Save the result to backend for future use
@@ -142,9 +165,15 @@ export default function ProductDetailsScreen() {
     }
   };
 
+  const shouldShowWarning = (warningMsg) => {
+    if (!warningMsg) return false;
+    const lower = String(warningMsg).toLowerCase().trim();
+    return lower !== 'null' && lower !== 'none' && lower !== 'no warning' && lower !== '';
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
-      {warning && (
+      {shouldShowWarning(warning) && (
         <View style={styles.warningCard}>
           <Ionicons name="warning" size={32} color="white" />
           <Text style={styles.warningText}>{i18n.warning || "WARNING"}</Text>

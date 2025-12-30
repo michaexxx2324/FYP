@@ -44,31 +44,29 @@ export default function HomeScreen() {
       <View style={styles.gameCard}>
         <View style={styles.gameHeader}>
           <Ionicons name="game-controller" size={24} color="#FF9800" />
-          <Text style={styles.gameTitle}>Discount Game</Text>
+          <Text style={styles.gameTitle}>{i18n.discountGame || "Discount Game"}</Text>
         </View>
         
         <Text style={styles.gameDescription}>
-          Tired of just scanning labels?{"\n"}
-          Do you want some free discount? try this now{"\n"}
-          playing the games to get the 10% off of our Partner Store!!
+          {i18n.gameDescription || "Tired of just scanning labels?\nDo you want some free discount? try this now\nplaying the games to get the 10% off of our Partner Store!!"}
         </Text>
 
         <View style={styles.partnersContainer}>
           <View style={styles.partnerBox}>
             <Image source={require('../../assets/HKTVmall.png')} style={styles.partnerLogo} resizeMode="contain" />
-            <Text style={styles.partnerName}>HKTVmall</Text>
+            <Text style={styles.partnerName}>{i18n.hktvmall}</Text>
           </View>
           <View style={styles.partnerBox}>
             <Image source={require('../../assets/pandamart.jpg')} style={styles.partnerLogo} resizeMode="contain" />
-            <Text style={styles.partnerName}>panda mart</Text>
+            <Text style={styles.partnerName}>{i18n.pandamart}</Text>
           </View>
           <View style={styles.partnerBox}>
             <Image source={require('../../assets/PARKnSHOP.png')} style={styles.partnerLogo} resizeMode="contain" />
-            <Text style={styles.partnerName}>PARKnSHOP</Text>
+            <Text style={styles.partnerName}>{i18n.parknshop}</Text>
           </View>
           <View style={styles.partnerBox}>
             <Image source={require('../../assets/wellcome.png')} style={styles.partnerLogo} resizeMode="contain" />
-            <Text style={styles.partnerName}>Wellcome</Text>
+            <Text style={styles.partnerName}>{i18n.wellcome}</Text>
           </View>
         </View>
 
@@ -76,7 +74,7 @@ export default function HomeScreen() {
           style={styles.playButton}
           onPress={() => router.push('/quiz-game')}
         >
-          <Text style={styles.playButtonText}>Play Now</Text>
+          <Text style={styles.playButtonText}>{i18n.playNow || "Play Now"}</Text>
         </TouchableOpacity>
       </View>
 

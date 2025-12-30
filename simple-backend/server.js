@@ -170,7 +170,8 @@ app.get('/api/GetComments', async (req, res) => {
   }
 
   try {
-    const comments = await Comment.find({ "news id": newsId });
+    // Sort by _id descending (latest first) since 'time' is a string
+    const comments = await Comment.find({ "news id": newsId }).sort({ _id: -1 });
     res.json(comments.map(c => ({
       id: c._id,
       userId: c["user id"],
@@ -693,6 +694,10 @@ app.get('/api/favorites/:userId', async (req, res) => {
     const postIds = favorites.map(f => f["post id"]);
     
     const posts = await Blog.find({ _id: { $in: postIds } }).lean();
+    
+    // Sort by post datetime descending (latest first)
+    posts.sort((a, b) => new Date(b["post datetime"]) - new Date(a["post datetime"]));
+
     res.json(posts.map(b => ({
       id: b._id,
       title: b["post name"],

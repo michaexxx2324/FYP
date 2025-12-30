@@ -127,7 +127,7 @@ export default function QuizGameScreen() {
             {i18n.redeemAt || "Redeem at our partner stores:"}
           </Text>
           <View style={styles.partnerLogos}>
-             <Text style={styles.partnerName}>HKTVmall, panda mart, PARKnSHOP, Wellcome</Text>
+             <Text style={styles.partnerName}>{i18n.partnerList}</Text>
           </View>
 
           <TouchableOpacity 

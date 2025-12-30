@@ -44,10 +44,19 @@ export default function ScanScreen() {
 
     try {
       // Extract 13 digit number if possible, or just use data
-      // User said "the x in the Data will be a 13 digit number"
-      // Assuming data IS the number.
+      let barcode = data;
       
-      const product = await getProductByBarcode(data);
+      // If data is a URL or contains non-numeric characters, try to extract the longest number
+      if (isNaN(data) || data.startsWith('http')) {
+        const matches = data.match(/\d{8,14}/g); // Look for 8 to 14 digit numbers
+        if (matches && matches.length > 0) {
+          // Pick the longest match, usually the EAN code
+          barcode = matches.reduce((a, b) => a.length > b.length ? a : b);
+          console.log(`Extracted barcode ${barcode} from URL/String: ${data}`);
+        }
+      }
+      
+      const product = await getProductByBarcode(barcode);
       
       if (product) {
         addToHistory(product);
@@ -134,7 +143,7 @@ export default function ScanScreen() {
             {
               role: 'user',
               content: [
-                { type: 'text', text: 'Extract all text from this image. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations.' },
+                { type: 'text', text: 'Extract text from this image, specifically focusing on food ingredients, nutrition information, and allergen warnings. IGNORE any QR codes, barcodes, or marketing URLs. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations.' },
                 { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
               ]
             }
@@ -194,7 +203,7 @@ export default function ScanScreen() {
           ref={cameraRef}
           onBarcodeScanned={!scanned ? handleBarcodeScanned : undefined}
           barcodeScannerSettings={{
-            barcodeTypes: ["qr", "ean13", "upc_e"],
+            barcodeTypes: ["qr", "ean13", "ean8", "upc_a", "upc_e", "code128", "code39"],
           }}
         >
           <View style={styles.buttonContainer}>

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator }
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -56,13 +57,20 @@ export default function FavoritesScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{i18n.myFavorites || "My Favorites"}</Text>
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color="#4CAF50" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={posts}
           renderItem={renderItem}
-          keyExtractor={item => item._id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <Text style={styles.emptyText}>{i18n.noFavorites || "No favorite posts yet"}</Text>
@@ -77,6 +85,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    paddingTop: 50, // Adjust for status bar
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  backButton: {
+    marginRight: 15,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
   },
   center: {
     flex: 1,
