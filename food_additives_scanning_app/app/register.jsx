@@ -355,6 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     padding: 20,
     paddingTop: 50,
+    paddingBottom: 50,
   },
   card: {
     flex: 1,

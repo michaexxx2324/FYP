@@ -148,7 +148,7 @@ export default function UpgradeToVipScreen() {
         <View style={{width: 24}} />
       </View>
       
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={{paddingBottom: 50}}>
         {/* Banner */}
         <View style={styles.banner}>
           <View style={styles.bannerContent}>

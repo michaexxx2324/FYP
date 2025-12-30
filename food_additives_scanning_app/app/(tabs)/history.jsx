@@ -44,7 +44,9 @@ export default function HistoryScreen() {
           params: { 
             itemName: item.itemName, 
             itemCode: item.itemCode, 
-            nutritionInformation: item.nutritionInformation 
+            nutritionInformation: item.nutritionInformation,
+            warning: item.warning,
+            healthAnalysis: item.healthAnalysis
           }
         })} 
       />
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   listContent: {
-    paddingBottom: 20,
+    paddingBottom: 80,
   },
   card: {
     backgroundColor: 'white',

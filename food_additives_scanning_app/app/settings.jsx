@@ -195,7 +195,7 @@ export default function SettingsScreen() {
         <View style={{width: 24}} />
       </View>
 
-      <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.formContainer} contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={false}>
         
         <Text style={styles.label}>{i18n.email}</Text>
         <TextInput

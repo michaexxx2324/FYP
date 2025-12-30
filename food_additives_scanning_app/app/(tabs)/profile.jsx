@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 80}}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle-outline" size={80} color="#ccc" />
@@ -145,6 +145,15 @@ export default function ProfileScreen() {
         >
           <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
           <Text style={[styles.menuText, { color: '#FF3B30' }]}>{i18n.logout}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.menuItem} 
+          onPress={() => router.push('/blog/favorites')}
+        >
+          <Ionicons name="heart-outline" size={24} color="#FF4081" />
+          <Text style={styles.menuText}>{i18n.myFavorites || "My Favorites"}</Text>
+          <Ionicons name="chevron-forward" size={24} color="#ccc" />
         </TouchableOpacity>
 
         <TouchableOpacity 

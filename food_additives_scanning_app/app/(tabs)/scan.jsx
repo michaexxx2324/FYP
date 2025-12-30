@@ -57,7 +57,9 @@ export default function ScanScreen() {
           params: { 
             itemName: product.itemName, 
             itemCode: product.itemCode, 
-            nutritionInformation: product.nutritionInformation 
+            nutritionInformation: product.nutritionInformation,
+            warning: product.warning,
+            healthAnalysis: product.healthAnalysis
           }
         });
         // Reset scan state after a short delay so when they come back it's ready
@@ -240,7 +242,7 @@ const styles = StyleSheet.create({
   buttonContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'transparent', margin: 64, justifyContent: 'center', alignItems: 'flex-end' },
   
   // OCR Styles
-  ocrContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' },
+  ocrContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0', paddingBottom: 50 },
   ocrControlsCentered: { width: '100%', padding: 20, gap: 20 },
   captureBtnLarge: { backgroundColor: '#007AFF', padding: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10 },
   galleryBtnLarge: { backgroundColor: '#34C759', padding: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10 },
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
   resultText: { fontSize: 16 },
   productCard: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 80,
     left: 20,
     right: 20,
     backgroundColor: 'white',

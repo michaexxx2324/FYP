@@ -15,8 +15,19 @@ export default function HomeScreen() {
   const recentScans = history.slice(0, 3);
 
   return (
-    <ScrollView style={styles.container}>
-      {!isVip && (
+    <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
+      {isVip ? (
+        <TouchableOpacity 
+          style={[styles.vipButton, { backgroundColor: '#E68A00' }]}
+          onPress={() => alert(i18n.vipFunctionalityComingSoon)}
+        >
+          <Ionicons name="star" size={20} color="white" style={{ marginRight: 8 }} />
+          <View>
+            <Text style={styles.vipButtonText}>{i18n.vipFunction || "VIP Function"}</Text>
+            <Text style={styles.vipButtonSubText}>{i18n.exclusiveAccess || "Exclusive Access"}</Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
         <TouchableOpacity 
           style={styles.vipButton}
           onPress={() => router.push('/upgrade-to-vip')}

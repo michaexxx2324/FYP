@@ -34,7 +34,9 @@ const ScanHistorySchema = new mongoose.Schema({
   "item name": String,
   "item code": String,
   "nutrition information": String,
-  "user id": String
+  "user id": String,
+  "warning": String,
+  "health analysis": String
 }, { strict: false });
 
 const ScanHistory = mongoose.model('ScanHistory', ScanHistorySchema, 'ScanHistory');
@@ -77,7 +79,9 @@ app.get('/api/GetProduct', async (req, res) => {
       res.json({
         itemName: product["item name"],
         itemCode: product["item code"],
-        nutritionInformation: product["nutrition information"]
+        nutritionInformation: product["nutrition information"],
+        warning: product["warning"],
+        healthAnalysis: product["health analysis"]
       });
     } else {
       console.log('Product not found in either collection');
@@ -91,18 +95,34 @@ app.get('/api/GetProduct', async (req, res) => {
 
 // Save Scan History Endpoint
 app.post('/api/SaveScanHistory', async (req, res) => {
-  const { itemName, itemCode, nutritionInformation, userId } = req.body;
+  const { itemName, itemCode, nutritionInformation, userId, warning, healthAnalysis } = req.body;
 
   if (!itemName || !itemCode || !nutritionInformation) {
     return res.status(400).send("Missing required fields");
   }
 
   try {
+    // Check if it already exists to update it instead of creating duplicate
+    let existingScan = await ScanHistory.findOne({ "item code": itemCode, "user id": userId || "anonymous" });
+
+    if (existingScan) {
+      existingScan["item name"] = itemName;
+      existingScan["nutrition information"] = nutritionInformation;
+      if (warning) existingScan["warning"] = warning;
+      if (healthAnalysis) existingScan["health analysis"] = healthAnalysis;
+      
+      await existingScan.save();
+      console.log('Scan history updated:', itemName);
+      return res.status(200).json({ message: "Scan history updated successfully", data: existingScan });
+    }
+
     const newScan = new ScanHistory({
       "item name": itemName,
       "item code": itemCode,
       "nutrition information": nutritionInformation,
-      "user id": userId || "anonymous" // Default to anonymous if not provided
+      "user id": userId || "anonymous", // Default to anonymous if not provided
+      "warning": warning,
+      "health analysis": healthAnalysis
     });
 
     await newScan.save();
@@ -206,6 +226,7 @@ const UserSchema = new mongoose.Schema({
     partner: String,
     dateWon: { type: Date, default: Date.now }
   }],
+  favoritePosts: [String],
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -292,7 +313,8 @@ app.post('/api/login', async (req, res) => {
         isVip: user.isVip,
         allergies: user.allergies,
         dietPreferences: user.dietPreferences,
-        coupons: user.coupons || []
+        coupons: user.coupons || [],
+        favoritePosts: user.favoritePosts || []
       }
     });
   } catch (error) {
@@ -467,6 +489,219 @@ app.post('/api/user/coupon', async (req, res) => {
   } catch (error) {
     console.error("Add coupon error:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Blog Schema
+const BlogSchema = new mongoose.Schema({
+  "post name": String,
+  "post content": String,
+  "post datetime": { type: Date, default: Date.now },
+  "user id": String
+}, { strict: false });
+
+const Blog = mongoose.model('Blog', BlogSchema, 'blog');
+
+// Blog Comments Schema
+const BlogCommentSchema = new mongoose.Schema({
+  "post id": String,
+  "comments": String,
+  "comments datetime": { type: Date, default: Date.now },
+  "district": String,
+  "user id": String,
+  "user name": String
+}, { strict: false });
+
+const BlogComment = mongoose.model('BlogComment', BlogCommentSchema, 'blog comments');
+
+// Favorites Schema
+const FavoriteSchema = new mongoose.Schema({
+  "post id": String,
+  "user id": String
+}, { strict: false });
+
+const Favorite = mongoose.model('Favorite', FavoriteSchema, 'favorites');
+
+// Get All Blogs (with search)
+app.get('/api/blogs', async (req, res) => {
+  const { search } = req.query;
+  let query = {};
+  
+  if (search) {
+    query = {
+      $or: [
+        { "post name": { $regex: search, $options: 'i' } },
+        { "post content": { $regex: search, $options: 'i' } }
+      ]
+    };
+  }
+
+  try {
+    // Fetch all matching blogs without sorting in DB to avoid index errors
+    const blogs = await Blog.find(query).lean();
+    
+    // Sort in memory
+    blogs.sort((a, b) => new Date(b["post datetime"]) - new Date(a["post datetime"]));
+
+    console.log(`Found ${blogs.length} blogs`);
+    if (blogs.length > 0) {
+      console.log('Sample blog:', blogs[0]);
+    }
+
+    res.json(blogs.map(b => ({
+      id: b._id,
+      title: b["post name"],
+      content: b["post content"],
+      authorId: b["user id"],
+      createdAt: b["post datetime"]
+    })));
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create Blog Post
+app.post('/api/blogs', async (req, res) => {
+  const { title, content, authorId } = req.body;
+  
+  try {
+    const newBlog = new Blog({
+      "post name": title,
+      "post content": content,
+      "user id": authorId,
+      "post datetime": new Date()
+    });
+    await newBlog.save();
+    res.status(201).json({
+      id: newBlog._id,
+      title: newBlog["post name"],
+      content: newBlog["post content"],
+      authorId: newBlog["user id"],
+      createdAt: newBlog["post datetime"]
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get Single Blog Post
+app.get('/api/blogs/:id', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).lean();
+    if (!blog) return res.status(404).json({ message: "Blog post not found" });
+    res.json({
+      id: blog._id,
+      title: blog["post name"],
+      content: blog["post content"],
+      authorId: blog["user id"],
+      createdAt: blog["post datetime"]
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add Comment
+app.post('/api/blog-comments', async (req, res) => {
+  const { postId, text, userId, userName, district } = req.body;
+  try {
+    const newComment = new BlogComment({
+      "post id": postId,
+      "comments": text,
+      "user id": userId,
+      "user name": userName,
+      "district": district || "Unknown",
+      "comments datetime": new Date()
+    });
+    await newComment.save();
+    res.json(newComment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get Comments for a Post
+app.get('/api/blog-comments/:postId', async (req, res) => {
+  try {
+    // Fetch comments without sorting in DB
+    const comments = await BlogComment.find({ "post id": req.params.postId }).lean();
+    
+    // Sort in memory
+    comments.sort((a, b) => new Date(b["comments datetime"]) - new Date(a["comments datetime"]));
+
+    res.json(comments.map(c => ({
+      id: c._id,
+      postId: c["post id"],
+      text: c["comments"],
+      userId: c["user id"],
+      userName: c["user name"],
+      district: c["district"],
+      createdAt: c["comments datetime"]
+    })));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add to Favorites
+app.post('/api/favorites', async (req, res) => {
+  const { userId, postId } = req.body;
+  try {
+    // Check if already exists
+    const existing = await Favorite.findOne({ "user id": userId, "post id": postId });
+    if (existing) {
+      return res.status(400).json({ message: "Already in favorites" });
+    }
+
+    const newFavorite = new Favorite({
+      "user id": userId,
+      "post id": postId
+    });
+    await newFavorite.save();
+    res.json({ message: "Added to favorites" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Remove from Favorites
+app.delete('/api/favorites', async (req, res) => {
+  const { userId, postId } = req.body;
+  try {
+    await Favorite.deleteOne({ "user id": userId, "post id": postId });
+    res.json({ message: "Removed from favorites" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Check if Favorite
+app.get('/api/favorites/check/:userId/:postId', async (req, res) => {
+  try {
+    const favorite = await Favorite.findOne({ "user id": req.params.userId, "post id": req.params.postId });
+    res.json({ isFavorite: !!favorite });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get User Favorites (with Post details)
+app.get('/api/favorites/:userId', async (req, res) => {
+  try {
+    const favorites = await Favorite.find({ "user id": req.params.userId }).lean();
+    const postIds = favorites.map(f => f["post id"]);
+    
+    const posts = await Blog.find({ _id: { $in: postIds } }).lean();
+    res.json(posts.map(b => ({
+      id: b._id,
+      title: b["post name"],
+      content: b["post content"],
+      authorId: b["user id"],
+      createdAt: b["post datetime"]
+    })));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

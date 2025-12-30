@@ -201,6 +201,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
     justifyContent: 'center',
+    paddingBottom: 50,
   },
   loadingContainer: {
     flex: 1,

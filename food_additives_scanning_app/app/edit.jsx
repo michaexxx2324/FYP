@@ -89,7 +89,17 @@ export default function EditScreen() {
         });
         
         Alert.alert(i18n.success, i18n.saveSuccess, [
-          { text: 'OK', onPress: () => router.push('/scan') }
+          { 
+            text: 'OK', 
+            onPress: () => router.push({
+              pathname: '/product-details',
+              params: { 
+                itemName: itemName, 
+                itemCode: itemCode, 
+                nutritionInformation: ocrText 
+              }
+            }) 
+          }
         ]);
       } else {
         Alert.alert(i18n.error, i18n.saveError);
@@ -187,6 +197,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
     flexGrow: 1,
+    paddingBottom: 50,
   },
   title: {
     fontSize: 24,
