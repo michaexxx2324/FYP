@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -98,6 +99,7 @@ export default function QuizGameScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
+        <Stack.Screen options={{ title: i18n.discountGame, headerRight: () => <TranslateButton /> }} />
         <ActivityIndicator size="large" color="#4CAF50" />
         <Text style={{ marginTop: 10 }}>{i18n.loading}...</Text>
       </View>
@@ -107,6 +109,7 @@ export default function QuizGameScreen() {
   if (gameOver) {
     return (
       <View style={styles.container}>
+        <Stack.Screen options={{ title: i18n.discountGame, headerRight: () => <TranslateButton /> }} />
         <View style={styles.resultCard}>
           <Ionicons name="trophy" size={80} color="#FFD700" />
           <Text style={styles.resultTitle}>{i18n.congratulations || "Congratulations!"}</Text>
@@ -152,6 +155,7 @@ export default function QuizGameScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Stack.Screen options={{ title: i18n.discountGame, headerRight: () => <TranslateButton /> }} />
       <View style={styles.header}>
         <Text style={styles.questionCount}>
           {i18n.question || "Question"} {currentQuestionIndex + 1} / {questions.length}

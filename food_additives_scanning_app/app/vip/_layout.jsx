@@ -2,6 +2,7 @@ import { Tabs, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLanguage } from '../../context/LanguageContext';
 import { TouchableOpacity } from 'react-native';
+import TranslateButton from '../../components/TranslateButton';
 
 export default function VipLayout() {
   const { i18n } = useLanguage();
@@ -19,6 +20,9 @@ export default function VipLayout() {
         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 15 }}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <TranslateButton style={{ marginRight: 15, backgroundColor: 'rgba(255,255,255,0.2)' }} textStyle={{ color: 'white' }} />
       ),
     }}>
       <Tabs.Screen

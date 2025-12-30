@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import TranslateButton from '../../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -134,6 +135,10 @@ export default function PostDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <Stack.Screen options={{
+        headerRight: () => <TranslateButton />,
+        title: i18n.blog || "Blog"
+      }} />
       <View style={styles.postCard}>
         <Text style={styles.title}>{post.title}</Text>
         <View style={styles.metaRow}>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -192,7 +193,7 @@ export default function SettingsScreen() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
-        <View style={{width: 24}} />
+        <TranslateButton />
       </View>
 
       <ScrollView style={styles.formContainer} contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={false}>

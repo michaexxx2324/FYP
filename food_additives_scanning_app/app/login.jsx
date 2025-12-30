@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Acti
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -46,6 +47,9 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 1 }}>
+        <TranslateButton />
+      </View>
       <View style={styles.card}>
         <Text style={styles.headerTitle}>{i18n.loginTitle}</Text>
         

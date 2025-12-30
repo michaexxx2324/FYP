@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -44,6 +45,9 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 1 }}>
+        <TranslateButton />
+      </View>
       <View style={styles.card}>
         <Text style={styles.headerTitle}>{i18n.resetPasswordTitle}</Text>
         

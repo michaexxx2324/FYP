@@ -4,6 +4,7 @@ import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -106,7 +107,10 @@ export default function PaymentScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: i18n.paymentTitle }} />
+      <Stack.Screen options={{ 
+        title: i18n.paymentTitle,
+        headerRight: () => <TranslateButton />
+      }} />
       <ScrollView style={styles.content}>
         {/* Plan Selection */}
         <Text style={styles.sectionTitle}>{i18n.selectPlan}</Text>

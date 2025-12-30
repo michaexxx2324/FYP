@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import TranslateButton from '../../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -50,6 +51,10 @@ export default function CreatePostScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <Stack.Screen options={{
+        headerRight: () => <TranslateButton />,
+        title: i18n.createPost || "Create Post"
+      }} />
       <Text style={styles.label}>{i18n.title || "Title"}</Text>
       <TextInput
         style={styles.input}

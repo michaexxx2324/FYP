@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -145,7 +146,7 @@ export default function UpgradeToVipScreen() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{i18n.upgradeVIP}</Text>
-        <View style={{width: 24}} />
+        <TranslateButton />
       </View>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={{paddingBottom: 50}}>

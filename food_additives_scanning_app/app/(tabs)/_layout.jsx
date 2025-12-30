@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
+import TranslateButton from '../../components/TranslateButton';
 
 export default function TabLayout() {
   const { toggleLanguage, i18n } = useLanguage();
@@ -9,11 +10,7 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{
       tabBarActiveTintColor: 'blue',
-      headerRight: () => (
-        <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
-          <Text style={styles.langText}>中/ENG</Text>
-        </TouchableOpacity>
-      ),
+      headerRight: () => <TranslateButton style={{ marginRight: 15 }} />,
     }}>
       <Tabs.Screen
         name="index"

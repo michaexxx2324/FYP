@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLanguage } from '../context/LanguageContext';
+import TranslateButton from '../components/TranslateButton';
 
 const API_URL = 'http://192.168.50.124:3000/api';
 
@@ -160,6 +161,9 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 1 }}>
+        <TranslateButton />
+      </View>
       <View style={styles.card}>
         <Text style={styles.headerTitle}>{i18n.registerTitle}</Text>
         

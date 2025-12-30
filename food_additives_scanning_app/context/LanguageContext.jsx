@@ -254,6 +254,7 @@ export const translations = {
     submit: 'Submit',
     postCreated: 'Post created successfully',
     errorOccurred: 'An error occurred',
+    safeToConsume: 'Safe to consume! No allergens detected.',
   },
   zh: {
     home: '首頁',
@@ -558,6 +559,7 @@ export const translations = {
     lowRisk: '低風險',
     mediumRisk: '中風險',
     highRisk: '高風險',
+    safeToConsume: '安全食用！未檢測到過敏原。',
   }
 };
 

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useHistory } from '../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import TranslateButton from '../components/TranslateButton';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gpt-5-nano';
@@ -173,6 +174,9 @@ export default function ProductDetailsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
+      <Stack.Screen options={{
+        headerRight: () => <TranslateButton />
+      }} />
       {shouldShowWarning(warning) && (
         <View style={styles.warningCard}>
           <Ionicons name="warning" size={32} color="white" />

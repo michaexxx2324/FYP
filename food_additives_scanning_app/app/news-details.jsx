@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import TranslateButton from '../components/TranslateButton';
 
 export default function NewsDetailsScreen() {
   const { i18n } = useLanguage();
@@ -84,6 +85,7 @@ export default function NewsDetailsScreen() {
             <Ionicons name="arrow-back" size={24} color="black" />
             <Text style={styles.backText}>{i18n.return}</Text>
           </TouchableOpacity>
+          <TranslateButton />
         </View>
 
         <View style={styles.contentContainer}>

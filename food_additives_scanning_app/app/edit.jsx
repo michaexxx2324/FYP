@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Button, ScrollView, Alert, TouchableOpacity, Modal } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLanguage } from '../context/LanguageContext';
 import { useHistory } from '../context/HistoryContext';
 import { useAuth } from '../context/AuthContext';
+import TranslateButton from '../components/TranslateButton';
 
 export default function EditScreen() {
   const { i18n } = useLanguage();
@@ -114,6 +115,10 @@ export default function EditScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Stack.Screen options={{
+        headerRight: () => <TranslateButton />,
+        title: i18n.editScan
+      }} />
       <Text style={styles.title}>{i18n.editScan}</Text>
 
       <View style={styles.inputGroup}>
