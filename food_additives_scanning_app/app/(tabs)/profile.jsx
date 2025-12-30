@@ -53,6 +53,18 @@ export default function ProfileScreen() {
         )}
       </View>
 
+      {/* VIP Dashboard Button */}
+      {user.isVip && (
+        <TouchableOpacity 
+          style={styles.vipDashboardButton}
+          onPress={() => router.push('/vip/recipes')}
+        >
+          <Ionicons name="diamond-outline" size={24} color="white" style={{ marginRight: 10 }} />
+          <Text style={styles.vipDashboardText}>{i18n.vipDashboard || "VIP Dashboard"}</Text>
+          <Ionicons name="chevron-forward" size={24} color="white" style={{ marginLeft: 'auto' }} />
+        </TouchableOpacity>
+      )}
+
       <View style={styles.infoSection}>
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>{i18n.email}</Text>
@@ -110,16 +122,7 @@ export default function ProfileScreen() {
       )}
 
       <View style={styles.menu}>
-        {user.isVip ? (
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => alert(i18n.vipFunctionalityComingSoon)}
-          >
-            <Ionicons name="star" size={24} color="#E68A00" />
-            <Text style={styles.menuText}>{i18n.vipFunction}</Text>
-            <Ionicons name="chevron-forward" size={24} color="#ccc" />
-          </TouchableOpacity>
-        ) : (
+        {!user.isVip && (
           <TouchableOpacity 
             style={styles.menuItem} 
             onPress={() => router.push('/upgrade-to-vip')}
@@ -234,6 +237,28 @@ const styles = StyleSheet.create({
   tagText: {
     color: '#0277BD',
     fontSize: 14,
+  },
+  vipDashboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFD700', // Gold color
+    margin: 20,
+    marginTop: 0,
+    padding: 15,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  vipDashboardText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
   sectionTitle: {
     fontSize: 18,

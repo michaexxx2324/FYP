@@ -18,14 +18,12 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
       {isVip ? (
         <TouchableOpacity 
-          style={[styles.vipButton, { backgroundColor: '#E68A00' }]}
-          onPress={() => alert(i18n.vipFunctionalityComingSoon)}
+          style={styles.vipDashboardButton}
+          onPress={() => router.push('/vip/recipes')}
         >
-          <Ionicons name="star" size={20} color="white" style={{ marginRight: 8 }} />
-          <View>
-            <Text style={styles.vipButtonText}>{i18n.vipFunction || "VIP Function"}</Text>
-            <Text style={styles.vipButtonSubText}>{i18n.exclusiveAccess || "Exclusive Access"}</Text>
-          </View>
+          <Ionicons name="diamond-outline" size={24} color="white" style={{ marginRight: 10 }} />
+          <Text style={styles.vipDashboardText}>{i18n.vipDashboard || "VIP Dashboard"}</Text>
+          <Ionicons name="chevron-forward" size={24} color="white" style={{ marginLeft: 'auto' }} />
         </TouchableOpacity>
       ) : (
         <TouchableOpacity 
@@ -259,5 +257,26 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     marginTop: 10,
     fontSize: 16,
+  },
+  vipDashboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFD700', // Gold color
+    marginBottom: 20,
+    padding: 15,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  vipDashboardText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
 });

@@ -143,7 +143,7 @@ export default function ScanScreen() {
             {
               role: 'user',
               content: [
-                { type: 'text', text: 'Extract text from this image, specifically focusing on food ingredients, nutrition information, and allergen warnings. IGNORE any QR codes, barcodes, or marketing URLs. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations.' },
+                { type: 'text', text: 'Extract text from this image, specifically focusing on food ingredients, nutrition information, and allergen warnings. IGNORE any QR codes, barcodes, or marketing URLs. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations. Do NOT return any markdown images or links.' },
                 { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
               ]
             }
@@ -158,7 +158,13 @@ export default function ScanScreen() {
       }
 
       if (data.choices && data.choices.length > 0) {
-        const content = data.choices[0].message.content;
+        let content = data.choices[0].message.content;
+        // Remove markdown images ![...](...)
+        content = content.replace(/!\[.*?\]\(.*?\)/g, '');
+        // Remove standalone links
+        content = content.replace(/https?:\/\/\S+/g, '');
+        content = content.trim();
+
         setOcrText(content);
         
         // Navigate to Edit Screen with OCR result
