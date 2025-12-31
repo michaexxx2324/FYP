@@ -9,12 +9,16 @@ const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gpt-5-nano';
 
 export default function AnalysisScreen() {
-  const { i18n } = useLanguage();
+  const { i18n, language } = useLanguage();
   const { user } = useAuth();
   const { history } = useHistory();
   const [selectedItem, setSelectedItem] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const displayAnalysis = analysis && (analysis.english || analysis.traditional_chinese)
+    ? (language === 'zh' ? analysis.traditional_chinese : analysis.english)
+    : analysis;
 
   const handleAnalyze = async (item) => {
     setSelectedItem(item);
@@ -41,13 +45,21 @@ export default function AnalysisScreen() {
 
         Output Format (JSON):
         {
-          "score": 85,
-          "risk": "Low",
-          "recommendations": ["Rec 1", "Rec 2", "Rec 3"],
-          "details": "Detailed explanation..."
+          "english": {
+            "score": 85,
+            "risk": "Low",
+            "recommendations": ["Rec 1", "Rec 2", "Rec 3"],
+            "details": "Detailed explanation..."
+          },
+          "traditional_chinese": {
+            "score": 85,
+            "risk": "低",
+            "recommendations": ["建議 1", "建議 2", "建議 3"],
+            "details": "詳細解釋..."
+          }
         }
 
-        Provide output in BOTH English and Traditional Chinese (繁體中文).
+        STRICTLY return ONLY the JSON object. Do not add any introductory or concluding text.
       `;
 
       console.log("Sending request to AI Service...");
@@ -82,18 +94,74 @@ export default function AnalysisScreen() {
 
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
         
-        if (jsonMatch) {
-          try {
-            const parsedAnalysis = JSON.parse(jsonMatch[0]);
+        let parsedAnalysis = null;
+        
+        // 1. Try parsing the whole content as JSON
+        try {
+            parsedAnalysis = JSON.parse(content);
+        } catch (e) {
+            // 2. Try extracting from markdown code blocks
+            const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (codeBlockMatch) {
+                try {
+                    parsedAnalysis = JSON.parse(codeBlockMatch[1]);
+                } catch (e2) {
+                    console.warn("Failed to parse JSON from code block");
+                }
+            }
+            
+            // 3. Try finding the first { and last }
+            if (!parsedAnalysis) {
+                const firstOpen = content.indexOf('{');
+                const lastClose = content.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    try {
+                        const jsonString = content.substring(firstOpen, lastClose + 1);
+                        parsedAnalysis = JSON.parse(jsonString);
+                    } catch (e3) {
+                        console.warn("Failed to parse JSON from substring");
+                    }
+                }
+            }
+
+            // 4. Fallback: Try to find multiple JSON objects if the single object parse failed
+            if (!parsedAnalysis) {
+                const jsonMatches = content.match(/\{[\s\S]*?\}/g);
+                if (jsonMatches && jsonMatches.length >= 2) {
+                    try {
+                        // Assuming first is English and second is Chinese based on common AI behavior
+                        const part1 = JSON.parse(jsonMatches[0]);
+                        const part2 = JSON.parse(jsonMatches[1]);
+                        
+                        // Simple heuristic to check which is which (check for Chinese characters in risk or details)
+                        const isPart1Chinese = /[\u4e00-\u9fa5]/.test(JSON.stringify(part1));
+                        
+                        if (isPart1Chinese) {
+                            parsedAnalysis = { english: part2, traditional_chinese: part1 };
+                        } else {
+                            parsedAnalysis = { english: part1, traditional_chinese: part2 };
+                        }
+                    } catch (e4) {
+                        console.warn("Failed to parse multiple JSON blocks");
+                    }
+                } else if (jsonMatches && jsonMatches.length === 1) {
+                     try {
+                        const part = JSON.parse(jsonMatches[0]);
+                        // If only one JSON found, assign it to both or detect language
+                        parsedAnalysis = { english: part, traditional_chinese: part };
+                    } catch (e5) {
+                        console.warn("Failed to parse single JSON block from matches");
+                    }
+                }
+            }
+        }
+
+        if (parsedAnalysis) {
             setAnalysis(parsedAnalysis);
-          } catch (e) {
-            console.warn("Failed to parse inner JSON from AI content");
-            setAnalysis({ details: content });
-          }
         } else {
-          setAnalysis({ details: content });
+            console.warn("Failed to parse inner JSON from AI content. Content:", content);
+            setAnalysis({ details: content });
         }
       } else {
         throw new Error("No content received from AI Service");
@@ -141,26 +209,26 @@ export default function AnalysisScreen() {
 
           {loading ? (
             <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
-          ) : analysis ? (
+          ) : displayAnalysis ? (
             <View>
               <View style={styles.scoreCard}>
                 <Text style={styles.scoreLabel}>{i18n.nutritionScore || "Nutrition Density Score"}</Text>
-                <Text style={styles.scoreValue}>{analysis.score}/100</Text>
+                <Text style={styles.scoreValue}>{displayAnalysis.score}/100</Text>
               </View>
 
               <View style={styles.riskCard}>
                 <Text style={styles.riskLabel}>{i18n.additiveRisk || "Additive Risk"}</Text>
                 <Text style={[
                   styles.riskValue, 
-                  { color: analysis.risk?.includes('High') ? 'red' : analysis.risk?.includes('Medium') ? 'orange' : 'green' }
+                  { color: displayAnalysis.risk?.includes('High') ? 'red' : displayAnalysis.risk?.includes('Medium') ? 'orange' : 'green' }
                 ]}>
-                  {analysis.risk}
+                  {displayAnalysis.risk}
                 </Text>
               </View>
 
               <View style={styles.recCard}>
                 <Text style={styles.recLabel}>{i18n.personalizedAdvice || "Personalized Advice"}</Text>
-                {analysis.recommendations && analysis.recommendations.map((rec, i) => (
+                {displayAnalysis.recommendations && displayAnalysis.recommendations.map((rec, i) => (
                   <View key={i} style={styles.recItem}>
                     <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
                     <Text style={styles.recText}>{rec}</Text>

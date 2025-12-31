@@ -9,11 +9,15 @@ const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gpt-5-nano';
 
 export default function RecipesScreen() {
-  const { i18n } = useLanguage();
+  const { i18n, language } = useLanguage();
   const { user } = useAuth();
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState(null);
+
+  const displayRecipe = recipe && (recipe.english || recipe.traditional_chinese)
+    ? (language === 'zh' ? recipe.traditional_chinese : recipe.english)
+    : recipe;
 
   const takePicture = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -23,6 +27,26 @@ export default function RecipesScreen() {
     }
 
     const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      generateRecipe(result.assets[0].base64);
+    }
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(i18n.permissionNeeded, i18n.permissionNeeded);
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.5,
       base64: true,
@@ -49,21 +73,33 @@ export default function RecipesScreen() {
         - Diet: ${diet}
 
         Task:
-        1. List the identified ingredients.
-        2. Generate a HEALTHY recipe using these ingredients.
-        3. Ensure the recipe does NOT violate the user's diet or allergies if possible.
-        4. If the ingredients themselves contain allergens (e.g., user allergic to nuts, and image has nuts), provide a WARNING but still generate a recipe (maybe suggest alternatives).
+        1. List ALL identified ingredients from the image.
+        2. CRITICAL SAFETY CHECK: Compare identified ingredients against User Allergies.
+           - If ANY identified ingredient is an allergen for the user (e.g., image has eggs, user is allergic to eggs), you MUST provide a STRONG WARNING in the "warning" field.
+           - This warning is required even if you generate a recipe that excludes the allergen.
+        3. Generate a HEALTHY recipe.
+           - If an allergen is present in the ingredients, suggest a recipe that uses ALTERNATIVES or excludes that ingredient.
+           - Explicitly mention the substitution in the recipe.
 
         Output Format (JSON):
         {
-          "ingredients": ["List of ingredients found"],
-          "recipeName": "Name of the dish",
-          "instructions": ["Step 1", "Step 2"...],
-          "healthBenefits": "Why this is healthy",
-          "warning": "Warning message if allergens found, else null"
+          "english": {
+            "ingredients": ["List of ingredients found"],
+            "recipeName": "Name of the dish",
+            "instructions": ["Step 1", "Step 2"...],
+            "healthBenefits": "Why this is healthy",
+            "warning": "Warning message if allergens found in image, else null"
+          },
+          "traditional_chinese": {
+            "ingredients": ["List of ingredients found"],
+            "recipeName": "Name of the dish",
+            "instructions": ["Step 1", "Step 2"...],
+            "healthBenefits": "Why this is healthy",
+            "warning": "Warning message if allergens found in image, else null"
+          }
         }
         
-        Provide output in BOTH English and Traditional Chinese (繁體中文) for all text fields.
+        STRICTLY return ONLY the JSON object. Do not add any introductory or concluding text.
       `;
 
       console.log("Sending request to AI Service...");
@@ -103,17 +139,73 @@ export default function RecipesScreen() {
 
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
         
-        if (jsonMatch) {
-          try {
-            setRecipe(JSON.parse(jsonMatch[0]));
-          } catch (e) {
-            console.warn("Failed to parse inner JSON from AI content");
-            setRecipe({ recipeName: "Analysis Result", instructions: [content] });
-          }
+        let parsedRecipe = null;
+        
+        // 1. Try parsing the whole content as JSON
+        try {
+            parsedRecipe = JSON.parse(content);
+        } catch (e) {
+            // 2. Try extracting from markdown code blocks
+            const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (codeBlockMatch) {
+                try {
+                    parsedRecipe = JSON.parse(codeBlockMatch[1]);
+                } catch (e2) {
+                    console.warn("Failed to parse JSON from code block");
+                }
+            }
+            
+            // 3. Try finding the first { and last }
+            if (!parsedRecipe) {
+                const firstOpen = content.indexOf('{');
+                const lastClose = content.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    try {
+                        const jsonString = content.substring(firstOpen, lastClose + 1);
+                        parsedRecipe = JSON.parse(jsonString);
+                    } catch (e3) {
+                        console.warn("Failed to parse JSON from substring");
+                    }
+                }
+            }
+
+             // 4. Fallback: Try to find multiple JSON objects if the single object parse failed
+            if (!parsedRecipe) {
+                const jsonMatches = content.match(/\{[\s\S]*?\}/g);
+                if (jsonMatches && jsonMatches.length >= 2) {
+                    try {
+                        // Assuming first is English and second is Chinese based on common AI behavior
+                        const part1 = JSON.parse(jsonMatches[0]);
+                        const part2 = JSON.parse(jsonMatches[1]);
+                        
+                        // Simple heuristic to check which is which (check for Chinese characters)
+                        const isPart1Chinese = /[\u4e00-\u9fa5]/.test(JSON.stringify(part1));
+                        
+                        if (isPart1Chinese) {
+                            parsedRecipe = { english: part2, traditional_chinese: part1 };
+                        } else {
+                            parsedRecipe = { english: part1, traditional_chinese: part2 };
+                        }
+                    } catch (e4) {
+                        console.warn("Failed to parse multiple JSON blocks");
+                    }
+                } else if (jsonMatches && jsonMatches.length === 1) {
+                     try {
+                        const part = JSON.parse(jsonMatches[0]);
+                        parsedRecipe = { english: part, traditional_chinese: part };
+                    } catch (e5) {
+                        console.warn("Failed to parse single JSON block from matches");
+                    }
+                }
+            }
+        }
+
+        if (parsedRecipe) {
+            setRecipe(parsedRecipe);
         } else {
-          setRecipe({ recipeName: "Analysis Result", instructions: [content] });
+            console.warn("Failed to parse inner JSON from AI content. Content:", content);
+            setRecipe({ recipeName: "Analysis Result", instructions: [content] });
         }
       } else {
         throw new Error("No content received from AI Service");
@@ -139,10 +231,17 @@ export default function RecipesScreen() {
           </View>
         )}
         
-        <TouchableOpacity style={styles.cameraButton} onPress={takePicture}>
-          <Ionicons name="camera" size={24} color="white" />
-          <Text style={styles.cameraButtonText}>{i18n.takePhoto || "Take Photo"}</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <TouchableOpacity style={styles.cameraButton} onPress={takePicture}>
+            <Ionicons name="camera" size={24} color="white" />
+            <Text style={styles.cameraButtonText}>{i18n.takePhoto || "Take Photo"}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.cameraButton, { backgroundColor: '#4CAF50' }]} onPress={pickImage}>
+            <Ionicons name="images" size={24} color="white" />
+            <Text style={styles.cameraButtonText}>{i18n.selectAlbum || "Select Album"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading && (
@@ -152,12 +251,12 @@ export default function RecipesScreen() {
         </View>
       )}
 
-      {recipe && (
+      {displayRecipe && (
         <View style={styles.resultContainer}>
-          {recipe.warning ? (
+          {displayRecipe.warning ? (
             <View style={styles.warningBox}>
               <Ionicons name="warning" size={24} color="white" />
-              <Text style={styles.warningText}>{recipe.warning}</Text>
+              <Text style={styles.warningText}>{displayRecipe.warning}</Text>
             </View>
           ) : (
             <View style={[styles.warningBox, { backgroundColor: '#4CAF50' }]}>
@@ -166,25 +265,25 @@ export default function RecipesScreen() {
             </View>
           )}
 
-          <Text style={styles.recipeTitle}>{recipe.recipeName}</Text>
+          <Text style={styles.recipeTitle}>{displayRecipe.recipeName}</Text>
           
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>{i18n.ingredientsList || "Ingredients"}</Text>
-            {recipe.ingredients && recipe.ingredients.map((ing, i) => (
+            {displayRecipe.ingredients && displayRecipe.ingredients.map((ing, i) => (
               <Text key={i} style={styles.listItem}>• {ing}</Text>
             ))}
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>{i18n.instructions || "Instructions"}</Text>
-            {recipe.instructions && recipe.instructions.map((step, i) => (
+            {displayRecipe.instructions && displayRecipe.instructions.map((step, i) => (
               <Text key={i} style={styles.listItem}>{i + 1}. {step}</Text>
             ))}
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>{i18n.healthBenefits || "Health Benefits"}</Text>
-            <Text style={styles.bodyText}>{recipe.healthBenefits}</Text>
+            <Text style={styles.bodyText}>{displayRecipe.healthBenefits}</Text>
           </View>
         </View>
       )}
