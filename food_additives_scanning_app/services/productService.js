@@ -1,6 +1,6 @@
-// This service handles communication with the backend to fetch product details
-// You need to deploy the Azure Function provided in the 'azure-functions' folder
-// and update the API_URL below with your deployed function URL.
+
+// need to deploy Azure 
+// 'azure-functions'
 
 // Example: 'https://my-food-app.azurewebsites.net/api/GetProduct'
 // For local testing with Expo Go, use your computer's IP: 'http://192.168.1.100:7071/api/GetProduct'
