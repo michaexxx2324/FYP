@@ -79,7 +79,7 @@ export default function AnalysisScreen() {
 
       const text = await response.text();
       console.log("AI Response Status:", response.status);
-      // console.log("AI Response Body:", text); // Uncomment for debugging
+      
 
       if (!response.ok) {
         throw new Error(`AI Service Error (${response.status}): ${text.slice(0, 100)}`);
@@ -97,11 +97,11 @@ export default function AnalysisScreen() {
         
         let parsedAnalysis = null;
         
-        // 1. Try parsing the whole content as JSON
+        
         try {
             parsedAnalysis = JSON.parse(content);
         } catch (e) {
-            // 2. Try extracting from markdown code blocks
+            
             const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
             if (codeBlockMatch) {
                 try {
@@ -111,7 +111,7 @@ export default function AnalysisScreen() {
                 }
             }
             
-            // 3. Try finding the first { and last }
+            
             if (!parsedAnalysis) {
                 const firstOpen = content.indexOf('{');
                 const lastClose = content.lastIndexOf('}');
@@ -125,16 +125,16 @@ export default function AnalysisScreen() {
                 }
             }
 
-            // 4. Fallback: Try to find multiple JSON objects if the single object parse failed
+            
             if (!parsedAnalysis) {
                 const jsonMatches = content.match(/\{[\s\S]*?\}/g);
                 if (jsonMatches && jsonMatches.length >= 2) {
                     try {
-                        // Assuming first is English and second is Chinese based on common AI behavior
+                        
                         const part1 = JSON.parse(jsonMatches[0]);
                         const part2 = JSON.parse(jsonMatches[1]);
                         
-                        // Simple heuristic to check which is which (check for Chinese characters in risk or details)
+                        
                         const isPart1Chinese = /[\u4e00-\u9fa5]/.test(JSON.stringify(part1));
                         
                         if (isPart1Chinese) {
@@ -148,7 +148,7 @@ export default function AnalysisScreen() {
                 } else if (jsonMatches && jsonMatches.length === 1) {
                      try {
                         const part = JSON.parse(jsonMatches[0]);
-                        // If only one JSON found, assign it to both or detect language
+                        
                         parsedAnalysis = { english: part, traditional_chinese: part };
                     } catch (e5) {
                         console.warn("Failed to parse single JSON block from matches");

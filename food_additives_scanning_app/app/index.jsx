@@ -25,7 +25,7 @@ export default function LandingScreen() {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // Animation finished
+      
       setTimeout(() => {
         setAnimationFinished(true);
       }, 1000);
@@ -58,7 +58,7 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff', // Or your app theme color
+    backgroundColor: '#ffffff', 
     justifyContent: 'center',
     alignItems: 'center',
   },

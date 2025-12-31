@@ -21,7 +21,7 @@ export default function UpgradeToVipScreen() {
     }
 
     try {
-      // Call backend to update VIP status
+      
       const response = await fetch(`${API_URL}/user/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -34,7 +34,7 @@ export default function UpgradeToVipScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        // Update local context
+        
         updateUser({ isVip: true });
         Alert.alert(i18n.success, i18n.youAreNowVip, [
           { text: 'OK', onPress: () => router.back() }
@@ -60,7 +60,7 @@ export default function UpgradeToVipScreen() {
           </View>
           <Text style={styles.cardSubtitle}>{i18n.recipeSubtitle}</Text>
 
-          {/* Recipe Item 1 */}
+          
           <View style={styles.recipeItem}>
             <View style={styles.recipeLeftBorder} />
             <View style={styles.recipeContent}>
@@ -72,7 +72,7 @@ export default function UpgradeToVipScreen() {
             </View>
           </View>
 
-          {/* Recipe Item 2 */}
+          
           <View style={styles.recipeItem}>
             <View style={styles.recipeLeftBorder} />
             <View style={styles.recipeContent}>
@@ -150,7 +150,7 @@ export default function UpgradeToVipScreen() {
       </View>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={{paddingBottom: 50}}>
-        {/* Banner */}
+        
         <View style={styles.banner}>
           <View style={styles.bannerContent}>
             <Ionicons name="star" size={24} color="white" style={{ marginRight: 8 }} />
@@ -159,7 +159,7 @@ export default function UpgradeToVipScreen() {
           <Text style={styles.bannerSubtitle}>{i18n.vipSubtitle}</Text>
         </View>
 
-        {/* Tabs */}
+        
         <View style={styles.tabsContainer}>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'recipe' && styles.activeTab]}
@@ -187,10 +187,10 @@ export default function UpgradeToVipScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Content Area */}
+        
         {renderContent()}
 
-        {/* Membership Section */}
+        
         <View style={styles.contentCard}>
           <Text style={styles.cardTitle}>{i18n.membership}</Text>
           <Text style={styles.priceText}>{i18n.price}</Text>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   banner: {
-    backgroundColor: '#E68A00', // Orange color from image
+    backgroundColor: '#E68A00', 
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   activeTab: {
-    backgroundColor: '#00BFFF', // Light blue from image
+    backgroundColor: '#00BFFF', 
   },
   tabText: {
     color: '#666',
@@ -412,9 +412,9 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 5,
   },
-  // New Styles
+  
   progressBarContainer: {
-    backgroundColor: '#28a745', // Green
+    backgroundColor: '#28a745', 
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   calorieBox: {
-    backgroundColor: '#FFF9C4', // Light yellow
+    backgroundColor: '#FFF9C4', 
     flex: 0.48,
     padding: 15,
     borderRadius: 10,

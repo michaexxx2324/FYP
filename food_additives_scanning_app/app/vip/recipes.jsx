@@ -142,11 +142,11 @@ export default function RecipesScreen() {
         
         let parsedRecipe = null;
         
-        // 1. Try parsing the whole content as JSON
+        
         try {
             parsedRecipe = JSON.parse(content);
         } catch (e) {
-            // 2. Try extracting from markdown code blocks
+            
             const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
             if (codeBlockMatch) {
                 try {
@@ -156,7 +156,7 @@ export default function RecipesScreen() {
                 }
             }
             
-            // 3. Try finding the first { and last }
+            
             if (!parsedRecipe) {
                 const firstOpen = content.indexOf('{');
                 const lastClose = content.lastIndexOf('}');
@@ -170,16 +170,16 @@ export default function RecipesScreen() {
                 }
             }
 
-             // 4. Fallback: Try to find multiple JSON objects if the single object parse failed
+             
             if (!parsedRecipe) {
                 const jsonMatches = content.match(/\{[\s\S]*?\}/g);
                 if (jsonMatches && jsonMatches.length >= 2) {
                     try {
-                        // Assuming first is English and second is Chinese based on common AI behavior
+                        
                         const part1 = JSON.parse(jsonMatches[0]);
                         const part2 = JSON.parse(jsonMatches[1]);
                         
-                        // Simple heuristic to check which is which (check for Chinese characters)
+                        
                         const isPart1Chinese = /[\u4e00-\u9fa5]/.test(JSON.stringify(part1));
                         
                         if (isPart1Chinese) {

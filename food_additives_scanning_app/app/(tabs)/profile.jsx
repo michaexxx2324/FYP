@@ -53,7 +53,7 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      {/* VIP Dashboard Button */}
+      
       {user.isVip && (
         <TouchableOpacity 
           style={styles.vipDashboardButton}
@@ -102,7 +102,7 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Coupons Section */}
+      
       {user.coupons && user.coupons.length > 0 && (
         <View style={styles.infoSection}>
           <Text style={styles.sectionTitle}>{i18n.myCoupons || "My Coupons"}</Text>
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   vipDashboardButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFD700', // Gold color
+    backgroundColor: '#FFD700', 
     margin: 20,
     marginTop: 0,
     padding: 15,

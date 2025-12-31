@@ -36,7 +36,7 @@ export default function PaymentScreen() {
       
       Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
       
-      // Ask for manual confirmation since we can't get a callback from personal links
+      
       setTimeout(() => {
         Alert.alert(
           i18n.confirmPayment,
@@ -54,8 +54,8 @@ export default function PaymentScreen() {
         );
       }, 1000);
     } else {
-      // Dummy payment for other methods (VISA, Alipay, WeChat)
-      // For showcase purposes, we simulate a successful transaction
+      
+      
       const isShowcase = selectedMethod === 'visa' || selectedMethod === 'alipay' || selectedMethod === 'wechat';
       const message = isShowcase
         ? i18n.transactionId + Math.floor(Math.random() * 1000000000) 
@@ -112,7 +112,7 @@ export default function PaymentScreen() {
         headerRight: () => <TranslateButton />
       }} />
       <ScrollView style={styles.content}>
-        {/* Plan Selection */}
+        
         <Text style={styles.sectionTitle}>{i18n.selectPlan}</Text>
         {plans.map((plan) => (
           <TouchableOpacity
@@ -138,7 +138,7 @@ export default function PaymentScreen() {
           </TouchableOpacity>
         ))}
 
-        {/* Payment Method Selection */}
+        
         <Text style={styles.sectionTitle}>{i18n.selectPaymentMethod}</Text>
         {paymentMethods.map((method) => (
           <TouchableOpacity
@@ -160,7 +160,7 @@ export default function PaymentScreen() {
         ))}
       </ScrollView>
 
-      {/* Bottom Pay Button */}
+      
       <View style={styles.bottomContainer}>
         <TouchableOpacity style={styles.payButton} onPress={handlePay}>
           <Text style={styles.payButtonText}>{i18n.payNow}</Text>

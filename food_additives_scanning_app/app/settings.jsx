@@ -16,7 +16,7 @@ export default function SettingsScreen() {
   
   const [showPassword, setShowPassword] = useState(false);
   
-  // Custom Input State
+  
   const [showCustomAllergy, setShowCustomAllergy] = useState(false);
   const [customAllergyText, setCustomAllergyText] = useState('');
   const [showCustomDiet, setShowCustomDiet] = useState(false);
@@ -25,7 +25,7 @@ export default function SettingsScreen() {
   const [formData, setFormData] = useState({
     email: '',
     username: '',
-    password: '', // Optional: only if changing
+    password: '', 
     allergies: [],
     dietPreferences: []
   });
@@ -58,7 +58,7 @@ export default function SettingsScreen() {
       : [];
     
     const all = [...defaultAllergies, ...userCustom, ...localCustomAllergies];
-    // Deduplicate
+    
     const unique = [];
     const seen = new Set();
     for (const item of all) {
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
       : [];
 
     const all = [...defaultDiets, ...userCustom, ...localCustomDiets];
-    // Deduplicate
+    
     const unique = [];
     const seen = new Set();
     for (const item of all) {
@@ -152,7 +152,7 @@ export default function SettingsScreen() {
       };
 
       if (formData.password) {
-        // Password Validation
+        
         const passwordRegex = /^(?=.*[a-zA-Z]).{8,}$/;
         if (!passwordRegex.test(formData.password)) {
           Alert.alert('Weak Password', 'Password must be at least 8 characters long and contain at least one English letter.');
@@ -290,7 +290,7 @@ export default function SettingsScreen() {
         <View style={{ height: 50 }} />
       </ScrollView>
 
-      {/* Custom Allergy Modal */}
+      
       <Modal visible={showCustomAllergy} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -313,7 +313,7 @@ export default function SettingsScreen() {
         </View>
       </Modal>
 
-      {/* Custom Diet Modal */}
+      
       <Modal visible={showCustomDiet} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>

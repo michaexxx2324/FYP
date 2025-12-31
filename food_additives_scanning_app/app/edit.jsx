@@ -29,14 +29,14 @@ export default function EditScreen() {
   }, [params.ocrText]);
 
   useEffect(() => {
-    // Generate 13-digit code
+    
     const generatedCode = generate13DigitCode();
     setItemCode(generatedCode);
   }, []);
 
   const generate13DigitCode = () => {
-    // Simple generation: timestamp + random to make 13 digits
-    // Date.now() is 13 digits usually, but let's be safe
+    
+    
     const timestamp = Date.now().toString();
     const random = Math.floor(Math.random() * 1000).toString();
     return (timestamp + random).slice(0, 13);
@@ -66,8 +66,8 @@ export default function EditScreen() {
 
     setIsSaving(true);
     try {
-      // Save to backend
-      // Use your computer's local IP address instead of localhost/10.0.2.2 for physical devices
+      
+      
       const response = await fetch('http://192.168.50.124:3000/api/SaveScanHistory', {
         method: 'POST',
         headers: {
@@ -82,7 +82,7 @@ export default function EditScreen() {
       });
 
       if (response.ok) {
-        // Also add to local history context for immediate display
+        
         addToHistory({
           itemName: itemName,
           itemCode: itemCode,

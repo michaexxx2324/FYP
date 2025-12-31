@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       setUser(newUser);
       await AsyncStorage.setItem('userToken', newToken);
       await AsyncStorage.setItem('userData', JSON.stringify(newUser));
-      // Also sync with UserContext for VIP status if needed, but AuthContext is source of truth for login
+      
     } catch (error) {
       console.error('Login error', error);
     }

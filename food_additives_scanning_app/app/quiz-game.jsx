@@ -49,7 +49,7 @@ export default function QuizGameScreen() {
       setScore(score + 1);
     }
 
-    // Wait a bit before moving to next question
+    
     setTimeout(() => {
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -88,7 +88,7 @@ export default function QuizGameScreen() {
 
       if (response.ok) {
         const data = await response.json();
-        // Update local user context with new coupons
+        
         updateUser({ coupons: data.coupons });
       }
     } catch (error) {

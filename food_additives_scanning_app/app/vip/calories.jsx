@@ -60,7 +60,7 @@ export default function CaloriesScreen() {
     setLoading(true);
 
     try {
-      // Ask AI to extract calories from the nutrition info
+      
       const prompt = `
         Extract the calories (kcal) per serving or per 100g from this text.
         Text: ${selectedFood.nutritionInformation}
@@ -100,12 +100,12 @@ export default function CaloriesScreen() {
         }
       } catch (e) {
           console.warn("Falling back to mock data due to API error:", e);
-          // Mock: Random calorie count between 50 and 500
+          
           caloriesPerUnit = Math.floor(Math.random() * 450) + 50;
           Alert.alert("Demo Mode", "AI Service unavailable. Estimated calories added.");
       }
 
-      // If AI returns 0 or fails, maybe ask user? For now, assume 0 if failed.
+      
       if (caloriesPerUnit === 0) {
          Alert.alert("Info", "Could not auto-detect calories. Added as 0.");
       }
@@ -136,7 +136,7 @@ export default function CaloriesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header Card */}
+      
       <View style={styles.headerCard}>
         <Text style={styles.headerTitle}>{i18n.calorieCounter || "Calorie Counting"}</Text>
         <View style={styles.progressContainer}>
@@ -148,7 +148,7 @@ export default function CaloriesScreen() {
         </View>
       </View>
 
-      {/* Intake List */}
+      
       <View style={styles.listContainer}>
         <Text style={styles.sectionTitle}>{i18n.todayIntake || "Today's Intake"}</Text>
         <FlatList
@@ -167,12 +167,12 @@ export default function CaloriesScreen() {
         />
       </View>
 
-      {/* Scan/Add Button */}
+      
       <TouchableOpacity style={styles.scanButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.scanButtonText}>{i18n.scanToRecord || "Scan Food to Record"}</Text>
       </TouchableOpacity>
 
-      {/* Modal for Selection */}
+      
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>

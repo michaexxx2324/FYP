@@ -15,12 +15,12 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Date Picker State
+  
   const [dob, setDob] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dobSelected, setDobSelected] = useState(false);
 
-  // Custom Input State
+  
   const [showCustomAllergy, setShowCustomAllergy] = useState(false);
   const [customAllergyText, setCustomAllergyText] = useState('');
   const [showCustomDiet, setShowCustomDiet] = useState(false);
@@ -33,7 +33,7 @@ export default function RegisterScreen() {
     confirmPassword: '',
     dob: '',
     allergies: [],
-    dietPreferences: [] // Changed to array to support multiple/custom
+    dietPreferences: [] 
   });
 
   const [allergiesList, setAllergiesList] = useState([]);
@@ -120,7 +120,7 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Password Validation: At least 8 chars, at least 1 letter
+    
     const passwordRegex = /^(?=.*[a-zA-Z]).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
       Alert.alert(i18n.weakPassword, i18n.passwordRequirements);
@@ -302,7 +302,7 @@ export default function RegisterScreen() {
           <View style={{ height: 50 }} />
         </ScrollView>
 
-        {/* Custom Allergy Modal */}
+        
         <Modal visible={showCustomAllergy} transparent animationType="fade">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -325,7 +325,7 @@ export default function RegisterScreen() {
           </View>
         </Modal>
 
-        {/* Custom Diet Modal */}
+        
         <Modal visible={showCustomDiet} transparent animationType="fade">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>

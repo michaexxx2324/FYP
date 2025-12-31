@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    paddingTop: 50, // Adjust for status bar
+    paddingTop: 50, 
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',

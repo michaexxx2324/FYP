@@ -38,7 +38,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      {/* Game Promotion Card */}
+      
       <View style={styles.gameCard}>
         <View style={styles.gameHeader}>
           <Ionicons name="game-controller" size={24} color="#FF9800" />
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   vipDashboardButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFD700', // Gold color
+    backgroundColor: '#FFD700', 
     marginBottom: 20,
     padding: 15,
     borderRadius: 10,

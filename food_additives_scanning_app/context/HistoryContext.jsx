@@ -28,7 +28,7 @@ export const HistoryProvider = ({ children }) => {
 
   const addToHistory = async (item) => {
     try {
-      // Avoid duplicates at the top of the list
+      
       const newHistory = [item, ...history.filter(h => h.itemCode !== item.itemCode)];
       setHistory(newHistory);
       
@@ -41,15 +41,15 @@ export const HistoryProvider = ({ children }) => {
 
   const removeFromHistory = async (itemCode) => {
     try {
-      // 1. Remove locally
+      
       const newHistory = history.filter(h => h.itemCode !== itemCode);
       setHistory(newHistory);
       
       const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
       await AsyncStorage.setItem(key, JSON.stringify(newHistory));
 
-      // 2. Remove from backend (ScanHistory collection)
-      // Using the same IP as configured in other files
+      
+      
       try {
         await fetch(`http://192.168.50.124:3000/api/DeleteScanHistory?itemCode=${itemCode}`, {
           method: 'DELETE',

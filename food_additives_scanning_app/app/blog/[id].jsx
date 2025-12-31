@@ -85,13 +85,13 @@ export default function PostDetailScreen() {
           userId: user.userId,
           userName: user.username,
           text: comment,
-          district: "Unknown" // You might want to get this from user profile if available
+          district: "Unknown" 
         }),
       });
 
       if (response.ok) {
         setComment('');
-        fetchComments(); // Refresh comments
+        fetchComments(); 
       }
     } catch (error) {
       console.error(error);

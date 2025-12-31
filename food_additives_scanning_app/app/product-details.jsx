@@ -24,7 +24,7 @@ export default function ProductDetailsScreen() {
 
   useEffect(() => {
     if (savedAnalysis) {
-      // If we have saved analysis from history/scan, use it
+      
       try {
         const parsedAnalysis = typeof savedAnalysis === 'string' ? JSON.parse(savedAnalysis) : savedAnalysis;
         setAnalysis(parsedAnalysis);
@@ -32,7 +32,7 @@ export default function ProductDetailsScreen() {
         setLoading(false);
       } catch (e) {
         console.error("Error parsing saved analysis", e);
-        analyzeProduct(); // Fallback to re-analyze
+        analyzeProduct(); 
       }
     } else {
       analyzeProduct();
@@ -57,7 +57,7 @@ export default function ProductDetailsScreen() {
       });
       console.log("Analysis saved to backend");
       
-      // Also update local history context so it's available immediately
+      
       addToHistory({
         itemName,
         itemCode,
@@ -131,7 +131,7 @@ export default function ProductDetailsScreen() {
         
         let result = null;
         try {
-          // 1. Try to find the first JSON object in the string
+          
           const firstOpen = content.indexOf('{');
           const lastClose = content.lastIndexOf('}');
           
@@ -139,7 +139,7 @@ export default function ProductDetailsScreen() {
             const jsonString = content.substring(firstOpen, lastClose + 1);
             result = JSON.parse(jsonString);
           } else {
-            // 2. If no braces found, try parsing the whole string (unlikely but possible)
+            
             result = JSON.parse(content);
           }
         } catch (e) {
@@ -149,10 +149,10 @@ export default function ProductDetailsScreen() {
         if (result) {
           setAnalysis(result);
           setWarning(result.warning);
-          // Save the result to backend for future use
+          
           saveAnalysisToBackend(result, result.warning);
         } else {
-          // Fallback if not JSON
+          
           const fallbackResult = { summary: content, details: '' };
           setAnalysis(fallbackResult);
           saveAnalysisToBackend(fallbackResult, null);
@@ -160,7 +160,7 @@ export default function ProductDetailsScreen() {
       }
     } catch (error) {
       console.error("Analysis Error:", error);
-      // Don't alert, just show basic info
+      
     } finally {
       setLoading(false);
     }

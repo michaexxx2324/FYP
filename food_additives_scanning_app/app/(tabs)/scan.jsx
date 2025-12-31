@@ -2,14 +2,14 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Button, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-// import TextRecognition from '@react-native-ml-kit/text-recognition'; // Removed ML Kit
+
 import { useLanguage } from '../../context/LanguageContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getProductByBarcode } from '../../services/productService';
 import { useHistory } from '../../context/HistoryContext';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
-const POE_BOT_NAME = 'gpt-5-nano'; // User requested model
+const POE_BOT_NAME = 'gpt-5-nano'; 
 
 import { useRouter } from 'expo-router';
 
@@ -19,7 +19,7 @@ export default function ScanScreen() {
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
-  const [mode, setMode] = useState('barcode'); // 'barcode' or 'ocr'
+  const [mode, setMode] = useState('barcode'); 
   const [ocrText, setOcrText] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const [productData, setProductData] = useState(null);
@@ -43,14 +43,14 @@ export default function ScanScreen() {
     setProductData(null);
 
     try {
-      // Extract 13 digit number if possible, or just use data
+      
       let barcode = data;
       
-      // If data is a URL or contains non-numeric characters, try to extract the longest number
+      
       if (isNaN(data) || data.startsWith('http')) {
-        const matches = data.match(/\d{8,14}/g); // Look for 8 to 14 digit numbers
+        const matches = data.match(/\d{8,14}/g); 
         if (matches && matches.length > 0) {
-          // Pick the longest match, usually the EAN code
+          
           barcode = matches.reduce((a, b) => a.length > b.length ? a : b);
           console.log(`Extracted barcode ${barcode} from URL/String: ${data}`);
         }
@@ -60,7 +60,7 @@ export default function ScanScreen() {
       
       if (product) {
         addToHistory(product);
-        // Navigate directly to product details
+        
         router.push({
           pathname: '/product-details',
           params: { 
@@ -71,7 +71,7 @@ export default function ScanScreen() {
             healthAnalysis: product.healthAnalysis
           }
         });
-        // Reset scan state after a short delay so when they come back it's ready
+        
         setTimeout(() => setScanned(false), 1000);
       } else {
         Alert.alert(i18n.notFound, i18n.productNotFound, [
@@ -89,7 +89,7 @@ export default function ScanScreen() {
 
   const takePictureAndRecognize = async () => {
     try {
-      // Use ImagePicker.launchCameraAsync to enable the system's built-in crop UI (allowsEditing: true)
+      
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(i18n.permissionNeeded, i18n.permissionNeeded);
@@ -97,7 +97,7 @@ export default function ScanScreen() {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true, // Enable cropping
+        allowsEditing: true, 
         quality: 1,
         base64: true,
       });
@@ -115,7 +115,7 @@ export default function ScanScreen() {
   const pickImageAndRecognize = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true, // Enable cropping
+      allowsEditing: true, 
       quality: 1,
       base64: true,
     });
@@ -159,15 +159,15 @@ export default function ScanScreen() {
 
       if (data.choices && data.choices.length > 0) {
         let content = data.choices[0].message.content;
-        // Remove markdown images ![...](...)
+        
         content = content.replace(/!\[.*?\]\(.*?\)/g, '');
-        // Remove standalone links
+        
         content = content.replace(/https?:\/\/\S+/g, '');
         content = content.trim();
 
         setOcrText(content);
         
-        // Navigate to Edit Screen with OCR result
+        
         router.push({
           pathname: '/edit',
           params: { ocrText: content }
@@ -182,7 +182,7 @@ export default function ScanScreen() {
       Alert.alert(i18n.error, error.message);
     } finally {
       setProcessingOcr(false);
-      setImageUri(null); // Reset image uri so we don't show preview
+      setImageUri(null); 
     }
   };
 
@@ -201,7 +201,7 @@ export default function ScanScreen() {
         />
       </View>
 
-      {/* Removed Preview UI Block */}
+      
       
       {mode === 'barcode' ? (
         <CameraView
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   controls: { flexDirection: 'row', justifyContent: 'space-around', padding: 10, backgroundColor: '#fff' },
   buttonContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'transparent', margin: 64, justifyContent: 'center', alignItems: 'flex-end' },
   
-  // OCR Styles
+  
   ocrContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0', paddingBottom: 50 },
   ocrControlsCentered: { width: '100%', padding: 20, gap: 20 },
   captureBtnLarge: { backgroundColor: '#007AFF', padding: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10 },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   loadingContainer: { alignItems: 'center' },
   loadingText: { marginTop: 10, fontSize: 18, color: '#666' },
 
-  // Existing Styles
+  
   ocrControls: { flexDirection: 'row', gap: 20 },
   captureBtn: { backgroundColor: 'blue', padding: 15, borderRadius: 10 },
   galleryBtn: { backgroundColor: 'green', padding: 15, borderRadius: 10 },

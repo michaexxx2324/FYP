@@ -46,12 +46,12 @@ export default function NewsDetailsScreen() {
       userName: user.username,
       comments: newComment,
       time: new Date().toLocaleString(),
-      district: 'Hong Kong', // Mock district
+      district: 'Hong Kong', 
       newsId: params.newsId
     };
 
     try {
-      // Correcting the fetch call below
+      
       const saveResponse = await fetch('http://192.168.50.124:3000/api/SaveComment', {
         method: 'POST',
         headers: {
@@ -61,7 +61,7 @@ export default function NewsDetailsScreen() {
       });
 
       if (saveResponse.ok) {
-        // Refresh comments
+        
         fetchComments();
         setNewComment('');
       } else {
@@ -93,7 +93,7 @@ export default function NewsDetailsScreen() {
           <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
           <View style={styles.divider} />
           <Text style={styles.content}>{params.content}</Text>
-          {/* Hong Kong specific dummy content */}
+          
           <Text style={styles.content}>
             {'\n'}
             The Centre for Food Safety (CFS) of the Food and Environmental Hygiene Department announced today that a sample of the above-mentioned product was found to contain a pathogen, Salmonella. The CFS is following up on the case.
@@ -107,7 +107,7 @@ export default function NewsDetailsScreen() {
         <View style={styles.commentsSection}>
           <Text style={styles.commentsHeader}>{i18n.comments}</Text>
 
-          {/* Input Box moved here, above comments */}
+          
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
