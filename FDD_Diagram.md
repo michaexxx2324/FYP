@@ -21,7 +21,7 @@ graph TD
     Auth --> Auth2[Login to Account]
     Auth --> Auth3[Logout]
     Auth --> Auth4[Reset Password]
-    Auth --> Auth5[Update Profile (Allergies/Diet)]
+    Auth --> Auth5["Update Profile (Allergies/Diet)"]
     Auth --> Auth6[View Profile Details]
 
     %% Scanning & Analysis Features
