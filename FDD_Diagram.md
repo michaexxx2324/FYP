@@ -5,7 +5,7 @@ This document outlines the Feature Driven Development (FDD) model for the Food A
 ## FDD Model
 
 ```mermaid
-graph TD
+graph LR
     %% Root Node
     Root[Food Additives Scanning App]
     
