@@ -4,7 +4,9 @@ import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import TranslateButton from '../components/TranslateButton';
 
-const API_URL = 'http://192.168.50.124:3000/api';
+import { API_URL } from '@env';
+
+// const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');

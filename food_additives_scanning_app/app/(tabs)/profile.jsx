@@ -3,6 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { API_URL } from '@env';
 
 export default function ProfileScreen() {
   const { i18n } = useLanguage();
@@ -16,7 +17,7 @@ export default function ProfileScreen() {
   const handleResetVip = async () => {
     if (!user) return;
     try {
-      const response = await fetch('http://192.168.50.124:3000/api/user/update', {
+      const response = await fetch(`${API_URL}/user/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.userId, isVip: false }),

@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
+import { API_URL } from '@env';
 
 export default function NewsDetailsScreen() {
   const { i18n } = useLanguage();
@@ -23,7 +24,7 @@ export default function NewsDetailsScreen() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`http://192.168.50.124:3000/api/GetComments?newsId=${params.newsId}`);
+      const response = await fetch(`${API_URL}/GetComments?newsId=${params.newsId}`);
       if (response.ok) {
         const data = await response.json();
         setComments(data);
@@ -52,7 +53,7 @@ export default function NewsDetailsScreen() {
 
     try {
       
-      const saveResponse = await fetch('http://192.168.50.124:3000/api/SaveComment', {
+      const saveResponse = await fetch(`${API_URL}/SaveComment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

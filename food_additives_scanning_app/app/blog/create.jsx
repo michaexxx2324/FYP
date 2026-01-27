@@ -4,8 +4,9 @@ import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import TranslateButton from '../../components/TranslateButton';
+import { API_URL } from '@env';
 
-const API_URL = 'http://192.168.50.124:3000/api';
+// const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function CreatePostScreen() {
   const { i18n } = useLanguage();

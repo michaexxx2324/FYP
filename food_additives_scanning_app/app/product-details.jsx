@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useHistory } from '../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
+import { API_URL } from '@env';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gpt-5-nano';
@@ -41,7 +42,7 @@ export default function ProductDetailsScreen() {
 
   const saveAnalysisToBackend = async (analysisResult, warningMsg) => {
     try {
-      await fetch('http://192.168.50.124:3000/api/SaveScanHistory', {
+      await fetch(`${API_URL}/SaveScanHistory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

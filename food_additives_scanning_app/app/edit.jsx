@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useHistory } from '../context/HistoryContext';
 import { useAuth } from '../context/AuthContext';
 import TranslateButton from '../components/TranslateButton';
+import { API_URL } from '@env';
 
 export default function EditScreen() {
   const { i18n } = useLanguage();
@@ -68,7 +69,7 @@ export default function EditScreen() {
     try {
       
       
-      const response = await fetch('http://192.168.50.124:3000/api/SaveScanHistory', {
+      const response = await fetch(`${API_URL}/SaveScanHistory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

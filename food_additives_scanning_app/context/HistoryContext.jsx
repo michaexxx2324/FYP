@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
+import { API_URL } from '@env';
 
 const HistoryContext = createContext();
 
@@ -51,7 +52,7 @@ export const HistoryProvider = ({ children }) => {
       
       
       try {
-        await fetch(`http://192.168.50.124:3000/api/DeleteScanHistory?itemCode=${itemCode}`, {
+        await fetch(`${API_URL}/DeleteScanHistory?itemCode=${itemCode}`, {
           method: 'DELETE',
         });
       } catch (serverError) {

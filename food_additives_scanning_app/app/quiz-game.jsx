@@ -6,7 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
 
-const API_URL = 'http://192.168.50.124:3000/api';
+import { API_URL } from '@env';
+
+// const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function QuizGameScreen() {
   const { i18n } = useLanguage();
