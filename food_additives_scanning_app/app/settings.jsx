@@ -165,7 +165,7 @@ export default function SettingsScreen() {
       }
 
       const response = await fetch(`${API_URL}/user/update`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });

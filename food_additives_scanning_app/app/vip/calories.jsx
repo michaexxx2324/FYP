@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from '../../context/LanguageContext';
 import { useHistory } from '../../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { POE_API_KEY } from '@env';
 
-const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gemini-3-pro';
 
 export default function CaloriesScreen() {
@@ -16,17 +16,36 @@ export default function CaloriesScreen() {
   const [intakeLog, setIntakeLog] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
-  const [servings, setServings] = useState('1');
+  const [grams, setGrams] = useState('100');
   const [loading, setLoading] = useState(false);
+  const [goalModalVisible, setGoalModalVisible] = useState(false);
+  const [tempGoal, setTempGoal] = useState('2000');
+  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
     loadDailyLog();
   }, []);
 
+  useEffect(() => {
+    if (cooldown > 0) {
+      const interval = setInterval(() => {
+        setCooldown(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [cooldown]);
+
   const loadDailyLog = async () => {
     try {
       const today = new Date().toDateString();
       const storedLog = await AsyncStorage.getItem(`calories_${today}`);
+      const storedGoal = await AsyncStorage.getItem('user_calorie_goal');
+      
+      if (storedGoal) {
+        setDailyGoal(parseInt(storedGoal));
+        setTempGoal(storedGoal);
+      }
+
       if (storedLog) {
         const log = JSON.parse(storedLog);
         setIntakeLog(log);
@@ -35,6 +54,17 @@ export default function CaloriesScreen() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleUpdateGoal = async () => {
+    const newGoal = parseInt(tempGoal);
+    if (newGoal > 0) {
+      setDailyGoal(newGoal);
+      await AsyncStorage.setItem('user_calorie_goal', newGoal.toString());
+      setGoalModalVisible(false);
+    } else {
+      Alert.alert("Invalid Input", "Please enter a valid calorie goal.");
     }
   };
 
@@ -56,16 +86,19 @@ export default function CaloriesScreen() {
   };
 
   const confirmAddFood = async () => {
-    if (!selectedFood) return;
+    if (!selectedFood || cooldown > 0) return;
     setLoading(true);
 
     try {
       
       const prompt = `
-        Extract the calories (kcal) per serving or per 100g from this text.
-        Text: ${selectedFood.nutritionInformation}
+        Calculate the TOTAL calories (kcal) for ${grams} grams of this food based on the nutrition info.
+        Nutrition Info: ${selectedFood.nutritionInformation}
         
-        Return ONLY the number (integer). If not found, return 0.
+        Strictly output valid JSON only:
+        { "calories": number }
+        
+        Do not output any other text or explanation.
       `;
 
       const response = await fetch('https://api.poe.com/v1/chat/completions', {
@@ -82,16 +115,28 @@ export default function CaloriesScreen() {
         })
       });
 
-      let caloriesPerUnit = 0;
+      let totalCalories = 0;
       try {
         const text = await response.text();
         if (response.ok) {
             const data = JSON.parse(text);
             if (data.choices && data.choices.length > 0) {
                 const content = data.choices[0].message.content;
-                const match = content.match(/\d+/);
-                if (match) {
-                  caloriesPerUnit = parseInt(match[0]);
+                
+                // Try to find JSON in the content
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                   const jsonResult = JSON.parse(jsonMatch[0]);
+                   totalCalories = parseInt(jsonResult.calories);
+                } else {
+                   // Fallback to simple number match if JSON fails, but look for the last number
+                   // usually the result comes at the end if it's chatting
+                   const matches = content.match(/\d+/g);
+                   if (matches && matches.length > 0) {
+                       // Try to pick the most reasonable number (not 100 from 'per 100g')
+                       // This is a last resort fallback
+                       totalCalories = parseInt(matches[matches.length - 1]);
+                   }
                 }
             }
         } else {
@@ -99,38 +144,31 @@ export default function CaloriesScreen() {
             throw new Error("API Error");
         }
       } catch (e) {
-          console.warn("Falling back to mock data due to API error:", e);
-          
-          caloriesPerUnit = Math.floor(Math.random() * 450) + 50;
+          console.warn("Falling back to demo mode:", e);
+          totalCalories = Math.floor((parseInt(grams) || 100) * 1.5); // Rough estimate fallback
           Alert.alert("Demo Mode", "AI Service unavailable. Estimated calories added.");
       }
 
-      
-      if (caloriesPerUnit === 0) {
-         Alert.alert("Info", "Could not auto-detect calories. Added as 0.");
-      }
-
-      const totalCalories = caloriesPerUnit * parseFloat(servings);
-      
       const newEntry = {
         id: Date.now(),
         name: selectedFood.itemName,
         calories: totalCalories,
-        servings: servings,
+        grams: grams,
         time: new Date().toLocaleTimeString()
       };
 
       const newLog = [...intakeLog, newEntry];
       saveDailyLog(newLog);
       setModalVisible(false);
-      setServings('1');
+      setGrams('100');
       setSelectedFood(null);
 
     } catch (error) {
       console.error(error);
-      Alert.alert(i18n.error, i18n.networkError);
+      Alert.alert(i18n.error, i18n.networkError || "Network Error");
     } finally {
       setLoading(false);
+      setCooldown(10);
     }
   };
 
@@ -141,7 +179,10 @@ export default function CaloriesScreen() {
         <Text style={styles.headerTitle}>{i18n.calorieCounter || "Calorie Counting"}</Text>
         <View style={styles.progressContainer}>
           <Text style={styles.caloriesValue}>{Math.round(todayCalories)}</Text>
-          <Text style={styles.caloriesLabel}>{i18n.todayIntake || "Today's Intake"} / {i18n.dailyGoal || "Goal"} {dailyGoal}</Text>
+          <TouchableOpacity onPress={() => setGoalModalVisible(true)} style={styles.goalContainer}>
+            <Text style={styles.caloriesLabel}>{i18n.todayIntake || "Today's Intake"} / {i18n.dailyGoal || "Goal"} {dailyGoal}</Text>
+            <Ionicons name="pencil" size={16} color="#666" style={{ marginLeft: 5 }} />
+          </TouchableOpacity>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${Math.min((todayCalories / dailyGoal) * 100, 100)}%` }]} />
           </View>
@@ -158,7 +199,7 @@ export default function CaloriesScreen() {
             <View style={styles.logItem}>
               <View>
                 <Text style={styles.logName}>{item.name}</Text>
-                <Text style={styles.logTime}>{item.time} • {item.servings} servings</Text>
+                <Text style={styles.logTime}>{item.time} • {item.grams ? `${item.grams}g` : `${item.servings} srv`}</Text>
               </View>
               <Text style={styles.logCalories}>{Math.round(item.calories)} kcal</Text>
             </View>
@@ -198,22 +239,54 @@ export default function CaloriesScreen() {
             ) : (
               <>
                 <Text style={styles.modalTitle}>{selectedFood.itemName}</Text>
-                <Text style={styles.label}>{i18n.howManyServings || "How many servings?"}</Text>
+                <Text style={styles.label}>{i18n.howManyGrams || "Amount eaten (grams)"}</Text>
                 <TextInput
-                  style={styles.input}
-                  value={servings}
-                  onChangeText={setServings}
+                  style={[styles.input, loading && styles.disabledInput]}
+                  value={grams}
+                  onChangeText={setGrams}
                   keyboardType="numeric"
+                  placeholder="e.g. 100"
+                  editable={!loading}
                 />
-                <TouchableOpacity style={styles.confirmButton} onPress={confirmAddFood} disabled={loading}>
-                  <Text style={styles.confirmButtonText}>{loading ? "Calculating..." : "Add to Log"}</Text>
+                <TouchableOpacity 
+                   style={[styles.confirmButton, (loading || cooldown > 0) && styles.disabledButton]} 
+                   onPress={confirmAddFood} 
+                   disabled={loading || cooldown > 0}
+                >
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={styles.confirmButtonText}>
+                      {cooldown > 0 ? `Wait ${cooldown}s` : "Add to Log"}
+                    </Text>
+                  )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedFood(null)}>
+                <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedFood(null)} disabled={loading}>
                   <Text style={styles.closeButtonText}>{i18n.back || "Back"}</Text>
                 </TouchableOpacity>
               </>
             )}
           </View>
+        </View>
+      </Modal>
+
+      <Modal visible={goalModalVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Set Daily Calorie Goal</Text>
+                <TextInput
+                    style={styles.input}
+                    value={tempGoal}
+                    onChangeText={setTempGoal}
+                    keyboardType="numeric"
+                />
+                 <TouchableOpacity style={styles.confirmButton} onPress={handleUpdateGoal}>
+                  <Text style={styles.confirmButtonText}>Save Goal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.closeButton} onPress={() => setGoalModalVisible(false)}>
+                  <Text style={styles.closeButtonText}>Cancel</Text>
+                </TouchableOpacity>
+            </View>
         </View>
       </Modal>
     </View>
@@ -225,8 +298,9 @@ const styles = StyleSheet.create({
   headerCard: { backgroundColor: 'white', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 20, elevation: 3 },
   headerTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
   progressContainer: { width: '100%', alignItems: 'center' },
+  goalContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   caloriesValue: { fontSize: 48, fontWeight: 'bold', color: '#4CAF50' },
-  caloriesLabel: { color: '#666', marginBottom: 10 },
+  caloriesLabel: { color: '#666' },
   progressBarBg: { width: '100%', height: 10, backgroundColor: '#eee', borderRadius: 5 },
   progressBarFill: { height: '100%', backgroundColor: '#4CAF50', borderRadius: 5 },
   listContainer: { flex: 1 },
@@ -247,7 +321,9 @@ const styles = StyleSheet.create({
   closeButton: { marginTop: 10, padding: 10, alignItems: 'center' },
   closeButtonText: { color: '#666' },
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 10, fontSize: 18, textAlign: 'center', marginBottom: 20 },
+  disabledInput: { backgroundColor: '#f0f0f0', color: '#aaa' },
   confirmButton: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 10, alignItems: 'center' },
+  disabledButton: { backgroundColor: '#a5d6a7' },
   confirmButtonText: { color: 'white', fontWeight: 'bold' },
   label: { marginBottom: 10, textAlign: 'center' },
 });

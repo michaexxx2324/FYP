@@ -1,4 +1,5 @@
-const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
+import { POE_API_KEY } from '@env';
+
 const POE_BOT_NAME = 'gemini-3-pro'; 
 
 /**

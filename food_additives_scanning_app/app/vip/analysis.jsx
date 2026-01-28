@@ -4,8 +4,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useHistory } from '../../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { POE_API_KEY } from '@env';
 
-const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gemini-3-pro';
 
 export default function AnalysisScreen() {
@@ -15,6 +15,7 @@ export default function AnalysisScreen() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showDetailedReport, setShowDetailedReport] = useState(false);
 
   const displayAnalysis = analysis && (analysis.english || analysis.traditional_chinese)
     ? (language === 'zh' ? analysis.traditional_chinese : analysis.english)
@@ -24,42 +25,38 @@ export default function AnalysisScreen() {
     setSelectedItem(item);
     setLoading(true);
     setAnalysis(null);
+    setShowDetailedReport(false);
 
     try {
       const allergies = user?.allergies?.join(', ') || 'None';
       const diet = user?.dietPreferences?.join(', ') || 'None';
+      const weight = user?.weight || 'Unknown';
+      const healthStatus = user?.healthStatus?.join(', ') || 'None';
 
       const prompt = `
-        Perform a DEEP ADVANCED ANALYSIS on this food item.
+        Perform a CLINICAL-GRADE DEEP ANALYSIS.
         Item: ${item.itemName}
-        Nutrition/Ingredients: ${item.nutritionInformation}
-        
-        User Profile:
-        - Allergies: ${allergies}
-        - Diet: ${diet}
+        Ingredients: ${item.nutritionInformation}
+        User: Allergies: ${allergies}, Diet: ${diet}, Weight: ${weight}kg, Status: ${healthStatus}
 
-        Task:
-        1. Calculate a "Nutrition Density Score" (0-100).
-        2. Assess "Additive Risk" (Low/Medium/High).
-        3. Provide 3 Personalized Recommendations (e.g., "Reduce salt intake", "Avoid sulfites").
-
-        Output Format (JSON):
+        Output JSON Structure:
         {
           "english": {
-            "score": 85,
-            "risk": "Low",
-            "recommendations": ["Rec 1", "Rec 2", "Rec 3"],
-            "details": "Detailed explanation..."
+            "score": number,
+            "risk": "Low" | "Medium" | "High",
+            "novaGroup": 1 | 2 | 3 | 4,
+            "recommendations": string[],
+            "details": "Include Additive safety, NOVA justification, and Hidden Allergens."
           },
           "traditional_chinese": {
-            "score": 85,
-            "risk": "低",
-            "recommendations": ["建議 1", "建議 2", "建議 3"],
-            "details": "詳細解釋..."
+            "score": number,
+            "risk": "低" | "中" | "高",
+            "novaGroup": 1 | 2 | 3 | 4,
+            "recommendations": string[],
+            "details": "包含添加劑安全性、NOVA 分級理由及隱藏過敏原檢查。"
           }
         }
-
-        STRICTLY return ONLY the JSON object. Do not add any introductory or concluding text.
+        STRICTLY return ONLY JSON.
       `;
 
       console.log("Sending request to AI Service...");
@@ -216,6 +213,21 @@ export default function AnalysisScreen() {
                 <Text style={styles.scoreValue}>{displayAnalysis.score}/100</Text>
               </View>
 
+              {displayAnalysis.novaGroup && (
+                <View style={[styles.novaCard, { borderColor: displayAnalysis.novaGroup >= 4 ? '#D32F2F' : '#4CAF50' }]}>
+                  <Text style={styles.novaLabel}>NOVA Group</Text>
+                  <Text style={[styles.novaValue, { color: displayAnalysis.novaGroup >= 4 ? '#D32F2F' : '#4CAF50' }]}>
+                      {displayAnalysis.novaGroup}
+                  </Text>
+                  <Text style={styles.novaDescription}>
+                      {displayAnalysis.novaGroup === 1 ? 'Unprocessed or minimally processed foods' :
+                      displayAnalysis.novaGroup === 2 ? 'Processed culinary ingredients' :
+                      displayAnalysis.novaGroup === 3 ? 'Processed foods' :
+                      'Ultra-processed foods'}
+                  </Text>
+                </View>
+              )}
+
               <View style={styles.riskCard}>
                 <Text style={styles.riskLabel}>{i18n.additiveRisk || "Additive Risk"}</Text>
                 <Text style={[
@@ -236,9 +248,21 @@ export default function AnalysisScreen() {
                 ))}
               </View>
               
-              <TouchableOpacity style={styles.reportButton}>
-                <Text style={styles.reportButtonText}>{i18n.generateReport || "Generate Detailed Report"}</Text>
-              </TouchableOpacity>
+              {!showDetailedReport && (
+                <TouchableOpacity 
+                  style={styles.reportButton} 
+                  onPress={() => setShowDetailedReport(true)}
+                >
+                  <Text style={styles.reportButtonText}>{i18n.generateReport || "Generate Detailed Report"}</Text>
+                </TouchableOpacity>
+              )}
+
+              {showDetailedReport && displayAnalysis.details && (
+                <View style={styles.detailsCard}>
+                  <Text style={styles.detailsTitle}>{i18n.details || "Detailed Analysis"}</Text>
+                  <Text style={styles.detailsText}>{displayAnalysis.details}</Text>
+                </View>
+              )}
             </View>
           ) : null}
         </ScrollView>
@@ -265,6 +289,13 @@ const styles = StyleSheet.create({
   riskCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 15, alignItems: 'center' },
   riskLabel: { fontSize: 16, color: '#666', marginBottom: 5 },
   riskValue: { fontSize: 24, fontWeight: 'bold' },
+  novaCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 15, alignItems: 'center', borderWidth: 2 },
+  novaLabel: { fontSize: 16, color: '#666', marginBottom: 5 },
+  novaValue: { fontSize: 36, fontWeight: 'bold' },
+  novaDescription: { fontSize: 14, color: '#666', textAlign: 'center', marginTop: 5 },
+  detailsCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 20 },
+  detailsTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#333' },
+  detailsText: { fontSize: 15, lineHeight: 22, color: '#444' },
   recCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 20 },
   recLabel: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
   recItem: { flexDirection: 'row', marginBottom: 10, alignItems: 'flex-start' },

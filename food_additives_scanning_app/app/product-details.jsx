@@ -6,9 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { useHistory } from '../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
-import { API_URL } from '@env';
+import { API_URL, POE_API_KEY } from '@env';
 
-const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
 const POE_BOT_NAME = 'gemini-3-pro';
 
 export default function ProductDetailsScreen() {

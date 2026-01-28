@@ -25,7 +25,7 @@ export default function UpgradeToVipScreen() {
     try {
       
       const response = await fetch(`${API_URL}/user/update`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.userId,
