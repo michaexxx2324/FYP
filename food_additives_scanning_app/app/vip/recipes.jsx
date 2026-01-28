@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
-const POE_BOT_NAME = 'gpt-5-nano';
+const POE_BOT_NAME = 'gemini-3-pro';
 
 export default function RecipesScreen() {
   const { i18n, language } = useLanguage();

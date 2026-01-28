@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
@@ -10,15 +11,74 @@ export default function ProfileScreen() {
   const { user, logout, updateUser } = useAuth();
   const router = useRouter();
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [editData, setEditData] = useState({});
+
+  useEffect(() => {
+    if (user) {
+      setEditData({
+        userId: user.userId,
+        username: user.username || '',
+        email: user.email || '',
+        height: user.height || '',
+        weight: user.weight || '',
+        dob: user.dob || '', // Date selection logic might be complex in edit, maybe just read-only/text input for now
+        allergies: user.allergies || [],
+        dietPreferences: user.dietPreferences || [],
+        healthStatus: user.healthStatus || [],
+        age: user.age || ''
+      });
+    }
+  }, [user]);
+
   const getLabel = (id) => {
     return i18n[id] || id;
+  };
+
+  const handleSaveProfile = async () => {
+    setLoading(true);
+    try {
+      // Recalculate age if DOB is changed? user inputs DOB as string here for simplicity or date picker? 
+      // For now, let's just save what is edited.
+      
+      const response = await fetch(`${API_URL}/user/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        updateUser(data.user);
+        setIsEditing(false);
+        Alert.alert(i18n.success, i18n.profileUpdated || "Profile Updated");
+      } else {
+        Alert.alert("Error", "Failed to update profile");
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert("Error", "Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleListSelection = (field, id) => {
+    setEditData(prev => {
+      const list = prev[field] || [];
+      const newList = list.includes(id) 
+        ? list.filter(item => item !== id)
+        : [...list, id];
+      return { ...prev, [field]: newList };
+    });
   };
 
   const handleResetVip = async () => {
     if (!user) return;
     try {
       const response = await fetch(`${API_URL}/user/update`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.userId, isVip: false }),
       });
@@ -42,6 +102,11 @@ export default function ProfileScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 80}}>
       <View style={styles.header}>
+        <View style={styles.headerTopRow}>
+          <TouchableOpacity onPress={() => isEditing ? handleSaveProfile() : setIsEditing(true)}>
+            <Text style={styles.editButtonText}>{isEditing ? (loading ? "..." : i18n.save || "Save") : i18n.edit || "Edit"}</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle-outline" size={80} color="#ccc" />
         </View>
@@ -67,40 +132,147 @@ export default function ProfileScreen() {
       )}
 
       <View style={styles.infoSection}>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{i18n.email}</Text>
-          <Text style={styles.infoValue}>{user.email}</Text>
-        </View>
+        {isEditing ? (
+          <>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.heightLabel || "Height (cm)"}</Text>
+              <TextInput 
+                style={styles.input} 
+                value={String(editData.height || '')} 
+                onChangeText={t => setEditData({...editData, height: t})} 
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.infoItem}>
+               <Text style={styles.infoLabel}>{i18n.weightLabel || "Weight (kg)"}</Text>
+               <TextInput 
+                style={styles.input} 
+                value={String(editData.weight || '')} 
+                onChangeText={t => setEditData({...editData, weight: t})} 
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.infoItem}>
+               <Text style={styles.infoLabel}>{i18n.age || "Age"}</Text>
+               <TextInput 
+                style={styles.input} 
+                value={String(editData.age || '')} 
+                onChangeText={t => setEditData({...editData, age: t})} 
+                keyboardType="numeric"
+                editable={false} // Mostly readonly as calculated from DOB
+              />
+            </View>
+             <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.healthStatusLabel || "Health Status"}</Text>
+              <View style={styles.tagsContainer}>
+                {['pregnant', 'diabetes', 'highBloodPressure', 'kidneyDisease', 'cardiovascularDisease', 'stroke', 'arthritis'].map((status) => (
+                  <TouchableOpacity 
+                    key={status} 
+                    style={[styles.tag, editData.healthStatus?.includes(status) && styles.selectedTag]}
+                    onPress={() => toggleListSelection('healthStatus', status)}
+                  >
+                    <Text style={[styles.tagText, editData.healthStatus?.includes(status) && styles.selectedTagText]}>{getLabel(status) || status}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+             <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.allergies}</Text>
+              <View style={styles.tagsContainer}>
+                {['peanut','nut','gluten','dairy','egg','shellfish','sulfites'].map((a) => (
+                  <TouchableOpacity 
+                    key={a} 
+                    style={[styles.tag, editData.allergies?.includes(a) && styles.selectedTag]}
+                    onPress={() => toggleListSelection('allergies', a)}
+                  >
+                    <Text style={[styles.tagText, editData.allergies?.includes(a) && styles.selectedTagText]}>{getLabel(a)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+             <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.dietPreferences}</Text>
+               <View style={styles.tagsContainer}>
+                {['none','vegetarian','vegan','halal'].map((d) => (
+                  <TouchableOpacity 
+                    key={d} 
+                    style={[styles.tag, editData.dietPreferences?.includes(d) && styles.selectedTag]}
+                    onPress={() => toggleListSelection('dietPreferences', d)}
+                  >
+                    <Text style={[styles.tagText, editData.dietPreferences?.includes(d) && styles.selectedTagText]}>{getLabel(d)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.email}</Text>
+              <Text style={styles.infoValue}>{user.email}</Text>
+            </View>
+            
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.age || "Age"}</Text>
+              <Text style={styles.infoValue}>{user.age || 'N/A'}</Text>
+            </View>
 
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{i18n.allergies}</Text>
-          <View style={styles.tagsContainer}>
-            {user.allergies && user.allergies.length > 0 ? (
-              user.allergies.map((allergy, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{getLabel(allergy)}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.infoValue}>{i18n.none}</Text>
-            )}
-          </View>
-        </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.heightLabel || "Height"}</Text>
+              <Text style={styles.infoValue}>{user.height ? user.height + ' cm' : 'N/A'}</Text>
+            </View>
 
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{i18n.dietPreferences}</Text>
-          <View style={styles.tagsContainer}>
-            {user.dietPreferences && user.dietPreferences.length > 0 ? (
-              user.dietPreferences.map((diet, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{getLabel(diet)}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.infoValue}>{i18n.none}</Text>
-            )}
-          </View>
-        </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.weightLabel || "Weight"}</Text>
+              <Text style={styles.infoValue}>{user.weight ? user.weight + ' kg' : 'N/A'}</Text>
+            </View>
+
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.healthStatusLabel || "Health Status"}</Text>
+              <View style={styles.tagsContainer}>
+                 {user.healthStatus && user.healthStatus.length > 0 ? (
+                  user.healthStatus.map((s, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{getLabel(s) || s}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.infoValue}>{i18n.none}</Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.allergies}</Text>
+              <View style={styles.tagsContainer}>
+                {user.allergies && user.allergies.length > 0 ? (
+                  user.allergies.map((allergy, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{getLabel(allergy)}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.infoValue}>{i18n.none}</Text>
+                )}
+              </View>
+            </View>
+            
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>{i18n.dietPreferences}</Text>
+              <View style={styles.tagsContainer}>
+                {user.dietPreferences && user.dietPreferences.length > 0 ? (
+                  user.dietPreferences.map((diet, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{getLabel(diet)}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.infoValue}>{i18n.none}</Text>
+                )}
+              </View>
+            </View>
+          </>
+        )}
       </View>
 
       
@@ -184,6 +356,32 @@ const styles = StyleSheet.create({
     padding: 30,
     alignItems: 'center',
     marginBottom: 10,
+    paddingTop: 50,
+  },
+  headerTopRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 10,
+  },
+  editButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: 'normal',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginTop: 5,
+  },
+  selectedTag: {
+    backgroundColor: '#0277BD',
+  },
+  selectedTagText: {
+    color: 'white',
   },
   avatarContainer: {
     marginBottom: 10,

@@ -7,9 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getProductByBarcode } from '../../services/productService';
 import { useHistory } from '../../context/HistoryContext';
-
-const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
-const POE_BOT_NAME = 'gpt-5-nano'; 
+import { scanImage } from '../../services/ocrService'; 
 
 import { useRouter } from 'expo-router';
 
@@ -131,42 +129,10 @@ export default function ScanScreen() {
     setOcrText(i18n.processing);
     
     try {
-      const response = await fetch('https://api.poe.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${POE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: POE_BOT_NAME,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: 'Extract text from this image, specifically focusing on food ingredients, nutrition information, and allergen warnings. IGNORE any QR codes, barcodes, or marketing URLs. If the text is in any language other than English (e.g., Japanese, Chinese), you MUST translate it to English. Return ONLY the final English text. Do not include the original text. Do not include any explanations. Do NOT return any markdown images or links.' },
-                { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-              ]
-            }
-          ]
-        })
-      });
+      const content = await scanImage(base64Image);
 
-      const data = await response.json();
-      
-      if (data.error) {
-         throw new Error(data.error.message);
-      }
-
-      if (data.choices && data.choices.length > 0) {
-        let content = data.choices[0].message.content;
-        
-        content = content.replace(/!\[.*?\]\(.*?\)/g, '');
-        
-        content = content.replace(/https?:\/\/\S+/g, '');
-        content = content.trim();
-
+      if (content) {
         setOcrText(content);
-        
         
         router.push({
           pathname: '/edit',

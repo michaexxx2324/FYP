@@ -218,8 +218,12 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
   dob: String,
+  age: Number,
+  height: String,
+  weight: String,
   allergies: [String],
   dietPreferences: [String],
+  healthStatus: [String],
   isVip: { type: Boolean, default: false },
   coupons: [{
     code: String,
@@ -235,7 +239,9 @@ const User = mongoose.model('User', UserSchema, 'users');
 
 // Register Endpoint
 app.post('/api/register', async (req, res) => {
-  const { email, username, password, dob, allergies, dietPreferences } = req.body;
+  const { email, username, password, dob, age, height, weight, allergies, dietPreferences, healthStatus } = req.body;
+  
+  console.log('Registering user with data:', { email, age, height, weight, healthStatus });
 
   if (!email || !username || !password) {
     return res.status(400).json({ message: "Missing required fields" });
@@ -265,8 +271,12 @@ app.post('/api/register', async (req, res) => {
       username,
       password: hashedPassword,
       dob,
+      age,
+      height,
+      weight,
       allergies,
       dietPreferences, // Now an array
+      healthStatus,
       isVip: false
     });
 
@@ -311,9 +321,14 @@ app.post('/api/login', async (req, res) => {
         userId: user.userId,
         username: user.username,
         email: user.email,
+        dob: user.dob,
+        age: user.age,
+        height: user.height,
+        weight: user.weight,
         isVip: user.isVip,
         allergies: user.allergies,
         dietPreferences: user.dietPreferences,
+        healthStatus: user.healthStatus,
         coupons: user.coupons || [],
         favoritePosts: user.favoritePosts || []
       }
@@ -324,9 +339,9 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Update User Profile Endpoint
-app.put('/api/user/update', async (req, res) => {
-  const { userId, username, email, password, allergies, dietPreferences, isVip } = req.body;
+// Update Profile Endpoint
+app.post('/api/user/update', async (req, res) => {
+  const { userId, username, email, allergies, dietPreferences, healthStatus, dob, age, height, weight, isVip, password } = req.body;
 
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
@@ -342,6 +357,12 @@ app.put('/api/user/update', async (req, res) => {
     if (email) user.email = email;
     if (allergies) user.allergies = allergies;
     if (dietPreferences) user.dietPreferences = dietPreferences;
+    if (healthStatus) user.healthStatus = healthStatus;
+    if (dob) user.dob = dob;
+    if (age) user.age = age;
+    if (height) user.height = height;
+    if (weight) user.weight = weight;
+    
     if (typeof isVip !== 'undefined') user.isVip = isVip; // Allow updating VIP status
     if (password) {
       user.password = await bcrypt.hash(password, 10);
@@ -357,7 +378,12 @@ app.put('/api/user/update', async (req, res) => {
         email: user.email,
         isVip: user.isVip,
         allergies: user.allergies,
-        dietPreferences: user.dietPreferences
+        dietPreferences: user.dietPreferences,
+        healthStatus: user.healthStatus,
+        dob: user.dob,
+        age: user.age,
+        height: user.height,
+        weight: user.weight
       }
     });
   } catch (error) {

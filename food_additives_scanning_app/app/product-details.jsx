@@ -9,10 +9,10 @@ import TranslateButton from '../components/TranslateButton';
 import { API_URL } from '@env';
 
 const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
-const POE_BOT_NAME = 'gpt-5-nano';
+const POE_BOT_NAME = 'gemini-3-pro';
 
 export default function ProductDetailsScreen() {
-  const { i18n } = useLanguage();
+  const { i18n, language } = useLanguage();
   const { user } = useAuth();
   const { addToHistory } = useHistory();
   const router = useRouter();
@@ -21,14 +21,15 @@ export default function ProductDetailsScreen() {
 
   const [analysis, setAnalysis] = useState(null);
   const [warning, setWarning] = useState(null);
+  const [safetyLevel, setSafetyLevel] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (savedAnalysis) {
-      
       try {
         const parsedAnalysis = typeof savedAnalysis === 'string' ? JSON.parse(savedAnalysis) : savedAnalysis;
         setAnalysis(parsedAnalysis);
+        setSafetyLevel(parsedAnalysis.safetyLevel || 'Safe'); // Default or infer
         setWarning(savedWarning);
         setLoading(false);
       } catch (e) {
@@ -58,7 +59,6 @@ export default function ProductDetailsScreen() {
       });
       console.log("Analysis saved to backend");
       
-      
       addToHistory({
         itemName,
         itemCode,
@@ -73,8 +73,12 @@ export default function ProductDetailsScreen() {
 
   const analyzeProduct = async () => {
     try {
-      const allergies = user?.allergies?.join(', ') || 'None';
-      const diet = user?.dietPreferences?.join(', ') || 'None';
+      const allergies = user?.allergies?.length > 0 ? user.allergies.join(', ') : 'None';
+      const diet = user?.dietPreferences?.length > 0 ? user.dietPreferences.join(', ') : 'None';
+      const healthStatus = user?.healthStatus?.length > 0 ? user.healthStatus.join(', ') : 'None';
+      const age = user?.age || 'Unknown';
+      const height = user?.height || 'Unknown';
+      const weight = user?.weight || 'Unknown';
 
       const prompt = `
         Analyze the following food item based on the provided text/label information.
@@ -84,30 +88,39 @@ export default function ProductDetailsScreen() {
         User Profile:
         Allergies: ${allergies}
         Dietary Preferences: ${diet}
+        Health Status: ${healthStatus}
+        Age: ${age}
+        Height: ${height}
+        Weight: ${weight}
 
         Tasks:
-        1. Extract and summarize the key Food Label Information (e.g., ingredients list, nutritional values) if the input text is raw or unstructured.
-        2. Analyze for high salt, high sugar, or high fat content.
-        3. Identify any dangerous food additives (E-numbers, preservatives, etc.).
-        4. CRITICAL: Check if the item contains any ingredients that match the user's allergies or violate their dietary preferences.
-        5. CRITICAL: Specifically look for "Cross-Contamination Warnings" or "Factory Warnings" (e.g., "Produced in a factory that handles...", "May contain traces of...", "生產此食品的廠房亦處理..."). Treat these as potential allergy risks ONLY IF the user has that specific allergy.
+        1. Extract and summarize the key Food Label Information.
+        2. Analyze for high salt, high sugar, or high fat content considering the user's health status (e.g., Diabetes, Hypertension).
+        3. Identify any dangerous food additives.
+        4. CRITICAL: Check if the item contains any ingredients matching the user's allergies, dietary preferences, or contraindicated by their health status.
 
-        IMPORTANT RULES FOR "warning" FIELD:
-        - The "warning" field must be used ONLY for severe alerts related to the User Profile (Allergies or Diet).
-        - If the User Profile has no allergies and no dietary preferences, "warning" MUST be null.
-        - Do NOT put general health warnings (like "High Sugar", "Unhealthy additives") in the "warning" field. Put them in "summary" or "details".
-        - If the item contains an allergen that the user is NOT allergic to, do NOT put it in "warning".
-        - If there is a cross-contamination warning for an ingredient the user is NOT allergic to, do NOT put it in "warning".
+        Determine "safetyLevel":
+        - "Danger": Immediate harm risk (e.g. Contains Allergen).
+        - "Warning": Long-term health risk or specific concern (e.g. High Sugar for Diabetic user, High Salt for Hypertension).
+        - "Safe": No specific issues found.
 
-        IMPORTANT: Provide the output in BOTH English and Traditional Chinese (繁體中文) for EVERY field.
-        Format each field as: "English text...\n\n(中文翻譯...)"
+        Provide output separated for English and Traditional Chinese (繁體中文).
 
-        Return ONLY a JSON object with this format:
+        Return ONLY a JSON object with this EXACT structure:
         {
-          "labelInfo": "Extracted summary of the food label information (English + Chinese)",
-          "summary": "Brief analysis of healthiness (salt/sugar/additives) (English + Chinese)",
-          "warning": "URGENT WARNING MESSAGE if and ONLY IF allergy/diet violation found, otherwise null. (English + Chinese)",
-          "details": "Detailed analysis including additives found and specific cross-contamination warnings if any (English + Chinese)"
+          "safetyLevel": "Danger" | "Warning" | "Safe",
+          "english": {
+            "labelInfo": "Extracted summary...",
+            "summary": "Brief analysis...",
+            "warning": "Specific warning text if any, or explanation of safety level",
+            "details": "Detailed analysis..."
+          },
+          "chinese": {
+            "labelInfo": "...",
+            "summary": "...",
+            "warning": "...",
+            "details": "..."
+          }
         }
       `;
 
@@ -149,28 +162,45 @@ export default function ProductDetailsScreen() {
 
         if (result) {
           setAnalysis(result);
-          setWarning(result.warning);
-          
-          saveAnalysisToBackend(result, result.warning);
+          setSafetyLevel(result.safetyLevel);
+          // For backward compatibility or general warning display, we can pick English warning for database 'warning' column
+          const warnMsg = result.english?.warning || result.safetyLevel;
+          setWarning(warnMsg);
+          saveAnalysisToBackend(result, warnMsg);
         } else {
-          
-          const fallbackResult = { summary: content, details: '' };
+          const fallbackResult = { safetyLevel: 'Safe', english: { summary: content, details: '' }, chinese: { summary: content, details: '' } };
           setAnalysis(fallbackResult);
           saveAnalysisToBackend(fallbackResult, null);
         }
       }
     } catch (error) {
       console.error("Analysis Error:", error);
-      
     } finally {
       setLoading(false);
     }
   };
 
-  const shouldShowWarning = (warningMsg) => {
-    if (!warningMsg) return false;
-    const lower = String(warningMsg).toLowerCase().trim();
-    return lower !== 'null' && lower !== 'none' && lower !== 'no warning' && lower !== '';
+  const getDisplayContent = () => {
+    if (!analysis) return null;
+    // Default to 'english' if language not matched or structure missing
+    const langKey = language === 'zh' || language === 'zh-HK' || language === 'zh-TW' ? 'chinese' : 'english';
+    return analysis[langKey] || analysis.english || {}; 
+  };
+
+  const displayContent = getDisplayContent();
+  const currentSafetyLevel = analysis?.safetyLevel || safetyLevel;
+
+  const getSafetyColor = () => {
+    if (currentSafetyLevel === 'Danger') return '#D32F2F'; // Red
+    if (currentSafetyLevel === 'Warning') return '#FFA000'; // Amber/Orange
+    if (currentSafetyLevel === 'Safe') return '#4CAF50'; // Green
+    return '#4CAF50';
+  };
+
+  const getSafetyText = () => {
+    if (currentSafetyLevel === 'Danger') return i18n.danger || "DANGER";
+    if (currentSafetyLevel === 'Warning') return i18n.warning || "WARNING";
+    return i18n.safe || "SAFE";
   };
 
   return (
@@ -178,11 +208,12 @@ export default function ProductDetailsScreen() {
       <Stack.Screen options={{
         headerRight: () => <TranslateButton />
       }} />
-      {shouldShowWarning(warning) && (
-        <View style={styles.warningCard}>
-          <Ionicons name="warning" size={32} color="white" />
-          <Text style={styles.warningText}>{i18n.warning || "WARNING"}</Text>
-          <Text style={styles.warningDetail}>{warning}</Text>
+      
+      {!loading && analysis && (
+        <View style={[styles.warningCard, { backgroundColor: getSafetyColor() }]}>
+          <Ionicons name={currentSafetyLevel === 'Safe' ? "checkmark-circle" : "warning"} size={32} color="white" />
+          <Text style={styles.warningText}>{getSafetyText()}</Text>
+          <Text style={styles.warningDetail}>{displayContent.warning || displayContent.summary}</Text>
         </View>
       )}
 
@@ -203,16 +234,16 @@ export default function ProductDetailsScreen() {
           <ActivityIndicator size="large" color="#4CAF50" />
         ) : analysis ? (
           <>
-            {analysis.labelInfo && (
+            {displayContent.labelInfo && (
               <View style={styles.infoSection}>
                 <Text style={styles.subHeader}>{i18n.labelInfo || "Label Information"}:</Text>
-                <Text style={styles.value}>{analysis.labelInfo}</Text>
+                <Text style={styles.value}>{displayContent.labelInfo}</Text>
               </View>
             )}
             <Text style={styles.subHeader}>{i18n.healthAnalysis || "Health Analysis"}:</Text>
-            <Text style={styles.analysisSummary}>{analysis.summary}</Text>
-            {analysis.details && (
-              <Text style={styles.analysisDetails}>{analysis.details}</Text>
+            <Text style={styles.analysisSummary}>{displayContent.summary}</Text>
+            {displayContent.details && (
+              <Text style={styles.analysisDetails}>{displayContent.details}</Text>
             )}
           </>
         ) : (

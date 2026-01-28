@@ -33,12 +33,17 @@ export default function RegisterScreen() {
     password: '',
     confirmPassword: '',
     dob: '',
+    age: '',
+    height: '',
+    weight: '',
     allergies: [],
-    dietPreferences: [] 
+    dietPreferences: [],
+    healthStatus: []
   });
 
   const [allergiesList, setAllergiesList] = useState([]);
   const [dietList, setDietList] = useState([]);
+  const [healthStatusList, setHealthStatusList] = useState([]);
 
   useEffect(() => {
     setAllergiesList([
@@ -57,6 +62,16 @@ export default function RegisterScreen() {
       { id: 'vegan', label: i18n.vegan },
       { id: 'halal', label: i18n.halal },
     ]);
+
+    setHealthStatusList([
+      { id: 'pregnant', label: i18n.pregnant || 'Pregnant' },
+      { id: 'diabetes', label: i18n.diabetes || 'Diabetes' },
+      { id: 'highBloodPressure', label: i18n.highBloodPressure || 'High Blood Pressure' },
+      { id: 'kidneyDisease', label: i18n.kidneyDisease || 'Kidney Disease' },
+      { id: 'cardiovascularDisease', label: i18n.cardiovascularDisease || 'Cardiovascular Disease' },
+      { id: 'stroke', label: i18n.stroke || 'Stroke' },
+      { id: 'arthritis', label: i18n.arthritis || 'Arthritis' },
+    ]);
   }, [i18n]);
 
   const toggleAllergy = (id) => {
@@ -65,6 +80,15 @@ export default function RegisterScreen() {
         ? prev.allergies.filter(a => a !== id)
         : [...prev.allergies, id];
       return { ...prev, allergies: newAllergies };
+    });
+  };
+
+  const toggleHealthStatus = (id) => {
+    setFormData(prev => {
+      const newStatus = prev.healthStatus.includes(id)
+        ? prev.healthStatus.filter(a => a !== id)
+        : [...prev.healthStatus, id];
+      return { ...prev, healthStatus: newStatus };
     });
   };
 
@@ -77,12 +101,25 @@ export default function RegisterScreen() {
     });
   };
 
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || dob;
     setShowDatePicker(Platform.OS === 'ios');
     setDob(currentDate);
     setDobSelected(true);
-    setFormData({ ...formData, dob: currentDate.toISOString().split('T')[0] });
+    const dobString = currentDate.toISOString().split('T')[0];
+    const age = calculateAge(currentDate);
+    setFormData({ ...formData, dob: dobString, age: age });
   };
 
   const addCustomAllergy = () => {
@@ -130,6 +167,14 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
+      console.log('Sending registration data:', {
+         email: formData.email,
+         age: formData.age,
+         height: formData.height,
+         weight: formData.weight,
+         healthStatus: formData.healthStatus
+      });
+
       const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,8 +183,12 @@ export default function RegisterScreen() {
           username: formData.username,
           password: formData.password,
           dob: formData.dob,
+          age: formData.age,
+          height: formData.height,
+          weight: formData.weight,
           allergies: formData.allergies,
-          dietPreferences: formData.dietPreferences
+          dietPreferences: formData.dietPreferences,
+          healthStatus: formData.healthStatus
         }),
       });
 
@@ -234,6 +283,40 @@ export default function RegisterScreen() {
               maximumDate={new Date()}
             />
           )}
+
+          <Text style={styles.label}>{i18n.heightLabel || "Height (cm)"}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. 170"
+            value={formData.height}
+            onChangeText={(text) => setFormData({...formData, height: text})}
+            keyboardType="numeric"
+          />
+
+          <Text style={styles.label}>{i18n.weightLabel || "Weight (kg)"}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. 60"
+            value={formData.weight}
+            onChangeText={(text) => setFormData({...formData, weight: text})}
+            keyboardType="numeric"
+          />
+
+          <Text style={styles.label}>{i18n.healthStatusLabel || "Health Status"}</Text>
+          <View style={styles.checkboxContainer}>
+            {healthStatusList.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.checkboxItem}
+                onPress={() => toggleHealthStatus(item.id)}
+              >
+                <View style={[styles.checkbox, formData.healthStatus.includes(item.id) && styles.checkboxChecked]}>
+                  {formData.healthStatus.includes(item.id) && <Ionicons name="checkmark" size={16} color="white" />}
+                </View>
+                <Text style={styles.checkboxLabel}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           <Text style={styles.label}>{i18n.allergiesLabel}</Text>
           <View style={styles.checkboxContainer}>

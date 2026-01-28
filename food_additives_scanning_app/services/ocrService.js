@@ -1,36 +1,111 @@
-const OCR_SPACE_API_KEY = 'k89557491788957'; // In a real app, use process.env.OCR_SPACE_API_KEY
+const POE_API_KEY = 'kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk';
+const POE_BOT_NAME = 'gemini-3-pro'; 
 
-export const scanImage = async (imageUri) => {
+/**
+ * Scans an image using the Poe AI API (OpenAI-compatible endpoint).
+ * @param {string} base64Image - The base64 encoded image string.
+ * @returns {Promise<string|null>} - The extracted text or null.
+ */
+export const scanImage = async (base64Image) => {
   try {
-    const formData = new FormData();
-    formData.append('apikey', OCR_SPACE_API_KEY);
-    formData.append('language', 'eng'); // You can make this dynamic if needed
-    formData.append('isOverlayRequired', 'false');
-    
-    // Append the image file
-    // React Native's FormData requires a name, type, and uri for files
-    const filename = imageUri.split('/').pop();
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : `image`;
-
-    formData.append('file', {
-      uri: imageUri,
-      name: filename,
-      type: type,
-    });
-
-    const response = await fetch('https://api.ocr.space/parse/image', {
+    const response = await fetch('https://api.poe.com/v1/chat/completions', {
       method: 'POST',
-      body: formData,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${POE_API_KEY}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        model: POE_BOT_NAME,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { 
+                type: 'text', 
+                text: `Role: You are a strict data extraction and translation system for food scanning apps.
+Task: Extract food ingredients, nutrition, and product details from the image.
+Language: Translate ALL content to English.
+
+Constraints:
+1. IGNORE any "Thinking", "Rationale", or internal monologue.
+2. IGNORE QR codes, barcodes, and marketing URLs.
+3. If a specific section (e.g., Distributor) is not found on the label, strictly OMIT that section. Do not write "Not found".
+4. START your final response with the delimiter string: "###DATA_START###".
+5. Follow the format below EXACTLY.
+
+Required Format:
+
+###DATA_START###
+*Product Name:*
+[Insert Name]
+
+*Ingredients:*
+[Insert Ingredients List]
+
+*Nutrition Information:*
+(Per [Insert Unit, e.g. 100ml])
+[Insert Nutrition Facts list using bullets]
+
+*Origin:*
+[Insert Country of Origin]
+
+*Storage Instructions:*
+[Insert Instructions]
+
+*Best Before Date:*
+[Insert Date]
+
+*Distributor Information:*
+[Insert Name, Address, Tel]
+
+*Net Volume:*
+[Insert Volume]
+
+*Cross-contamination Risk Statement:*
+[Insert "Produced in a factory..." or allergen warnings]`
+              },
+              { 
+                type: 'image_url', 
+                image_url: { url: `data:image/jpeg;base64,${base64Image}` } 
+              }
+            ]
+          }
+        ]
+      })
     });
 
-    const result = await response.json();
-    return result;
+    const data = await response.json();
+    
+    if (data.error) {
+       throw new Error(data.error.message || 'Unknown API Error');
+    }
+
+    if (data.choices && data.choices.length > 0) {
+      let content = data.choices[0].message.content;
+      
+      // Clean up the content
+      const delimiter = "###DATA_START###";
+      if (content.includes(delimiter)) {
+        content = content.split(delimiter)[1];
+      } else {
+        // Fallback: Remove "Thinking..." header and blockquotes (reasoning chains)
+        content = content.replace(/^Thinking\.\.\.\s*/i, '');
+        content = content.replace(/^>.*$/gm, '');
+      }
+
+      content = content.replace(/!\[.*?\]\(.*?\)/g, '');
+      content = content.replace(/https?:\/\/\S+/g, '');
+      
+      // Collapse multiple newlines and trim
+      content = content.replace(/\n{3,}/g, '\n\n');
+      content = content.trim();
+
+      return content;
+    } else {
+      return null;
+    }
   } catch (error) {
-    console.error('OCR Error:', error);
+    console.error('AI Error:', error);
     throw error;
   }
 };
