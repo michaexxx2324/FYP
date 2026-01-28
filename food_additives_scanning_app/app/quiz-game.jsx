@@ -6,12 +6,14 @@ import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
 
-import { API_URL } from '@env';
+import { API_URL, POE_API_KEY } from '@env';
+
+const POE_BOT_NAME = 'gemini-3-pro';
 
 // const API_URL = 'http://192.168.50.124:3000/api';
 
 export default function QuizGameScreen() {
-  const { i18n } = useLanguage();
+  const { i18n, language } = useLanguage();
   const { user, updateUser } = useAuth();
   const router = useRouter();
   
@@ -24,25 +26,133 @@ export default function QuizGameScreen() {
   const [isCorrect, setIsCorrect] = useState(null);
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    if (user) {
+        fetchQuestions();
+    }
+  }, [user]);
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`${API_URL}/quiz/questions`);
-      const data = await response.json();
-      setQuestions(data);
+      if (!user) {
+         // Fallback if user not loaded yet, though useAuth usually handles this
+         return; 
+      }
+
+      const allergies = user.allergies?.join(', ') || 'none';
+      const diet = user.dietPreferences?.join(', ') || 'none';
+      const healthStatus = user.healthStatus?.join(', ') || 'none';
+      const age = user.age || 'unknown';
+
+      const prompt = `
+        Generate 5 fun, engaging, and educational multiple-choice quiz questions about food additives, food safety, and nutrition.
+        
+        Tailor the questions to a user with:
+        - Allergies: ${allergies}
+        - Diet: ${diet}
+        - Health Status: ${healthStatus}
+        - Age: ${age}
+
+        Make sure the correct answers are scientifically accurate but explained simply.
+        Focus on "hidden dangers", "healthy alternatives", or "facts about [User's Allergies/Diet]".
+
+        Strictly conform to this JSON structure:
+        [
+          {
+            "id": 1,
+            "en": {
+              "question": "English Question text here?",
+              "options": ["Option A", "Option B", "Option C", "Option D"],
+              "answer": "Option A"
+            },
+            "zh": {
+              "question": "中文問題在這裏?",
+              "options": ["選項 A", "選項 B", "選項 C", "選項 D"],
+              "answer": "選項 A"
+            }
+          }
+        ]
+        
+        Return ONLY valid JSON. No markdown formatting.
+      `;
+
+      // console.log("Generating Quiz with prompt:", prompt);
+
+      const response = await fetch('https://api.poe.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${POE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: POE_BOT_NAME,
+          messages: [
+            { role: 'user', content: prompt }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("AI Service Failed");
+      }
+
+      const text = await response.text();
+      const data = JSON.parse(text);
+      
+      if (data.choices && data.choices.length > 0) {
+        const content = data.choices[0].message.content;
+        
+        // Parse JSON content
+        let parsedQuestions = [];
+        try {
+            // First try direct parse
+            parsedQuestions = JSON.parse(content);
+        } catch (e) {
+            // Try extracting from code blocks or finding array brackets
+            const match = content.match(/\[[\s\S]*\]/);
+            if (match) {
+                parsedQuestions = JSON.parse(match[0]);
+            }
+        }
+
+        if (Array.isArray(parsedQuestions) && parsedQuestions.length > 0) {
+             setQuestions(parsedQuestions);
+        } else {
+             // If AI fails layout, fallback to backend
+             console.warn("AI didn't return valid questions, falling back to server.");
+             fallbackFetch();
+        }
+      }
+
       setLoading(false);
     } catch (error) {
-      console.error("Failed to fetch questions", error);
-      Alert.alert(i18n.error, i18n.networkError);
-      setLoading(false);
+      console.error("Failed to generate questions, falling back:", error);
+      fallbackFetch();
     }
+  };
+
+  const fallbackFetch = async () => {
+      try {
+        const response = await fetch(`${API_URL}/quiz/questions`);
+        const data = await response.json();
+        setQuestions(data);
+      } catch (err) {
+          Alert.alert(i18n.error, i18n.networkError || "Could not load quiz.");
+      } finally {
+          setLoading(false);
+      }
   };
 
   const handleAnswer = (option) => {
     const currentQuestion = questions[currentQuestionIndex];
-    const correct = option === currentQuestion.answer;
+    
+    let correctAnswer;
+    if (currentQuestion.en && currentQuestion.zh) {
+         correctAnswer = (language === 'zh' ? currentQuestion.zh.answer : currentQuestion.en.answer);
+    } else {
+         correctAnswer = currentQuestion.answer;
+    }
+
+    const correct = option === correctAnswer;
     
     setSelectedOption(option);
     setIsCorrect(correct);
@@ -154,6 +264,10 @@ export default function QuizGameScreen() {
   }
 
   const currentQuestion = questions[currentQuestionIndex];
+  
+  const questionDisplay = (currentQuestion.en && currentQuestion.zh) 
+      ? (language === 'zh' ? currentQuestion.zh : currentQuestion.en)
+      : currentQuestion;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -168,11 +282,11 @@ export default function QuizGameScreen() {
       </View>
 
       <View style={styles.questionCard}>
-        <Text style={styles.questionText}>{currentQuestion.question}</Text>
+        <Text style={styles.questionText}>{questionDisplay.question}</Text>
       </View>
 
       <View style={styles.optionsContainer}>
-        {currentQuestion.options.map((option, index) => {
+        {questionDisplay.options.map((option, index) => {
           let buttonStyle = styles.optionButton;
           if (selectedOption === option) {
             buttonStyle = isCorrect ? styles.correctOption : styles.wrongOption;

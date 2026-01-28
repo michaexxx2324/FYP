@@ -103,9 +103,7 @@ export default function ProfileScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 80}}>
       <View style={styles.header}>
         <View style={styles.headerTopRow}>
-          <TouchableOpacity onPress={() => isEditing ? handleSaveProfile() : setIsEditing(true)}>
-            <Text style={styles.editButtonText}>{isEditing ? (loading ? "..." : i18n.save || "Save") : i18n.edit || "Edit"}</Text>
-          </TouchableOpacity>
+           {/* Edit button removed as per request - editing moved to settings */}
         </View>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle-outline" size={80} color="#ccc" />

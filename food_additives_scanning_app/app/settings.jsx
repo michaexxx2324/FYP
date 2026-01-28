@@ -29,11 +29,25 @@ export default function SettingsScreen() {
     username: '',
     password: '', 
     allergies: [],
-    dietPreferences: []
+    dietPreferences: [],
+    height: '',
+    weight: '',
+    age: '',
+    healthStatus: []
   });
 
   const [localCustomAllergies, setLocalCustomAllergies] = useState([]);
   const [localCustomDiets, setLocalCustomDiets] = useState([]);
+
+  const healthStatusOptions = useMemo(() => [
+    { id: 'pregnant', label: i18n.pregnant || 'Pregnant' },
+    { id: 'diabetes', label: i18n.diabetes || 'Diabetes' },
+    { id: 'highBloodPressure', label: i18n.highBloodPressure || 'High Blood Pressure' },
+    { id: 'kidneyDisease', label: i18n.kidneyDisease || 'Kidney Disease' },
+    { id: 'cardiovascularDisease', label: i18n.cardiovascularDisease || 'Cardiovascular Disease' },
+    { id: 'stroke', label: i18n.stroke || 'Stroke' },
+    { id: 'arthritis', label: i18n.arthritis || 'Arthritis' },
+  ], [i18n]);
 
   const defaultAllergies = useMemo(() => [
     { id: 'peanut', label: i18n.peanut },
@@ -99,10 +113,23 @@ export default function SettingsScreen() {
         username: user.username || '',
         password: '',
         allergies: user.allergies || [],
-        dietPreferences: user.dietPreferences || []
+        dietPreferences: user.dietPreferences || [],
+        height: user.height ? String(user.height) : '',
+        weight: user.weight ? String(user.weight) : '',
+        age: user.age ? String(user.age) : '',
+        healthStatus: user.healthStatus || []
       });
     }
   }, [user]);
+
+  const toggleHealthStatus = (id) => {
+      setFormData(prev => {
+        const newStatus = prev.healthStatus.includes(id)
+          ? prev.healthStatus.filter(s => s !== id)
+          : [...prev.healthStatus, id];
+        return { ...prev, healthStatus: newStatus };
+      });
+  };
 
   const toggleAllergy = (id) => {
     setFormData(prev => {
@@ -150,7 +177,11 @@ export default function SettingsScreen() {
         email: formData.email,
         username: formData.username,
         allergies: formData.allergies,
-        dietPreferences: formData.dietPreferences
+        dietPreferences: formData.dietPreferences,
+        height: formData.height,
+        weight: formData.weight,
+        age: formData.age,
+        healthStatus: formData.healthStatus
       };
 
       if (formData.password) {
@@ -229,6 +260,46 @@ export default function SettingsScreen() {
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
             <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="#666" />
           </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>{i18n.age || "Age"}</Text>
+        <TextInput
+          style={styles.input}
+          value={formData.age}
+          onChangeText={(text) => setFormData({...formData, age: text})}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.label}>{i18n.heightLabel || "Height (cm)"}</Text>
+        <TextInput
+          style={styles.input}
+          value={formData.height}
+          onChangeText={(text) => setFormData({...formData, height: text})}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.label}>{i18n.weightLabel || "Weight (kg)"}</Text>
+        <TextInput
+          style={styles.input}
+          value={formData.weight}
+          onChangeText={(text) => setFormData({...formData, weight: text})}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.label}>{i18n.healthStatusLabel || "Health Status"}</Text>
+        <View style={styles.checkboxContainer}>
+          {healthStatusOptions && healthStatusOptions.map((item) => (
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.checkboxItem}
+              onPress={() => toggleHealthStatus(item.id)}
+            >
+              <View style={[styles.checkbox, formData.healthStatus.includes(item.id) && styles.checkboxChecked]}>
+                {formData.healthStatus.includes(item.id) && <Ionicons name="checkmark" size={16} color="white" />}
+              </View>
+              <Text style={styles.checkboxLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.label}>{i18n.allergies}</Text>
