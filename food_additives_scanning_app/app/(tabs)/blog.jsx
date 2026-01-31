@@ -6,8 +6,6 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { API_URL } from '@env';
 
-// const API_URL = 'http://192.168.50.124:3000/api';
-
 export default function BlogScreen() {
   const { i18n } = useLanguage();
   const { user } = useAuth();

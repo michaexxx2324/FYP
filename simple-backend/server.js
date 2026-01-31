@@ -7,21 +7,17 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure'; // In production, use env var
+const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure'; 
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection String
 const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
 
-// Connect to MongoDB
 mongoose.connect(CONNECTION_STRING)
   .then(() => console.log('Connected to MongoDB (Cosmos DB)'))
   .catch(err => console.error('Could not connect to MongoDB:', err));
 
-// Define Schema
 const ProductSchema = new mongoose.Schema({
   "item name": String,
   "item code": String,
@@ -30,7 +26,6 @@ const ProductSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', ProductSchema, 'FoodLabelBarCodeScan');
 
-// ScanHistory Schema
 const ScanHistorySchema = new mongoose.Schema({
   "item name": String,
   "item code": String,
@@ -42,7 +37,6 @@ const ScanHistorySchema = new mongoose.Schema({
 
 const ScanHistory = mongoose.model('ScanHistory', ScanHistorySchema, 'ScanHistory');
 
-// Comments Schema
 const CommentSchema = new mongoose.Schema({
   "user id": String,
   "user name": String,
@@ -54,7 +48,6 @@ const CommentSchema = new mongoose.Schema({
 
 const Comment = mongoose.model('Comment', CommentSchema, 'comments');
 
-// API Endpoint
 app.get('/api/GetProduct', async (req, res) => {
   const barcode = req.query.barcode;
 
@@ -65,11 +58,9 @@ app.get('/api/GetProduct', async (req, res) => {
   console.log(`Searching for barcode: ${barcode}`);
 
   try {
-    // First check the main product database
     let product = await Product.findOne({ "item code": barcode });
     let source = 'FoodLabelBarCodeScan';
 
-    // If not found, check the scan history
     if (!product) {
       product = await ScanHistory.findOne({ "item code": barcode });
       source = 'ScanHistory';
@@ -94,7 +85,6 @@ app.get('/api/GetProduct', async (req, res) => {
   }
 });
 
-// Save Scan History Endpoint
 app.post('/api/SaveScanHistory', async (req, res) => {
   const { itemName, itemCode, nutritionInformation, userId, warning, healthAnalysis } = req.body;
 
@@ -103,7 +93,6 @@ app.post('/api/SaveScanHistory', async (req, res) => {
   }
 
   try {
-    // Check if it already exists to update it instead of creating duplicate
     let existingScan = await ScanHistory.findOne({ "item code": itemCode, "user id": userId || "anonymous" });
 
     if (existingScan) {
@@ -121,7 +110,7 @@ app.post('/api/SaveScanHistory', async (req, res) => {
       "item name": itemName,
       "item code": itemCode,
       "nutrition information": nutritionInformation,
-      "user id": userId || "anonymous", // Default to anonymous if not provided
+      "user id": userId || "anonymous",
       "warning": warning,
       "health analysis": healthAnalysis
     });
@@ -135,7 +124,6 @@ app.post('/api/SaveScanHistory', async (req, res) => {
   }
 });
 
-// Save Comment Endpoint
 app.post('/api/SaveComment', async (req, res) => {
   const { userId, userName, comments, time, district, newsId } = req.body;
 
@@ -162,7 +150,6 @@ app.post('/api/SaveComment', async (req, res) => {
   }
 });
 
-// Get Comments Endpoint
 app.get('/api/GetComments', async (req, res) => {
   const newsId = req.query.newsId;
 
@@ -171,7 +158,6 @@ app.get('/api/GetComments', async (req, res) => {
   }
 
   try {
-    // Sort by _id descending (latest first) since 'time' is a string
     const comments = await Comment.find({ "news id": newsId }).sort({ _id: -1 });
     res.json(comments.map(c => ({
       id: c._id,
@@ -187,7 +173,6 @@ app.get('/api/GetComments', async (req, res) => {
   }
 });
 
-// Delete Scan History Endpoint
 app.delete('/api/DeleteScanHistory', async (req, res) => {
   const { itemCode } = req.query;
 
@@ -196,14 +181,12 @@ app.delete('/api/DeleteScanHistory', async (req, res) => {
   }
 
   try {
-    // Only delete from ScanHistory (User generated content)
     const result = await ScanHistory.deleteOne({ "item code": itemCode });
     
     if (result.deletedCount > 0) {
       console.log(`Deleted history for code: ${itemCode}`);
       res.status(200).send("Deleted successfully");
     } else {
-      // If not found in ScanHistory, it might be a main product or already deleted
       res.status(404).send("Item not found in ScanHistory");
     }
   } catch (error) {
@@ -212,7 +195,6 @@ app.delete('/api/DeleteScanHistory', async (req, res) => {
   }
 });
 
-// User Schema
 const UserSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   email: { type: String, unique: true, required: true },
@@ -240,7 +222,6 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema, 'users');
 
-// Register Endpoint
 app.post('/api/register', async (req, res) => {
   const { email, username, password, dob, age, height, weight, allergies, dietPreferences, healthStatus } = req.body;
   
@@ -251,7 +232,6 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    // Check if user exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       if (existingUser.email === email) {
@@ -262,10 +242,8 @@ app.post('/api/register', async (req, res) => {
       }
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate User ID
     const userId = 'user_' + Math.random().toString(36).substr(2, 9);
 
     const newUser = new User({
@@ -278,7 +256,7 @@ app.post('/api/register', async (req, res) => {
       height,
       weight,
       allergies,
-      dietPreferences, // Now an array
+      dietPreferences, 
       healthStatus,
       isVip: false
     });
@@ -291,9 +269,8 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login Endpoint
 app.post('/api/login', async (req, res) => {
-  const { login, password } = req.body; // login can be email or username
+  const { login, password } = req.body; 
 
   if (!login || !password) {
     return res.status(400).json({ message: "Missing credentials" });
@@ -310,7 +287,6 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate Token
     const token = jwt.sign(
       { userId: user.userId, isVip: user.isVip },
       JWT_SECRET,
@@ -342,7 +318,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Update Profile Endpoint
 app.post('/api/user/update', async (req, res) => {
   const { userId, username, email, allergies, dietPreferences, healthStatus, dob, age, height, weight, isVip, password } = req.body;
 
@@ -366,7 +341,7 @@ app.post('/api/user/update', async (req, res) => {
     if (height) user.height = height;
     if (weight) user.weight = weight;
     
-    if (typeof isVip !== 'undefined') user.isVip = isVip; // Allow updating VIP status
+    if (typeof isVip !== 'undefined') user.isVip = isVip; 
     if (password) {
       user.password = await bcrypt.hash(password, 10);
     }
@@ -395,16 +370,14 @@ app.post('/api/user/update', async (req, res) => {
   }
 });
 
-// Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail', 
   auth: {
-    user: 'michaelwong88041356@gmail.com', // Replace with your Gmail
-    pass: 'paes efyf nluc fgok'     // Replace with your App Password
+    user: 'michaelwong88041356@gmail.com',
+    pass: 'paes efyf nluc fgok'
   }
 });
 
-// Forgot Password - Request OTP
 app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Email is required" });
@@ -425,25 +398,19 @@ app.post('/api/forgot-password', async (req, res) => {
         text: `Your OTP for password reset is: ${otp}\nIt expires in 10 minutes.`
     };
     
-    // Attempt to send email, but don't crash if it fails (dev mode fallback)
     try {
-         await transporter.sendMail(mailOptions); // Uncomment to enable real email
-        //console.log(`[DEV MODE] OTP generated for ${email}: ${otp}`);
-        
-        // In production, you would only confirm email sent. 
-        // For Dev, we log it so you can test without setting up SMTP.
+         await transporter.sendMail(mailOptions);
     } catch (mailError) {
         console.error("Email send failed:", mailError);
     }
 
-    res.json({ message: "OTP sent to your email (Check console for Dev mode)" });
+    res.json({ message: "OTP sent to your email" });
   } catch (error) {
     console.error("Forgot password error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-// Verify OTP
 app.post('/api/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required" });
@@ -452,7 +419,7 @@ app.post('/api/verify-otp', async (req, res) => {
         const user = await User.findOne({ 
             email, 
             resetOTP: otp,
-            resetOTPExpires: { $gt: Date.now() } // Check if not expired
+            resetOTPExpires: { $gt: Date.now() } 
         });
 
         if (!user) {
@@ -466,7 +433,6 @@ app.post('/api/verify-otp', async (req, res) => {
     }
 });
 
-// Reset Password Final
 app.post('/api/reset-password-final', async (req, res) => {
     const { email, otp, newPassword } = req.body;
     
@@ -485,10 +451,8 @@ app.post('/api/reset-password-final', async (req, res) => {
             return res.status(400).json({ message: "Invalid session or OTP expired" });
         }
 
-        // Hash new password
         user.password = await bcrypt.hash(newPassword, 10);
         
-        // Clear OTP fields
         user.resetOTP = undefined;
         user.resetOTPExpires = undefined;
 

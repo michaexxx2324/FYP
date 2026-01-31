@@ -84,20 +84,19 @@ Required Format:
     if (data.choices && data.choices.length > 0) {
       let content = data.choices[0].message.content;
       
-      // Clean up the content
+ 
       const delimiter = "###DATA_START###";
       if (content.includes(delimiter)) {
         content = content.split(delimiter)[1];
       } else {
-        // Fallback: Remove "Thinking..." header and blockquotes (reasoning chains)
+    
         content = content.replace(/^Thinking\.\.\.\s*/i, '');
         content = content.replace(/^>.*$/gm, '');
       }
 
       content = content.replace(/!\[.*?\]\(.*?\)/g, '');
       content = content.replace(/https?:\/\/\S+/g, '');
-      
-      // Collapse multiple newlines and trim
+
       content = content.replace(/\n{3,}/g, '\n\n');
       content = content.trim();
 

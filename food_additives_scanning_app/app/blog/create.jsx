@@ -6,8 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 import TranslateButton from '../../components/TranslateButton';
 import { API_URL } from '@env';
 
-// const API_URL = 'http://192.168.50.124:3000/api';
-
 export default function CreatePostScreen() {
   const { i18n } = useLanguage();
   const { user } = useAuth();

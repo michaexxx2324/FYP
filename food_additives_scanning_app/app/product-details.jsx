@@ -28,7 +28,7 @@ export default function ProductDetailsScreen() {
       try {
         const parsedAnalysis = typeof savedAnalysis === 'string' ? JSON.parse(savedAnalysis) : savedAnalysis;
         setAnalysis(parsedAnalysis);
-        setSafetyLevel(parsedAnalysis.safetyLevel || 'Safe'); // Default or infer
+        setSafetyLevel(parsedAnalysis.safetyLevel || 'Safe'); 
         setWarning(savedWarning);
         setLoading(false);
       } catch (e) {
@@ -162,7 +162,7 @@ export default function ProductDetailsScreen() {
         if (result) {
           setAnalysis(result);
           setSafetyLevel(result.safetyLevel);
-          // For backward compatibility or general warning display, we can pick English warning for database 'warning' column
+  
           const warnMsg = result.english?.warning || result.safetyLevel;
           setWarning(warnMsg);
           saveAnalysisToBackend(result, warnMsg);
@@ -181,7 +181,7 @@ export default function ProductDetailsScreen() {
 
   const getDisplayContent = () => {
     if (!analysis) return null;
-    // Default to 'english' if language not matched or structure missing
+  
     const langKey = language === 'zh' || language === 'zh-HK' || language === 'zh-TW' ? 'chinese' : 'english';
     return analysis[langKey] || analysis.english || {}; 
   };
@@ -190,9 +190,9 @@ export default function ProductDetailsScreen() {
   const currentSafetyLevel = analysis?.safetyLevel || safetyLevel;
 
   const getSafetyColor = () => {
-    if (currentSafetyLevel === 'Danger') return '#D32F2F'; // Red
-    if (currentSafetyLevel === 'Warning') return '#FFA000'; // Amber/Orange
-    if (currentSafetyLevel === 'Safe') return '#4CAF50'; // Green
+    if (currentSafetyLevel === 'Danger') return '#D32F2F'; 
+    if (currentSafetyLevel === 'Warning') return '#FFA000'; 
+    if (currentSafetyLevel === 'Safe') return '#4CAF50'; 
     return '#4CAF50';
   };
 

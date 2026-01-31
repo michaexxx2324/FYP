@@ -40,7 +40,6 @@ export default function ProfileScreen() {
     setLoading(true);
     try {
       // Recalculate age if DOB is changed? user inputs DOB as string here for simplicity or date picker? 
-      // For now, let's just save what is edited.
       
       const response = await fetch(`${API_URL}/user/update`, {
         method: 'POST',
@@ -103,7 +102,7 @@ export default function ProfileScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 80}}>
       <View style={styles.header}>
         <View style={styles.headerTopRow}>
-           {/* Edit button removed as per request - editing moved to settings */}
+           
         </View>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle-outline" size={80} color="#ccc" />

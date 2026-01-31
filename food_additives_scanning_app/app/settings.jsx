@@ -8,8 +8,6 @@ import TranslateButton from '../components/TranslateButton';
 
 import { API_URL } from '@env';
 
-// const API_URL = 'http://192.168.50.124:3000/api';
-
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, updateUser } = useAuth();

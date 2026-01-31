@@ -10,8 +10,6 @@ import { API_URL, POE_API_KEY } from '@env';
 
 const POE_BOT_NAME = 'gemini-3-pro';
 
-// const API_URL = 'http://192.168.50.124:3000/api';
-
 export default function QuizGameScreen() {
   const { i18n, language } = useLanguage();
   const { user, updateUser } = useAuth();
@@ -34,7 +32,7 @@ export default function QuizGameScreen() {
   const fetchQuestions = async () => {
     try {
       if (!user) {
-         // Fallback if user not loaded yet, though useAuth usually handles this
+         
          return; 
       }
 
@@ -101,13 +99,13 @@ export default function QuizGameScreen() {
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
         
-        // Parse JSON content
+       
         let parsedQuestions = [];
         try {
-            // First try direct parse
+      
             parsedQuestions = JSON.parse(content);
         } catch (e) {
-            // Try extracting from code blocks or finding array brackets
+
             const match = content.match(/\[[\s\S]*\]/);
             if (match) {
                 parsedQuestions = JSON.parse(match[0]);
@@ -117,7 +115,6 @@ export default function QuizGameScreen() {
         if (Array.isArray(parsedQuestions) && parsedQuestions.length > 0) {
              setQuestions(parsedQuestions);
         } else {
-             // If AI fails layout, fallback to backend
              console.warn("AI didn't return valid questions, falling back to server.");
              fallbackFetch();
         }

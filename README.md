@@ -39,3 +39,10 @@ vip deep mode:
 
 4. 营养配比建议 (Macronutrient Balance)
 根据用户的身高体重，计算该食品占用户每日建议摄入量 (GDA/RDI) 的百分比。
+
+// need to deploy Azure 
+// 'azure-functions'
+
+// Example: 'https://my-food-app.azurewebsites.net/api/GetProduct'
+// For local testing with Expo Go, use your computer's IP: 'http://192.168.1.100:7071/api/GetProduct'
+// const API_URL = 'http://192.168.50.124:3000/api/GetProduct'; 

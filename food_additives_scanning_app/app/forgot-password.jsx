@@ -6,8 +6,6 @@ import TranslateButton from '../components/TranslateButton';
 
 import { API_URL } from '@env';
 
-// const API_URL = 'http://192.168.50.124:3000/api';
-
 const STAGE_EMAIL = 'EMAIL';
 const STAGE_OTP = 'OTP';
 const STAGE_NEW_PASSWORD = 'NEW_PASSWORD';
@@ -21,7 +19,7 @@ export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { i18n } = useLanguage();
 
-  // STAGE 1: Request OTP
+
   const handleRequestOTP = async () => {
     if (!email) {
       Alert.alert(i18n.error || "Error", i18n.enterEmailAlert || "Please enter your email");
@@ -52,7 +50,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  // STAGE 2: Verify OTP
+
   const handleVerifyOTP = async () => {
     if (!otp || otp.length !== 6) {
       Alert.alert("Error", "Please enter a valid 6-digit OTP");
@@ -81,7 +79,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  // STAGE 3: Reset Password
+ 
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
