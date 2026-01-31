@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = 3000;
@@ -232,6 +233,8 @@ const UserSchema = new mongoose.Schema({
     dateWon: { type: Date, default: Date.now }
   }],
   favoritePosts: [String],
+  resetOTP: String,
+  resetOTPExpires: Date,
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -392,26 +395,120 @@ app.post('/api/user/update', async (req, res) => {
   }
 });
 
-// Reset Password Endpoint
-app.post('/api/reset-password', async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail', 
+  auth: {
+    user: 'michaelwong88041356@gmail.com', // Replace with your Gmail
+    pass: 'paes efyf nluc fgok'     // Replace with your App Password
   }
+});
+
+// Forgot Password - Request OTP
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
 
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetOTP = otp;
+    user.resetOTPExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    const mailOptions = {
+        from: 'Food Scanner App <no-reply@foodscanner.com>',
+        to: email,
+        subject: 'Password Reset OTP',
+        text: `Your OTP for password reset is: ${otp}\nIt expires in 10 minutes.`
+    };
+    
+    // Attempt to send email, but don't crash if it fails (dev mode fallback)
+    try {
+         await transporter.sendMail(mailOptions); // Uncomment to enable real email
+        //console.log(`[DEV MODE] OTP generated for ${email}: ${otp}`);
+        
+        // In production, you would only confirm email sent. 
+        // For Dev, we log it so you can test without setting up SMTP.
+    } catch (mailError) {
+        console.error("Email send failed:", mailError);
     }
 
-    // In a real app, send an email. Here we just simulate success.
-    res.json({ message: "Password reset link sent to your email." });
+    res.json({ message: "OTP sent to your email (Check console for Dev mode)" });
   } catch (error) {
-    console.error("Reset password error:", error);
+    console.error("Forgot password error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
+});
+
+// Verify OTP
+app.post('/api/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required" });
+
+    try {
+        const user = await User.findOne({ 
+            email, 
+            resetOTP: otp,
+            resetOTPExpires: { $gt: Date.now() } // Check if not expired
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        res.json({ message: "OTP verified successfully" });
+    } catch (error) {
+        console.error("Verify OTP error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+// Reset Password Final
+app.post('/api/reset-password-final', async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    
+    if (!email || !otp || !newPassword) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    try {
+        const user = await User.findOne({ 
+            email, 
+            resetOTP: otp, 
+            resetOTPExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid session or OTP expired" });
+        }
+
+        // Hash new password
+        user.password = await bcrypt.hash(newPassword, 10);
+        
+        // Clear OTP fields
+        user.resetOTP = undefined;
+        user.resetOTPExpires = undefined;
+
+        await user.save();
+
+        res.json({ message: "Password has been reset successfully" });
+    } catch (error) {
+        console.error("Reset password error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+// Reset Password Endpoint (Legacy/Simple) - keeping for compatibility if used elsewhere, but renamed internally
+app.post('/api/reset-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  // Redirect to new flow message
+  res.json({ message: "Please use the new Forgot Password flow." });
 });
 
 // Quiz Questions Endpoint (Simulating AI generation)
