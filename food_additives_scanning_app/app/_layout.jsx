@@ -8,13 +8,21 @@ export default function RootLayout() {
     <AuthProvider>
       <LanguageProvider>
         <HistoryProvider>
-            <Stack screenOptions={{ headerShown: false }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#fbf5e5' } }}>
               <Stack.Screen name="index" />
               <Stack.Screen name="login" />
               <Stack.Screen name="register" />
               <Stack.Screen name="forgot-password" />
               <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="product-details" options={{ title: 'Product Details', headerShown: true }} />
+              <Stack.Screen 
+                name="product-details" 
+                options={{ 
+                  title: 'Product Details', 
+                  headerShown: true,
+                  headerStyle: { backgroundColor: '#fbf5e5' },
+                  headerShadowVisible: false
+                }} 
+              />
             </Stack>
         </HistoryProvider>
       </LanguageProvider>

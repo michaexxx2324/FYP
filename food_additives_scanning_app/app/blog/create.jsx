@@ -52,7 +52,9 @@ export default function CreatePostScreen() {
     <ScrollView style={styles.container}>
       <Stack.Screen options={{
         headerRight: () => <TranslateButton />,
-        title: i18n.createPost || "Create Post"
+        title: i18n.createPost || "Create Post",
+        headerStyle: { backgroundColor: '#fbf5e5' },
+        headerShadowVisible: false,
       }} />
       <Text style={styles.label}>{i18n.title || "Title"}</Text>
       <TextInput

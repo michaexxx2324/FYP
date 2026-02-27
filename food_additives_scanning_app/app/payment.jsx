@@ -109,7 +109,9 @@ export default function PaymentScreen() {
     <View style={styles.container}>
       <Stack.Screen options={{ 
         title: i18n.paymentTitle,
-        headerRight: () => <TranslateButton />
+        headerRight: () => <TranslateButton />,
+        headerStyle: { backgroundColor: '#fbf5e5' },
+        headerShadowVisible: false,
       }} />
       <ScrollView style={styles.content}>
         
@@ -173,7 +175,7 @@ export default function PaymentScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbf5e5',
   },
   header: {
     flexDirection: 'row',

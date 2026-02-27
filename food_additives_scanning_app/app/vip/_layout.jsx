@@ -10,19 +10,19 @@ export default function VipLayout() {
 
   return (
     <Tabs screenOptions={{
-      tabBarActiveTintColor: '#FFD700',
+      tabBarActiveTintColor: '#2d5a27',
       tabBarInactiveTintColor: 'gray',
       headerShown: true,
-      headerStyle: { backgroundColor: '#FFD700' },
-      headerTintColor: '#fff',
+      headerStyle: { backgroundColor: '#fbf5e5' },
+      headerTintColor: '#2d5a27',
       headerTitleStyle: { fontWeight: 'bold' },
       headerLeft: () => (
         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 15 }}>
-          <Ionicons name="arrow-back" size={24} color="white" />
+          <Ionicons name="arrow-back" size={24} color="#2d5a27" />
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TranslateButton style={{ marginRight: 15, backgroundColor: 'rgba(255,255,255,0.2)' }} textStyle={{ color: 'white' }} />
+        <TranslateButton style={{ marginRight: 15 }} textStyle={{ color: '#2d5a27' }} />
       ),
     }}>
       <Tabs.Screen

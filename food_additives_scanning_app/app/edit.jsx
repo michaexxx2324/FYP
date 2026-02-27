@@ -118,7 +118,9 @@ export default function EditScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Stack.Screen options={{
         headerRight: () => <TranslateButton />,
-        title: i18n.editScan
+        title: i18n.editProduct,
+        headerStyle: { backgroundColor: '#fbf5e5' },
+        headerShadowVisible: false,
       }} />
       <Text style={styles.title}>{i18n.editScan}</Text>
 
@@ -201,7 +203,7 @@ export default function EditScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#fbf5e5',
     flexGrow: 1,
     paddingBottom: 50,
   },
@@ -210,6 +212,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#2d5a27',
   },
   inputGroup: {
     marginBottom: 20,
@@ -218,43 +221,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     fontWeight: '600',
-    color: '#333',
+    color: '#2d5a27',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: '#d1cabb',
+    borderRadius: 12,
+    padding: 15,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
+    color: '#5d574a',
   },
   disabledInput: {
-    backgroundColor: '#eee',
-    color: '#666',
+    backgroundColor: '#e6dfcf',
+    color: '#8c867a',
   },
   textArea: {
     height: 200,
+    textAlignVertical: 'top',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+    gap: 15,
   },
   button: {
     flex: 1,
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 24,
     alignItems: 'center',
-    marginHorizontal: 5,
+    shadowColor: '#5d574a',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   returnButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#8c867a',
   },
   saveButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#2d5a27',
   },
   buttonText: {
-    color: 'white',
+    color: '#fbf5e5',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -264,20 +274,25 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   scanButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#D97943', // Accent
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#D97943',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
   },
   helperText: {
     fontSize: 12,
-    color: '#888',
-    marginTop: 4,
+    color: '#8c867a',
+    marginTop: 5,
   },
   cameraContainer: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#000',
   },
   camera: {
     flex: 1,
@@ -290,22 +305,27 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   cameraText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     position: 'absolute',
     top: 100,
+    textAlign: 'center',
+    width: '100%',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   closeButton: {
-    backgroundColor: 'white',
-    padding: 15,
+    backgroundColor: '#fbf5e5',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 30,
-    width: 120,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: 'black',
+    color: '#2d5a27',
     fontWeight: 'bold',
     fontSize: 16,
   },

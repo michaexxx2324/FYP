@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Image, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, Animated, Dimensions, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,7 +43,7 @@ export default function LandingScreen() {
   }, [animationFinished, isLoading, user]);
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../assets/background.png')} style={styles.container} resizeMode="cover">
       <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
         <Image 
           source={require('../assets/icon.png')} 
@@ -51,7 +51,7 @@ export default function LandingScreen() {
           resizeMode="contain"
         />
       </Animated.View>
-    </View>
+    </ImageBackground>
   );
 }
 

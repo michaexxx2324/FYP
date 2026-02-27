@@ -32,24 +32,31 @@ export default function HistoryScreen() {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.itemCode} - {item.itemName}</Text>
+        <Text style={styles.cardInfo}>{item.itemCode}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1}>{item.itemName}</Text>
+      </View>
+      
+      <View style={styles.cardActions}>
+        <TouchableOpacity 
+          style={styles.viewButton}
+          onPress={() => router.push({
+            pathname: '/product-details',
+            params: { 
+              itemName: item.itemName, 
+              itemCode: item.itemCode, 
+              nutritionInformation: item.nutritionInformation,
+              warning: item.warning,
+              healthAnalysis: item.healthAnalysis
+            }
+          })}
+        >
+          <Text style={styles.viewButtonText}>{i18n.view}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={20} color="red" />
+          <Ionicons name="trash-outline" size={20} color="#D97943" />
         </TouchableOpacity>
       </View>
-      <Button 
-        title={i18n.view} 
-        onPress={() => router.push({
-          pathname: '/product-details',
-          params: { 
-            itemName: item.itemName, 
-            itemCode: item.itemCode, 
-            nutritionInformation: item.nutritionInformation,
-            warning: item.warning,
-            healthAnalysis: item.healthAnalysis
-          }
-        })} 
-      />
     </View>
   );
 
@@ -60,6 +67,7 @@ export default function HistoryScreen() {
       <TextInput
         style={styles.searchInput}
         placeholder={i18n.searchPlaceholder}
+        placeholderTextColor="#8c867a"
         value={searchText}
         onChangeText={setSearchText}
       />
@@ -83,58 +91,89 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbf5e5',
     padding: 20,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    marginBottom: 20,
+    color: '#2d5a27', // Primary
   },
   searchInput: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 12,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#d1cabb',
+    fontSize: 16,
+    color: '#5d574a',
   },
   listContent: {
     paddingBottom: 80,
   },
   card: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 15,
+    shadowColor: '#5d574a',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 6,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0e6d2',
   },
   cardHeader: {
+    marginBottom: 15,
+  },
+  cardInfo: {
+    fontSize: 12,
+    color: '#8c867a',
+    marginBottom: 4,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2d5a27',
+  },
+  cardActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 5,
   },
-  cardTitle: {
-    fontSize: 16,
+  viewButton: {
+    backgroundColor: '#2d5a27',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    shadowColor: '#2d5a27',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  viewButtonText: {
+    color: '#fbf5e5',
     fontWeight: 'bold',
-    flex: 1,
+    fontSize: 14,
   },
   deleteButton: {
-    padding: 5,
+    padding: 10,
+    backgroundColor: '#fbf5e5',
+    borderRadius: 20,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 50,
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: '#8c867a',
   },
 });

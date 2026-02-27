@@ -246,7 +246,7 @@ export default function RecipesScreen() {
 
       {loading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFD700" />
+          <ActivityIndicator size="large" color="#2d5a27" />
           <Text>{i18n.generatingRecipe || "Generating Recipe..."}</Text>
         </View>
       )}
@@ -292,20 +292,20 @@ export default function RecipesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  cameraSection: { alignItems: 'center', padding: 20, backgroundColor: 'white' },
-  previewImage: { width: 200, height: 200, borderRadius: 10, marginBottom: 20 },
-  placeholder: { width: 200, height: 200, backgroundColor: '#eee', borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  container: { flex: 1, backgroundColor: '#fbf5e5' },
+  cameraSection: { alignItems: 'center', padding: 20, backgroundColor: 'white', borderBottomLeftRadius: 24, borderBottomRightRadius: 24, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
+  previewImage: { width: 200, height: 200, borderRadius: 20, marginBottom: 20 },
+  placeholder: { width: 200, height: 200, backgroundColor: '#f0f0f0', borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   placeholderText: { marginTop: 10, color: '#888' },
-  cameraButton: { flexDirection: 'row', backgroundColor: '#FFD700', padding: 15, borderRadius: 25, alignItems: 'center' },
+  cameraButton: { flexDirection: 'row', backgroundColor: '#2d5a27', padding: 15, borderRadius: 25, alignItems: 'center' },
   cameraButtonText: { color: 'white', fontWeight: 'bold', marginLeft: 10 },
   loadingContainer: { padding: 20, alignItems: 'center' },
   resultContainer: { padding: 20 },
-  warningBox: { backgroundColor: '#FF5252', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  warningBox: { backgroundColor: '#D97943', padding: 15, borderRadius: 20, flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   warningText: { color: 'white', marginLeft: 10, flex: 1 },
-  recipeTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#333' },
-  section: { marginBottom: 20, backgroundColor: 'white', padding: 15, borderRadius: 10 },
-  sectionHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#FFD700' },
-  listItem: { fontSize: 16, marginBottom: 5, lineHeight: 24 },
-  bodyText: { fontSize: 16, lineHeight: 24 },
+  recipeTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#2d5a27' },
+  section: { marginBottom: 20, backgroundColor: 'white', padding: 20, borderRadius: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
+  sectionHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#2d5a27' },
+  listItem: { fontSize: 16, marginBottom: 5, lineHeight: 24, color: '#5d574a' },
+  bodyText: { fontSize: 16, lineHeight: 24, color: '#5d574a' },
 });

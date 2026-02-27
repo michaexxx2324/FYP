@@ -268,7 +268,12 @@ export default function QuizGameScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Stack.Screen options={{ title: i18n.discountGame, headerRight: () => <TranslateButton /> }} />
+      <Stack.Screen options={{ 
+        title: i18n.discountGame, 
+        headerRight: () => <TranslateButton />,
+        headerStyle: { backgroundColor: '#fbf5e5' },
+        headerShadowVisible: false,
+      }} />
       <View style={styles.header}>
         <Text style={styles.questionCount}>
           {i18n.question || "Question"} {currentQuestionIndex + 1} / {questions.length}
@@ -316,7 +321,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbf5e5',
     justifyContent: 'center',
     paddingBottom: 50,
   },

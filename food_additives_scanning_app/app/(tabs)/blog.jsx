@@ -112,7 +112,7 @@ export default function BlogScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbf5e5',
   },
   header: {
     padding: 15,

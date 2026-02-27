@@ -57,6 +57,11 @@ export default function FavoritesScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{
+        title: i18n.myFavorites || "My Favorites",
+        headerStyle: { backgroundColor: '#fbf5e5' },
+        headerShadowVisible: false,
+      }} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
@@ -85,7 +90,7 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbf5e5',
   },
   header: {
     flexDirection: 'row',

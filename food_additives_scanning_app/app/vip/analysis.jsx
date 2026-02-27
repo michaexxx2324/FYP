@@ -174,7 +174,7 @@ export default function AnalysisScreen() {
 
   const renderHistoryItem = ({ item }) => (
     <TouchableOpacity style={styles.historyItem} onPress={() => handleAnalyze(item)}>
-      <Ionicons name="scan-circle" size={40} color="#FFD700" />
+      <Ionicons name="scan-circle" size={40} color="#2d5a27" />
       <View style={styles.historyText}>
         <Text style={styles.historyName}>{item.itemName}</Text>
         <Text style={styles.historyDate}>{new Date(item.scanDate).toLocaleDateString()}</Text>
@@ -205,7 +205,7 @@ export default function AnalysisScreen() {
           <Text style={styles.itemTitle}>{selectedItem.itemName}</Text>
 
           {loading ? (
-            <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
+            <ActivityIndicator size="large" color="#2d5a27" style={{ marginTop: 50 }} />
           ) : displayAnalysis ? (
             <View>
               <View style={styles.scoreCard}>
@@ -272,34 +272,34 @@ export default function AnalysisScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: { fontSize: 18, fontWeight: 'bold', padding: 20, color: '#333' },
+  container: { flex: 1, backgroundColor: '#fbf5e5' },
+  header: { fontSize: 18, fontWeight: 'bold', padding: 20, color: '#2d5a27' },
   list: { padding: 15 },
-  historyItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', padding: 15, borderRadius: 10, marginBottom: 10 },
+  historyItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', padding: 15, borderRadius: 20, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   historyText: { flex: 1, marginLeft: 15 },
-  historyName: { fontSize: 16, fontWeight: 'bold' },
+  historyName: { fontSize: 16, fontWeight: 'bold', color: '#5d574a' },
   historyDate: { color: '#888', fontSize: 12 },
   analysisContainer: { padding: 20 },
   backButton: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  backText: { marginLeft: 5, fontSize: 16 },
-  itemTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  scoreCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 15, alignItems: 'center' },
+  backText: { marginLeft: 5, fontSize: 16, color: '#2d5a27' },
+  itemTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#2d5a27' },
+  scoreCard: { backgroundColor: 'white', padding: 20, borderRadius: 20, marginBottom: 15, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   scoreLabel: { fontSize: 16, color: '#666', marginBottom: 5 },
-  scoreValue: { fontSize: 36, fontWeight: 'bold', color: '#FFD700' },
-  riskCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 15, alignItems: 'center' },
+  scoreValue: { fontSize: 36, fontWeight: 'bold', color: '#D97943' },
+  riskCard: { backgroundColor: 'white', padding: 20, borderRadius: 20, marginBottom: 15, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   riskLabel: { fontSize: 16, color: '#666', marginBottom: 5 },
   riskValue: { fontSize: 24, fontWeight: 'bold' },
-  novaCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 15, alignItems: 'center', borderWidth: 2 },
+  novaCard: { backgroundColor: 'white', padding: 20, borderRadius: 20, marginBottom: 15, alignItems: 'center', borderWidth: 2 },
   novaLabel: { fontSize: 16, color: '#666', marginBottom: 5 },
   novaValue: { fontSize: 36, fontWeight: 'bold' },
   novaDescription: { fontSize: 14, color: '#666', textAlign: 'center', marginTop: 5 },
-  detailsCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 20 },
-  detailsTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#333' },
-  detailsText: { fontSize: 15, lineHeight: 22, color: '#444' },
-  recCard: { backgroundColor: 'white', padding: 20, borderRadius: 10, marginBottom: 20 },
-  recLabel: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  detailsCard: { backgroundColor: 'white', padding: 20, borderRadius: 20, marginBottom: 20 },
+  detailsTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#2d5a27' },
+  detailsText: { fontSize: 15, lineHeight: 22, color: '#5d574a' },
+  recCard: { backgroundColor: 'white', padding: 20, borderRadius: 20, marginBottom: 20 },
+  recLabel: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: '#2d5a27' },
   recItem: { flexDirection: 'row', marginBottom: 10, alignItems: 'flex-start' },
-  recText: { marginLeft: 10, flex: 1, fontSize: 16 },
-  reportButton: { backgroundColor: '#FF9800', padding: 15, borderRadius: 10, alignItems: 'center' },
+  recText: { marginLeft: 10, flex: 1, fontSize: 16, color: '#5d574a' },
+  reportButton: { backgroundColor: '#2d5a27', padding: 15, borderRadius: 25, alignItems: 'center' },
   reportButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
 });

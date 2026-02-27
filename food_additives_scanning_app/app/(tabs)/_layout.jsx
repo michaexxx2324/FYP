@@ -9,8 +9,13 @@ export default function TabLayout() {
 
   return (
     <Tabs screenOptions={{
-      tabBarActiveTintColor: 'blue',
+      tabBarActiveTintColor: '#2d5a27',
+      tabBarInactiveTintColor: '#888',
       headerRight: () => <TranslateButton style={{ marginRight: 15 }} />,
+      tabBarStyle: { backgroundColor: '#fbf5e5', borderTopWidth: 0, elevation: 5 },
+      headerStyle: { backgroundColor: '#fbf5e5' },
+      headerTintColor: '#5d574a',
+      headerShadowVisible: false, 
     }}>
       <Tabs.Screen
         name="index"
