@@ -1,0 +1,126 @@
+[2026-02-27T14:14:18.747Z] [INFO] Starting database initialization...
+[2026-02-27T14:14:18.751Z] [INFO] Fetching historical files skipping 0...
+[2026-02-27T14:14:19.128Z] [INFO] Fetched 0 historical file URLs.
+[2026-02-27T14:14:19.129Z] [INFO] Found 0 historical files.
+[2026-02-27T14:14:19.130Z] [INFO] Database initialized with 0 active alerts.
+[2026-02-27T14:16:24.063Z] [INFO] Starting database initialization...
+[2026-02-27T14:16:24.067Z] [INFO] Fetching historical files skipping 0...
+[2026-02-27T14:16:28.316Z] [INFO] Fetching historical files skipping 20...
+[2026-02-27T14:16:31.508Z] [INFO] Found 29 historical files.
+[2026-02-27T14:16:31.508Z] [INFO] Fetched 29 historical file URLs.
+[2026-02-27T14:16:31.509Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28A%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:31.629Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:31.629Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28B%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:31.707Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:31.707Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28C%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:31.811Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:31.811Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28D%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:31.904Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28E%29%20FCSYP-Food%20intake%20per%20day%20over%20the%20past%2012%20months%20prior%20to%20the%20interview%20by%20%28weighted%29%20respondents%20by%20FFQ%20item%20%28Bilingua%29.xml
+[2026-02-27T14:16:31.904Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:31.965Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:31.965Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28F%29%20FCSYP-Food%20intake%20per%20day%20over%20the%20past%2012%20months%20prior%20to%20the%20interview%20by%20%28weighted%29%20consumers%20by%20FFQ%20item%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.047Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28G%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.046Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.117Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.118Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28H%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.181Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.181Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28I%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.255Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.255Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28J%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.371Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.371Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28K%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.422Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28L%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.422Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.481Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.481Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28M%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.587Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.587Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/datagovhk/fcsyp/%28N%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:16:32.714Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.715Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20group%20-%20All%20Respondents).xml
+[2026-02-27T14:16:32.771Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.771Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20group%20-%20Consumers).xml
+[2026-02-27T14:16:32.839Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.839Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20subgroup%20-%20All%20Respondents).xml
+[2026-02-27T14:16:32.915Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:32.915Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20subgroup%20-%20Consumers).xml
+[2026-02-27T14:16:33.006Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.007Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%20FFQ%20(All%20Respondents).xml
+[2026-02-27T14:16:33.102Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%20FFQ%20(Consumers).xml
+[2026-02-27T14:16:33.102Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.191Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)consumers_by_food_group_from_24HDR.xml
+[2026-02-27T14:16:33.191Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.245Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.245Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)consumers_by_food_subgroup_from_24HDR.xml
+[2026-02-27T14:16:33.338Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.338Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)respondents_by_food_group_from_24HDR.xml
+[2026-02-27T14:16:33.394Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)respondents_by_food_subgroup_from_24HDR.xml
+[2026-02-27T14:16:33.394Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.475Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.476Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_over_the_past_12months_prior_to_the_interview_by(weighted)consumers_by_FFQ_item.xml
+[2026-02-27T14:16:33.543Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.543Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_over_the_past_12months_prior_to_the_interview_by(weighted)respondents_by_FFQ_item.xml
+[2026-02-27T14:16:33.601Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:16:33.601Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-02-27T14:16:33.681Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/filemanager/foodalert/sc_chi/foodalert_datagovhk.xml
+[2026-02-27T14:16:33.736Z] [INFO] Fetching and parsing: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-02-27T14:16:33.793Z] [INFO] Database initialized with 3 active alerts.
+[2026-02-27T14:19:49.511Z] [INFO] Starting database initialization...
+[2026-02-27T14:19:49.517Z] [INFO] Fetching historical files skipping 0...
+[2026-02-27T14:19:52.933Z] [INFO] Fetching historical files skipping 20...
+[2026-02-27T14:19:55.905Z] [INFO] Fetched 29 historical file URLs.
+[2026-02-27T14:19:55.906Z] [INFO] Found 29 historical files.
+[2026-02-27T14:19:55.906Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28A%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:55.970Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:55.971Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28B%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:55.992Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:55.992Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28C%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.036Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.036Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28D%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.078Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.079Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28E%29%20FCSYP-Food%20intake%20per%20day%20over%20the%20past%2012%20months%20prior%20to%20the%20interview%20by%20%28weighted%29%20respondents%20by%20FFQ%20item%20%28Bilingua%29.xml
+[2026-02-27T14:19:56.099Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.099Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28F%29%20FCSYP-Food%20intake%20per%20day%20over%20the%20past%2012%20months%20prior%20to%20the%20interview%20by%20%28weighted%29%20consumers%20by%20FFQ%20item%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.116Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28G%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.115Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.135Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.136Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28H%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.155Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.155Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28I%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.192Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.192Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28J%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20by%20sex%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.229Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.229Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28K%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20group%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.246Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.246Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28L%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20group%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.263Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.263Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28M%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20respondents%20by%20food%20subgroup%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.304Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/datagovhk/fcsyp/%28N%29%20FCSYP-Food%20intake%20per%20day%20by%20%28weighted%29%20consumers%20by%20food%20subgroup%20by%20age%20group%20from%2024HDR%20%28Bilingual%29.xml
+[2026-02-27T14:19:56.304Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.353Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.353Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20group%20-%20All%20Respondents).xml
+[2026-02-27T14:19:56.376Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20group%20-%20Consumers).xml
+[2026-02-27T14:19:56.375Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.391Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.391Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20subgroup%20-%20All%20Respondents).xml
+[2026-02-27T14:19:56.422Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.423Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%2024HourRecall%20(Food%20subgroup%20-%20Consumers).xml
+[2026-02-27T14:19:56.452Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.452Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%20FFQ%20(All%20Respondents).xml
+[2026-02-27T14:19:56.483Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.483Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/1stHKFCS%20FFQ%20(Consumers).xml
+[2026-02-27T14:19:56.510Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.511Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)consumers_by_food_group_from_24HDR.xml
+[2026-02-27T14:19:56.525Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.526Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)consumers_by_food_subgroup_from_24HDR.xml
+[2026-02-27T14:19:56.559Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.559Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)respondents_by_food_group_from_24HDR.xml
+[2026-02-27T14:19:56.577Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.578Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_by(weighted)respondents_by_food_subgroup_from_24HDR.xml
+[2026-02-27T14:19:56.609Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.609Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_over_the_past_12months_prior_to_the_interview_by(weighted)consumers_by_FFQ_item.xml
+[2026-02-27T14:19:56.651Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.651Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/english/programme/programme_firm/2ndHKFCS-Food_intake_per_day_over_the_past_12months_prior_to_the_interview_by(weighted)respondents_by_FFQ_item.xml
+[2026-02-27T14:19:56.671Z] [INFO] Fetching and parsing (en): https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-02-27T14:19:56.670Z] [WARN] RSS content seems empty or invalid format.
+[2026-02-27T14:19:56.706Z] [INFO] Fetching and parsing (tc): https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-02-27T14:19:56.722Z] [INFO] Database initialized with 2 active alerts.

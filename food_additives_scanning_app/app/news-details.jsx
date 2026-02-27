@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
+import RenderHtml from 'react-native-render-html';
 import { API_URL } from '@env';
 
 export default function NewsDetailsScreen() {
@@ -12,6 +13,7 @@ export default function NewsDetailsScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams();
   const router = useRouter();
+  const { width } = useWindowDimensions();
   
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -93,16 +95,24 @@ export default function NewsDetailsScreen() {
           <Text style={styles.title}>{params.title}</Text>
           <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
           <View style={styles.divider} />
-          <Text style={styles.content}>{params.content}</Text>
-          
-          <Text style={styles.content}>
-            {'\n'}
-            The Centre for Food Safety (CFS) of the Food and Environmental Hygiene Department announced today that a sample of the above-mentioned product was found to contain a pathogen, Salmonella. The CFS is following up on the case.
-            {'\n\n'}
-            "The CFS collected the sample from a supermarket in Causeway Bay for testing under its routine Food Surveillance Programme. The test result showed the presence of Salmonella in 25 grams of the sample," a CFS spokesman said.
-            {'\n\n'}
-            "Salmonella infection may cause fever and gastrointestinal upset such as vomiting, abdominal pain and diarrhoea. The effects on infants, young children, the elderly and persons with a weak immune system could be more severe and may even lead to death."
-          </Text>
+          {params.content ? (
+            <RenderHtml
+              contentWidth={width}
+              source={{ html: params.content }}
+              tagsStyles={{
+                p: { fontSize: 16, lineHeight: 24, color: '#444', marginBottom: 10 },
+                li: { fontSize: 16, lineHeight: 24, color: '#444' },
+              }}
+            />
+          ) : (
+            <Text style={styles.content}>No content available.</Text>
+          )}
+
+          <View style={styles.footerContainer}>
+            <Text style={styles.footerText}>
+              Content is from the Hong Kong Centre for Food Safety (Food and Environmental Hygiene Department)
+            </Text>
+          </View>
         </View>
 
         <View style={styles.commentsSection}>
@@ -256,5 +266,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  footerContainer: {
+    marginTop: 30,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingBottom: 20,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#888',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 });

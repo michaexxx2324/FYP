@@ -4,13 +4,35 @@ import { useHistory } from '../../context/HistoryContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useState, useEffect } from 'react';
+import { API_URL } from '@env';
 
 export default function HomeScreen() {
-  const { i18n } = useLanguage();
+  const { i18n, language } = useLanguage();
   const { history } = useHistory();
   const { user } = useAuth();
   const router = useRouter();
   const isVip = user?.isVip || false;
+
+  const [alerts, setAlerts] = useState([]);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const langParam = language === 'zh' ? 'tc' : 'en';
+        console.log(`Fetching alerts from ${API_URL}/alerts?lang=${langParam}`);
+        const response = await fetch(`${API_URL}/alerts?lang=${langParam}`);
+        const data = await response.json();
+        if (data.success) {
+          setAlerts(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch alerts:', error);
+      }
+    };
+
+    fetchAlerts();
+  }, [language]);
 
   const recentScans = history.slice(0, 3);
 
@@ -77,35 +99,32 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{i18n.newsTitle}</Text>
+        <Text style={styles.sectionTitle}>{i18n.alerts || "Food Alerts"}</Text>
         
-        <TouchableOpacity onPress={() => router.push({
-          pathname: '/news-details',
-          params: {
-            newsId: 'news1',
-            title: `${i18n.recallNotice}: ${i18n.mockNews1Title}`,
-            content: `${i18n.warning}: ${i18n.mockNews1Content}`
-          }
-        })}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{i18n.recallNotice}: {i18n.mockNews1Title}</Text>
-            <Text style={styles.cardContent}>{i18n.warning}: {i18n.mockNews1Content}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.push({
-          pathname: '/news-details',
-          params: {
-            newsId: 'news2',
-            title: `${i18n.productRecall}: ${i18n.mockNews2Title}`,
-            content: `${i18n.foodAlert}: ${i18n.mockNews2Content}`
-          }
-        })}>
-          <View style={styles.card}>
-             <Text style={styles.cardTitle}>{i18n.productRecall}: {i18n.mockNews2Title}</Text>
-             <Text style={styles.cardContent}>{i18n.foodAlert}: {i18n.mockNews2Content}</Text>
-          </View>
-        </TouchableOpacity>
+        {alerts.length > 0 ? (
+          alerts.map((alert, index) => (
+            <TouchableOpacity 
+              key={index}
+              onPress={() => router.push({
+                pathname: '/news-details',
+                params: {
+                  newsId: alert.link, 
+                  title: alert.title,
+                  content: alert.description,
+                  date: alert.publishDate || alert.pubDate,
+                  link: alert.link
+                }
+              })}
+            >
+              <View style={styles.card}>
+                <Text style={styles.cardTitle} numberOfLines={2}>{alert.title}</Text>
+                <Text style={styles.cardDate}>{alert.publishDate || alert.pubDate}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={{ textAlign: 'center', marginTop: 10, color: '#666' }}>No active alerts.</Text>
+        )}
       </View>
 
       {recentScans.length > 0 && (
@@ -242,11 +261,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 10, // Added margin for list items
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 14, // Adjusted size
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  cardDate: { // New style for date
+    fontSize: 12,
+    color: '#666',
   },
   cardContent: {
     fontSize: 14,

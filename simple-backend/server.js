@@ -4,6 +4,10 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron'); // Added for scheduling
+const alertsRouter = require('./routes/alerts'); // Added for alerts route
+const updateAlerts = require('./updateAlerts'); // Added for alerts update task
+const logger = require('./utils/logger'); // Added logger
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +15,21 @@ const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure';
 
 app.use(cors());
 app.use(express.json());
+
+// --- Food Alert Module Integration ---
+app.use('/api/alerts', alertsRouter);
+
+// Schedule daily update at 3:00 AM
+cron.schedule('0 3 * * *', async () => {
+    logger.info('Running scheduled daily update...');
+    try {
+        await updateAlerts();
+        logger.info('Scheduled update completed successfully.');
+    } catch (error) {
+        logger.error(`Scheduled update failed: ${error.message}`);
+    }
+});
+// -------------------------------------
 
 const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
 
