@@ -629,6 +629,15 @@ const FavoriteSchema = new mongoose.Schema({
 
 const Favorite = mongoose.model('Favorite', FavoriteSchema, 'favorites');
 
+// Blog Like Schema
+const BlogLikeSchema = new mongoose.Schema({
+  "post id": String,
+  "user id": String,
+  "action": { type: String, enum: ['like', 'dislike'] }
+}, { strict: false });
+
+const BlogLike = mongoose.model('BlogLike', BlogLikeSchema, 'blog_likes');
+
 // Get All Blogs (with search)
 app.get('/api/blogs', async (req, res) => {
   const { search } = req.query;
@@ -811,6 +820,66 @@ app.get('/api/favorites/:userId', async (req, res) => {
       authorId: b["user id"],
       createdAt: b["post datetime"]
     })));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get Likes/Dislikes for a Post
+app.get('/api/blog-likes/:postId', async (req, res) => {
+  const { userId } = req.query;
+  const { postId } = req.params;
+
+  try {
+    const likesCount = await BlogLike.countDocuments({ "post id": postId, "action": "like" });
+    const dislikesCount = await BlogLike.countDocuments({ "post id": postId, "action": "dislike" });
+
+    let userAction = null;
+    if (userId) {
+      const userLike = await BlogLike.findOne({ "post id": postId, "user id": userId });
+      if (userLike) {
+        userAction = userLike.action;
+      }
+    }
+
+    res.json({ likes: likesCount, dislikes: dislikesCount, userAction });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Toggle Like/Dislike
+app.post('/api/blog-likes', async (req, res) => {
+  const { userId, postId, action } = req.body; // action: 'like' or 'dislike'
+
+  if (!['like', 'dislike'].includes(action)) {
+    return res.status(400).json({ message: "Invalid action" });
+  }
+
+  try {
+    const existing = await BlogLike.findOne({ "user id": userId, "post id": postId });
+
+    if (existing) {
+      if (existing.action === action) {
+        // Toggle off (remove)
+        await BlogLike.deleteOne({ _id: existing._id });
+        res.json({ message: "Removed reaction", action: null });
+      } else {
+        // Change from like to dislike or vice versa
+        existing.action = action;
+        await existing.save();
+        res.json({ message: "Updated reaction", action });
+      }
+    } else {
+      // Create new
+      const newLike = new BlogLike({
+        "user id": userId,
+        "post id": postId,
+        "action": action
+      });
+      await newLike.save();
+      res.json({ message: "Added reaction", action });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

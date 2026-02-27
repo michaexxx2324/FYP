@@ -19,10 +19,15 @@ export default function PostDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+  
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [userAction, setUserAction] = useState(null);
 
   useEffect(() => {
     fetchPost();
     fetchComments();
+    fetchLikes();
     if (user) {
       checkFavorite();
     }
@@ -42,6 +47,24 @@ export default function PostDetailScreen() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLikes = async () => {
+    try {
+      let url = `${API_URL}/blog-likes/${id}`;
+      if (user) {
+        url += `?userId=${user.userId}`;
+      }
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setLikes(data.likes);
+        setDislikes(data.dislikes);
+        setUserAction(data.userAction);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -123,8 +146,29 @@ export default function PostDetailScreen() {
     }
   };
 
-  const handleReport = () => {
-    Alert.alert("Info", "Reporting feature is currently unavailable.");
+  const handleReaction = async (action) => {
+    if (!user) {
+      Alert.alert(i18n.error, i18n.pleaseLoginFirst);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/blog-likes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.userId,
+          postId: id,
+          action: action
+        }),
+      });
+
+      if (response.ok) {
+        fetchLikes();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (loading) {
@@ -158,10 +202,23 @@ export default function PostDetailScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.reportButton} onPress={handleReport}>
-            <Ionicons name="flag-outline" size={20} color="#666" />
-            <Text style={styles.reportText}>{i18n.report || "Report"}</Text>
-          </TouchableOpacity>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity 
+              style={[styles.reactionButton, userAction === 'like' && styles.likeActive]} 
+              onPress={() => handleReaction('like')}
+            >
+              <Ionicons name="thumbs-up-outline" size={20} color={userAction === 'like' ? "white" : "#666"} />
+              <Text style={[styles.reactionText, userAction === 'like' && { color: 'white' }]}>{likes}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.reactionButton, userAction === 'dislike' && styles.dislikeActive]} 
+              onPress={() => handleReaction('dislike')}
+            >
+              <Ionicons name="thumbs-down-outline" size={20} color={userAction === 'dislike' ? "white" : "#666"} />
+              <Text style={[styles.reactionText, userAction === 'dislike' && { color: 'white' }]}>{dislikes}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -240,6 +297,30 @@ const styles = StyleSheet.create({
   },
   favActive: {
     backgroundColor: '#FF4081',
+  },
+  reactionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginLeft: 10,
+    minWidth: 60,
+    justifyContent: 'center',
+  },
+  likeActive: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
+  },
+  dislikeActive: {
+    backgroundColor: '#F44336',
+    borderColor: '#F44336',
+  },
+  reactionText: {
+    marginLeft: 5,
+    fontWeight: 'bold',
+    color: '#666',
   },
   actionText: {
     color: '#FF4081',
