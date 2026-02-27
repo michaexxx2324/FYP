@@ -140,7 +140,9 @@ export default function HomeScreen() {
                   params: { 
                     itemName: scan.itemName, 
                     itemCode: scan.itemCode, 
-                    nutritionInformation: scan.nutritionInformation 
+                    nutritionInformation: scan.nutritionInformation,
+                    warning: scan.warning,
+                    healthAnalysis: scan.healthAnalysis
                   }
                 })} 
               />
