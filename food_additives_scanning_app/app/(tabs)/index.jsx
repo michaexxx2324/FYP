@@ -97,7 +97,6 @@ export default function HomeScreen() {
         
         {alerts.length > 0 ? (
           alerts.map((alert, index) => {
-            // Build rich content if available
             let richContent = alert.description;
             console.log(`Alert ${index} fields:`, Object.keys(alert));
             if (alert.actionTaken || alert.productDetails) {

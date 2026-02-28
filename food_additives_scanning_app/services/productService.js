@@ -2,7 +2,7 @@ import { API_URL } from '@env';
 
 export const getProductByBarcode = async (barcode) => {
   try {
-    console.log(`Fetching product for barcode: ${barcode}`);
+
     const response = await fetch(`${API_URL}/GetProduct?barcode=${barcode}`);
     
     if (!response.ok) {

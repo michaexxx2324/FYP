@@ -73,8 +73,6 @@ export default function QuizGameScreen() {
         Return ONLY valid JSON. No markdown formatting.
       `;
 
-      // console.log("Generating Quiz with prompt:", prompt);
-
       const response = await fetch('https://api.poe.com/v1/chat/completions', {
         method: 'POST',
         headers: {

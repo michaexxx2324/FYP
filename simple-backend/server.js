@@ -4,10 +4,10 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const cron = require('node-cron'); // Added for scheduling
-const alertsRouter = require('./routes/alerts'); // Added for alerts route
-const updateAlerts = require('./updateAlerts'); // Added for alerts update task
-const logger = require('./utils/logger'); // Added logger
+const cron = require('node-cron');
+const alertsRouter = require('./routes/alerts');
+const updateAlerts = require('./updateAlerts'); 
+const logger = require('./utils/logger'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,10 +16,10 @@ const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure';
 app.use(cors());
 app.use(express.json());
 
-// --- Food Alert Module Integration ---
+
 app.use('/api/alerts', alertsRouter);
 
-// Schedule daily update at 3:00 AM
+// Schedule daily update at 3:00 am
 cron.schedule('0 3 * * *', async () => {
     logger.info('Running scheduled daily update...');
     try {
@@ -29,7 +29,7 @@ cron.schedule('0 3 * * *', async () => {
         logger.error(`Scheduled update failed: ${error.message}`);
     }
 });
-// -------------------------------------
+
 
 const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
 
@@ -487,13 +487,13 @@ app.post('/api/reset-password-final', async (req, res) => {
     }
 });
 
-// Reset Password Endpoint (Legacy/Simple) - keeping for compatibility if used elsewhere, but renamed internally
+
 app.post('/api/reset-password', async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ message: "Email is required" });
   }
-  // Redirect to new flow message
+  
   res.json({ message: "Please use the new Forgot Password flow." });
 });
 
@@ -562,14 +562,14 @@ app.get('/api/quiz/questions', (req, res) => {
     }
   ];
 
-  // Shuffle and pick 5
+ 
   const shuffled = allQuestions.sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 5);
 
   res.json(selected);
 });
 
-// Add Coupon Endpoint
+
 app.post('/api/user/coupon', async (req, res) => {
   const { userId, coupon } = req.body;
 
@@ -583,12 +583,12 @@ app.post('/api/user/coupon', async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Initialize coupons array if it doesn't exist
+  
     if (!user.coupons) {
       user.coupons = [];
     }
 
-    // Add coupon
+
     user.coupons.push(coupon);
     await user.save();
 
@@ -602,7 +602,7 @@ app.post('/api/user/coupon', async (req, res) => {
   }
 });
 
-// Blog Schema
+
 const BlogSchema = new mongoose.Schema({
   "post name": String,
   "post content": String,
@@ -612,7 +612,7 @@ const BlogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', BlogSchema, 'blog');
 
-// Blog Comments Schema
+
 const BlogCommentSchema = new mongoose.Schema({
   "post id": String,
   "comments": String,
@@ -624,7 +624,7 @@ const BlogCommentSchema = new mongoose.Schema({
 
 const BlogComment = mongoose.model('BlogComment', BlogCommentSchema, 'blog comments');
 
-// Favorites Schema
+
 const FavoriteSchema = new mongoose.Schema({
   "post id": String,
   "user id": String
@@ -641,7 +641,7 @@ const BlogLikeSchema = new mongoose.Schema({
 
 const BlogLike = mongoose.model('BlogLike', BlogLikeSchema, 'blog_likes');
 
-// Get All Blogs (with search)
+
 app.get('/api/blogs', async (req, res) => {
   const { search } = req.query;
   let query = {};
@@ -656,10 +656,10 @@ app.get('/api/blogs', async (req, res) => {
   }
 
   try {
-    // Fetch all matching blogs without sorting in DB to avoid index errors
+  
     const blogs = await Blog.find(query).lean();
     
-    // Sort in memory
+   
     blogs.sort((a, b) => new Date(b["post datetime"]) - new Date(a["post datetime"]));
 
     console.log(`Found ${blogs.length} blogs`);
@@ -680,7 +680,7 @@ app.get('/api/blogs', async (req, res) => {
   }
 });
 
-// Create Blog Post
+
 app.post('/api/blogs', async (req, res) => {
   const { title, content, authorId } = req.body;
   
@@ -704,7 +704,7 @@ app.post('/api/blogs', async (req, res) => {
   }
 });
 
-// Get Single Blog Post
+
 app.get('/api/blogs/:id', async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id).lean();
@@ -721,7 +721,7 @@ app.get('/api/blogs/:id', async (req, res) => {
   }
 });
 
-// Add Comment
+
 app.post('/api/blog-comments', async (req, res) => {
   const { postId, text, userId, userName, district } = req.body;
   try {
@@ -740,13 +740,12 @@ app.post('/api/blog-comments', async (req, res) => {
   }
 });
 
-// Get Comments for a Post
 app.get('/api/blog-comments/:postId', async (req, res) => {
   try {
-    // Fetch comments without sorting in DB
+    
     const comments = await BlogComment.find({ "post id": req.params.postId }).lean();
     
-    // Sort in memory
+   
     comments.sort((a, b) => new Date(b["comments datetime"]) - new Date(a["comments datetime"]));
 
     res.json(comments.map(c => ({
@@ -767,7 +766,7 @@ app.get('/api/blog-comments/:postId', async (req, res) => {
 app.post('/api/favorites', async (req, res) => {
   const { userId, postId } = req.body;
   try {
-    // Check if already exists
+ 
     const existing = await Favorite.findOne({ "user id": userId, "post id": postId });
     if (existing) {
       return res.status(400).json({ message: "Already in favorites" });
@@ -784,7 +783,7 @@ app.post('/api/favorites', async (req, res) => {
   }
 });
 
-// Remove from Favorites
+
 app.delete('/api/favorites', async (req, res) => {
   const { userId, postId } = req.body;
   try {
@@ -795,7 +794,7 @@ app.delete('/api/favorites', async (req, res) => {
   }
 });
 
-// Check if Favorite
+
 app.get('/api/favorites/check/:userId/:postId', async (req, res) => {
   try {
     const favorite = await Favorite.findOne({ "user id": req.params.userId, "post id": req.params.postId });
@@ -805,7 +804,7 @@ app.get('/api/favorites/check/:userId/:postId', async (req, res) => {
   }
 });
 
-// Get User Favorites (with Post details)
+
 app.get('/api/favorites/:userId', async (req, res) => {
   try {
     const favorites = await Favorite.find({ "user id": req.params.userId }).lean();
@@ -813,7 +812,7 @@ app.get('/api/favorites/:userId', async (req, res) => {
     
     const posts = await Blog.find({ _id: { $in: postIds } }).lean();
     
-    // Sort by post datetime descending (latest first)
+  
     posts.sort((a, b) => new Date(b["post datetime"]) - new Date(a["post datetime"]));
 
     res.json(posts.map(b => ({
@@ -828,7 +827,7 @@ app.get('/api/favorites/:userId', async (req, res) => {
   }
 });
 
-// Get Likes/Dislikes for a Post
+
 app.get('/api/blog-likes/:postId', async (req, res) => {
   const { userId } = req.query;
   const { postId } = req.params;
@@ -851,9 +850,9 @@ app.get('/api/blog-likes/:postId', async (req, res) => {
   }
 });
 
-// Toggle Like/Dislike
+
 app.post('/api/blog-likes', async (req, res) => {
-  const { userId, postId, action } = req.body; // action: 'like' or 'dislike'
+  const { userId, postId, action } = req.body; 
 
   if (!['like', 'dislike'].includes(action)) {
     return res.status(400).json({ message: "Invalid action" });
@@ -864,17 +863,17 @@ app.post('/api/blog-likes', async (req, res) => {
 
     if (existing) {
       if (existing.action === action) {
-        // Toggle off (remove)
+    
         await BlogLike.deleteOne({ _id: existing._id });
         res.json({ message: "Removed reaction", action: null });
       } else {
-        // Change from like to dislike or vice versa
+   
         existing.action = action;
         await existing.save();
         res.json({ message: "Updated reaction", action });
       }
     } else {
-      // Create new
+
       const newLike = new BlogLike({
         "user id": userId,
         "post id": postId,
@@ -888,7 +887,7 @@ app.post('/api/blog-likes', async (req, res) => {
   }
 });
 
-// Start Server
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
 });
