@@ -26,6 +26,20 @@ export default function VipLayout() {
       ),
     }}>
       <Tabs.Screen
+        name="home"
+        options={{
+          title: i18n.home || 'Home',
+          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+        }}
+        listeners={() => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            router.dismissAll();
+            router.replace('/(tabs)');
+          },
+        })}
+      />
+      <Tabs.Screen
         name="recipes"
         options={{
           title: i18n.recipes || 'Recipes',

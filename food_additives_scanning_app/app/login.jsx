@@ -97,17 +97,6 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.socialContainer}>
-          <Text style={styles.socialTitle}>{i18n.socialLogin}</Text>
-          <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonText}>Google</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonText}>Apple ID</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
     </View>
   );
@@ -205,33 +194,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '600',
-  },
-  socialContainer: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e6dfcf',
-    paddingTop: 20,
-  },
-  socialTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 15,
-    color: '#5d574a',
-    textAlign: 'center',
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  socialButton: {
-    flex: 0.48,
-    backgroundColor: '#8c867a',
-    padding: 12,
-    borderRadius: 24,
-    alignItems: 'center',
-  },
-  socialButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
   },
 });

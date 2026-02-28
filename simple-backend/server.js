@@ -10,7 +10,7 @@ const updateAlerts = require('./updateAlerts'); // Added for alerts update task
 const logger = require('./utils/logger'); // Added logger
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'your_jwt_secret_key_here_make_it_long_and_secure'; 
 
 app.use(cors());
@@ -394,6 +394,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'michaelwong88041356@gmail.com',
     pass: 'paes efyf nluc fgok'
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 

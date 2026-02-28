@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('../utils/logger');
 const { isWithinLast7Days } = require('../utils/dateHelper');
 const { parseRss } = require('./rssParser');
+const scraper = require('./scraper');
 const axios = require('axios');
 
 const ALERTS_FILE = path.join(__dirname, '../data/alerts.json');
@@ -35,19 +36,50 @@ const updateAlerts = async (newRssContent, language = 'tc') => {
         let existingAlerts = loadAlerts();
         let addedCount = 0;
 
-        newItems.forEach(item => {
+        for (const item of newItems) {
             const isDuplicate = existingAlerts.some(
                 existing => existing.title === item.title && existing.pubDate === item.pubDate && existing.language === item.language
             );
 
             if (!isDuplicate) {
-                // Only consider if within last 7 days from now
-                if (isWithinLast7Days(item.pubDate)) {
+                // New item logic (already implemented)
+                 if (isWithinLast7Days(item.pubDate)) {
+                    // Fetch details from the link
+                    if (item.link) {
+                        try {
+                            const details = await scraper.fetchAlertDetails(item.link);
+                            Object.assign(item, details);
+                        } catch (err) {
+                            logger.warn(`Failed to fetch details for ${item.link}: ${err.message}`);
+                        }
+                    }
                     existingAlerts.push(item);
                     addedCount++;
                 }
+            } else {
+                // Check if existing item needs details (backfill)
+                const existingIndex = existingAlerts.findIndex(
+                    existing => existing.title === item.title && existing.pubDate === item.pubDate && existing.language === item.language
+                );
+                
+                if (existingIndex !== -1) {
+                    const existingItem = existingAlerts[existingIndex];
+                    if (!existingItem.actionTaken && !existingItem.reason && isWithinLast7Days(existingItem.pubDate)) {
+                         // Missing details, fetch them
+                         if (existingItem.link) {
+                            try {
+                                const details = await scraper.fetchAlertDetails(existingItem.link);
+                                Object.assign(existingItem, details);
+                                // Mark as updated so we save
+                                addedCount++; 
+                            } catch (err) {
+                                logger.warn(`Failed to backfill details for ${existingItem.link}: ${err.message}`);
+                            }
+                         }
+                    }
+                }
             }
-        });
+        }
 
         // Clean up old alerts
         const validAlerts = existingAlerts.filter(alert => isWithinLast7Days(alert.pubDate));

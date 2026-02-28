@@ -275,12 +275,16 @@ export default function QuizGameScreen() {
         headerShadowVisible: false,
       }} />
       <View style={styles.header}>
-        <Text style={styles.questionCount}>
-          {i18n.question || "Question"} {currentQuestionIndex + 1} / {questions.length}
-        </Text>
-        <Text style={styles.score}>
-          {i18n.score || "Score"}: {score}
-        </Text>
+        <View style={styles.badgeContainer}>
+          <Text style={styles.questionCountText}>
+            {i18n.question || "Question"} {currentQuestionIndex + 1} / {questions.length}
+          </Text>
+        </View>
+        <View style={[styles.badgeContainer, { backgroundColor: '#e8f5e9' }]}>
+          <Text style={[styles.scoreText, { color: '#2d5a27' }]}>
+            {i18n.score || "Score"}: {score}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.questionCard}>
@@ -289,9 +293,27 @@ export default function QuizGameScreen() {
 
       <View style={styles.optionsContainer}>
         {questionDisplay.options.map((option, index) => {
+          const isSelected = selectedOption === option;
+          const isCorrectOption = isSelected && isCorrect;
+          const isWrongOption = isSelected && !isCorrect;
+
           let buttonStyle = styles.optionButton;
-          if (selectedOption === option) {
-            buttonStyle = isCorrect ? styles.correctOption : styles.wrongOption;
+          let textStyle = styles.optionText;
+          let iconName = "ellipse-outline";
+          let iconColor = "#2d5a27";
+
+          if (isSelected) {
+            if (isCorrectOption) {
+              buttonStyle = [styles.optionButton, styles.correctOption];
+              textStyle = [styles.optionText, styles.selectedOptionText];
+              iconName = "checkmark-circle";
+              iconColor = "white";
+            } else {
+              buttonStyle = [styles.optionButton, styles.wrongOption];
+              textStyle = [styles.optionText, styles.selectedOptionText];
+              iconName = "close-circle";
+              iconColor = "white";
+            }
           }
 
           return (
@@ -300,15 +322,14 @@ export default function QuizGameScreen() {
               style={buttonStyle}
               onPress={() => !selectedOption && handleAnswer(option)}
               disabled={selectedOption !== null}
+              activeOpacity={0.8}
             >
-              <Text style={styles.optionText}>{option}</Text>
-              {selectedOption === option && (
-                <Ionicons 
-                  name={isCorrect ? "checkmark-circle" : "close-circle"} 
-                  size={24} 
-                  color="white" 
-                />
-              )}
+              <Text style={textStyle}>{option}</Text>
+              <Ionicons 
+                name={iconName} 
+                size={24} 
+                color={iconColor} 
+              />
             </TouchableOpacity>
           );
         })}
@@ -329,51 +350,76 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fbf5e5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 10,
   },
-  questionCount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+  badgeContainer: {
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e6dfcf',
+    shadowColor: '#2d5a27',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  score: {
-    fontSize: 16,
+  questionCountText: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#8c867a',
+  },
+  scoreText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2d5a27',
   },
   questionCard: {
     backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 15,
+    padding: 25,
+    borderRadius: 25,
     marginBottom: 30,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    elevation: 5,
+    shadowColor: '#2d5a27',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e6dfcf',
+    minHeight: 150,
+    justifyContent: 'center',
   },
   questionText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#333',
+    color: '#2d5a27',
+    lineHeight: 32,
   },
   optionsContainer: {
     gap: 15,
   },
   optionButton: {
     backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    padding: 18,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#e6dfcf',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   correctOption: {
     backgroundColor: '#4CAF50',
@@ -384,69 +430,97 @@ const styles = StyleSheet.create({
     borderColor: '#F44336',
   },
   optionText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 17,
+    color: '#5d574a',
+    fontWeight: '600',
+    flex: 1,
+  },
+  selectedOptionText: {
+    color: 'white',
   },
   resultCard: {
     backgroundColor: 'white',
     padding: 30,
-    borderRadius: 20,
+    borderRadius: 30,
     alignItems: 'center',
-    elevation: 5,
+    elevation: 10,
+    shadowColor: '#2d5a27',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    width: '100%',
   },
   resultTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
-    color: '#333',
+    color: '#2d5a27',
   },
   resultScore: {
-    fontSize: 18,
-    color: '#666',
+    fontSize: 20,
+    color: '#8c867a',
     marginBottom: 30,
+    fontWeight: '600',
   },
   discountText: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
+    color: '#4CAF50',
+    fontWeight: 'bold',
   },
   codeContainer: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#f1f8e9',
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#4CAF50',
-    marginBottom: 20,
+    borderColor: '#4CAF50', // Keeps green for success/coupon feel
     width: '100%',
     alignItems: 'center',
+    borderStyle: 'dashed',
+    marginBottom: 25,
   },
   codeText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4CAF50',
-    letterSpacing: 2,
+    color: '#2d5a27',
   },
   partnerText: {
     fontSize: 14,
-    color: '#888',
+    color: '#8c867a',
     marginBottom: 10,
   },
+  partnerLogos: {
+    backgroundColor: '#fafafa',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 25,
+    width: '100%',
+    alignItems: 'center',
+  },
   partnerName: {
-    fontWeight: 'bold',
-    color: '#555',
+    fontWeight: '600',
+    color: '#5d574a',
     textAlign: 'center',
+    fontSize: 15,
   },
   homeButton: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    marginTop: 20,
+    backgroundColor: '#2d5a27',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    minWidth: 200,
+    alignItems: 'center',
+    shadowColor: '#2d5a27',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 4,
   },
   homeButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

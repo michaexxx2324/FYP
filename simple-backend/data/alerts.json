@@ -11,7 +11,15 @@
       "origin": null,
       "batch": null
     },
-    "language": "en"
+    "language": "en",
+    "issueDate": "24.2.2026",
+    "source": "The Centre for Food Safety (CFS)",
+    "foodItem": "Prepackaged chocolate product",
+    "productDetails": "Product name: Furuta Doremi Song Chocolate\r\nBrand: Furuta\r\nPlace of origin: Japan\r\nPack size: 122 grams per pack\r\nBatch number: 2026.10/JG+FM\r\nImporter: Man Tung Trading Company Limited\r\nRetailer: APITA and UNY\r\nBest-before date: End of October, 2026",
+    "reason": "The CFS, through its Food Incident Surveillance System, noted a notification from the Japanese authority that the above-mentioned product may contain plastic fragments and is being recalled.",
+    "actionTaken": "-       Upon learning of the incident, the CFS immediately contacted local major importers and retailers for follow-up.\r\n-       ​According to preliminary investigation, the above importer had imported the affected batch of the product, which were all distributed to APITA and UNY for sale.\r\n-       The importer concerned has stopped sales and removed from shelves the affected product and has initiated a recall according to the CFS's instructions.\r\n-        ​The CFS has alerted the trade to the incident and will continue to follow up and take appropriate action. An investigation is ongoing.",
+    "adviceToTrade": "Stop using or selling the affected batch of the product immediately if in possession.",
+    "adviceToConsumers": "Not to consume the affected batch of prepackaged chocolate product."
   },
   {
     "title": "不要食用一批可能含有塑膠碎片的預先包裝朱古力產品",
@@ -25,6 +33,15 @@
       "origin": "日本",
       "batch": "2026.10/JG+FM"
     },
-    "language": "tc"
+    "language": "tc",
+    "issueDate": "24.2.2026",
+    "source": "食物安全中心（中心）",
+    "foodItem": "預先包裝朱古力產品",
+    "productDetails": "產品名稱：Furuta Doremi Song Chocolate\r\n品牌：Furuta\r\n來源地：日本\r\n包裝：一百二十二克（每包）\r\n批次編號：2026.10/JG+FM\r\n進口商：萬通進出口貿易有限公司\r\n零售商：APITA 及 UNY\r\n此日期前最佳：二○二六年十月底",
+    "reason": "中心透過食物事故監測系統，得悉日本當局發出通告，指上述產品可能含有塑膠碎片，正進行回收。",
+    "actionTaken": "-          中心得悉事件後，隨即聯絡本地主要進口商和零售商跟進。\r\n-          初步調查發現，上述進口商曾進口受影響批次產品，並已全部分銷至APITA及UNY以作出售。\r\n-          該進口商已按中心指示將受影響產品停售和下架，並展開回收。\r\n-          ​中心已就事件通知業界，並會繼續跟進事件和採取適當行動。調查仍然繼續。",
+    "adviceToTrade": "如持有受影響批次的產品，應立即停止使用或出售。",
+    "adviceToConsumers": "不要食用受影響批次的產品。",
+    "moreInfo": "中心發出的新聞公報\r\n市民欲查詢上述產品的回收事宜，可於辦公時間致電該進口商熱線2947 7038。"
   }
 ]

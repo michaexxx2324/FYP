@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator, RefreshControl, Platform, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLanguage } from '../../context/LanguageContext';
@@ -17,6 +18,7 @@ export default function PostDetailScreen() {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [comment, setComment] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
   
@@ -78,6 +80,16 @@ export default function PostDetailScreen() {
     } catch (error) {
       console.error(error);
     }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([
+      fetchPost(),
+      fetchComments(),
+      fetchLikes(),
+      user ? checkFavorite() : Promise.resolve()
+    ]);
+    setRefreshing(false);
   };
 
   const checkFavorite = async () => {
@@ -178,11 +190,26 @@ export default function PostDetailScreen() {
   if (!post) return null;
 
   return (
-    <ScrollView style={styles.container}>
-      <Stack.Screen options={{
-        headerRight: () => <TranslateButton />,
-        title: i18n.blog || "Blog"
-      }} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fbf5e5' }} edges={['top', 'left', 'right']}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      <View style={styles.customHeader}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{i18n.blog || "Blog"}</Text>
+        <View style={styles.headerRight}>
+          <TranslateButton />
+        </View>
+      </View>
+
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+
       <View style={styles.postCard}>
         <Text style={styles.title}>{post.title}</Text>
         <View style={styles.metaRow}>
@@ -246,6 +273,7 @@ export default function PostDetailScreen() {
         </View>
       </View>
     </ScrollView>
+  </SafeAreaView>
   );
 }
 
@@ -253,6 +281,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fbf5e5',
+  },
+  customHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingBottom: 10,
+    backgroundColor: '#fbf5e5',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  headerRight: {
+    width: 40, 
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   postCard: {
     backgroundColor: 'white',

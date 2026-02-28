@@ -2,11 +2,13 @@ import { Stack } from 'expo-router';
 import { LanguageProvider } from '../context/LanguageContext';
 import { HistoryProvider } from '../context/HistoryContext';
 import { AuthProvider } from '../context/AuthContext';
+import { AlertProvider } from '../context/AlertContext';
 
 export default function RootLayout() {
   return (
     <AuthProvider>
       <LanguageProvider>
+        <AlertProvider>
         <HistoryProvider>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#fbf5e5' } }}>
               <Stack.Screen name="index" />
@@ -25,6 +27,7 @@ export default function RootLayout() {
               />
             </Stack>
         </HistoryProvider>
+        </AlertProvider>
       </LanguageProvider>
     </AuthProvider>
   );

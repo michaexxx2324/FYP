@@ -76,6 +76,8 @@ export const translations = {
     comments: 'Comments',
     noComments: 'No one has commented yet',
     writeComment: 'Write a comment...',
+    contentSource: 'Content is from the Hong Kong Centre for Food Safety (Food and Environmental Hygiene Department)',
+    noContent: 'No content available.',
     // VIP Page
     vipFeatures: 'VIP Features',
     vipSubtitle: 'Advanced nutritional analysis and personalized recommendations',
@@ -340,6 +342,8 @@ export const translations = {
     comments: '評論',
     noComments: '暫無評論',
     writeComment: '寫下你的評論...',
+    contentSource: '內容來自香港食物安全中心（食物環境衛生署）',
+    noContent: '暫無內容。',
     // VIP Page
     vipFeatures: 'VIP 功能',
     vipSubtitle: '高級營養分析與個人化建議',

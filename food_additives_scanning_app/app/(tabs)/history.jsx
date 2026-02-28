@@ -31,31 +31,33 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardInfo}>{item.itemCode}</Text>
-        <Text style={styles.cardTitle} numberOfLines={1}>{item.itemName}</Text>
-      </View>
-      
-      <View style={styles.cardActions}>
-        <TouchableOpacity 
-          style={styles.viewButton}
-          onPress={() => router.push({
-            pathname: '/product-details',
-            params: { 
-              itemName: item.itemName, 
-              itemCode: item.itemCode, 
-              nutritionInformation: item.nutritionInformation,
-              warning: item.warning,
-              healthAnalysis: item.healthAnalysis
-            }
-          })}
-        >
-          <Text style={styles.viewButtonText}>{i18n.view}</Text>
-        </TouchableOpacity>
+      <View style={styles.cardContentRow}>
+        <View style={styles.cardTextContainer}>
+          <Text style={styles.cardInfo}>{item.itemCode}</Text>
+          <Text style={styles.cardTitle} numberOfLines={1}>{item.itemName}</Text>
+        </View>
+        
+        <View style={styles.cardActions}>
+          <TouchableOpacity 
+            style={styles.viewButton}
+            onPress={() => router.push({
+              pathname: '/product-details',
+              params: { 
+                itemName: item.itemName, 
+                itemCode: item.itemCode, 
+                nutritionInformation: item.nutritionInformation,
+                warning: item.warning,
+                healthAnalysis: item.healthAnalysis
+              }
+            })}
+          >
+            <Text style={styles.viewButtonText}>{i18n.view}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={20} color="#D97943" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteButton}>
+            <Ionicons name="trash-outline" size={20} color="#D97943" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -127,7 +129,16 @@ const styles = StyleSheet.create({
     borderColor: '#f0e6d2',
   },
   cardHeader: {
-    marginBottom: 15,
+    marginBottom: 0,
+  },
+  cardContentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardTextContainer: {
+    flex: 1,
+    paddingRight: 10,
   },
   cardInfo: {
     fontSize: 12,
@@ -135,21 +146,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2d5a27',
   },
   cardActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 5,
   },
   viewButton: {
     backgroundColor: '#2d5a27',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginRight: 10,
     shadowColor: '#2d5a27',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,

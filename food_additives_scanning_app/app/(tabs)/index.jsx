@@ -1,43 +1,37 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button, Image, RefreshControl } from 'react-native';
 import { useLanguage } from '../../context/LanguageContext';
 import { useHistory } from '../../context/HistoryContext';
 import { useAuth } from '../../context/AuthContext';
+import { useAlerts } from '../../context/AlertContext';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState, useEffect } from 'react';
-import { API_URL } from '@env';
+import { useState, useCallback } from 'react';
 
 export default function HomeScreen() {
-  const { i18n, language } = useLanguage();
+  const { i18n } = useLanguage();
   const { history } = useHistory();
   const { user } = useAuth();
+  const { alerts, fetchAlerts } = useAlerts();
   const router = useRouter();
   const isVip = user?.isVip || false;
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [alerts, setAlerts] = useState([]);
-
-  useEffect(() => {
-    const fetchAlerts = async () => {
-      try {
-        const langParam = language === 'zh' ? 'tc' : 'en';
-        console.log(`Fetching alerts from ${API_URL}/alerts?lang=${langParam}`);
-        const response = await fetch(`${API_URL}/alerts?lang=${langParam}`);
-        const data = await response.json();
-        if (data.success) {
-          setAlerts(data.data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch alerts:', error);
-      }
-    };
-
-    fetchAlerts();
-  }, [language]);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchAlerts();
+    setRefreshing(false);
+  }, []);
 
   const recentScans = history.slice(0, 3);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={{paddingBottom: 50}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {isVip ? (
         <TouchableOpacity 
           style={styles.vipDashboardButton}
@@ -102,7 +96,28 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>{i18n.alerts || "Food Alerts"}</Text>
         
         {alerts.length > 0 ? (
-          alerts.map((alert, index) => (
+          alerts.map((alert, index) => {
+            // Build rich content if available
+            let richContent = alert.description;
+            console.log(`Alert ${index} fields:`, Object.keys(alert));
+            if (alert.actionTaken || alert.productDetails) {
+                 console.log("Using rich content for alert", index);
+                 richContent = `
+                    ${alert.issueDate ? `<p><b>發出日期:</b> ${alert.issueDate}</p>` : ''}
+                    ${alert.source ? `<p><b>資料來源:</b> ${alert.source}</p>` : ''}
+                    ${alert.foodItem ? `<p><b>食品:</b> ${alert.foodItem}</p>` : ''}
+                    ${alert.productDetails ? `<p><b>產品名稱及資料:</b><br/>${alert.productDetails.replace(/\n/g, '<br/>')}</p>` : (alert.description || '')}
+                    ${alert.reason ? `<p><b>發出警報原因:</b><br/>${alert.reason.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.actionTaken ? `<p><b>食物安全中心採取的行動:</b><br/>${alert.actionTaken.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.adviceToTrade ? `<p><b>給業界的建議:</b><br/>${alert.adviceToTrade.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.adviceToConsumers ? `<p><b>給消費者的建議:</b><br/>${alert.adviceToConsumers.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.moreInfo ? `<p><b>更多資料:</b><br/>${alert.moreInfo.replace(/\n/g, '<br/>')}</p>` : ''}
+                 `;
+            } else {
+                 console.log("Using description for alert", index);
+            }
+
+            return (
             <TouchableOpacity 
               key={index}
               onPress={() => router.push({
@@ -110,7 +125,7 @@ export default function HomeScreen() {
                 params: {
                   newsId: alert.link, 
                   title: alert.title,
-                  content: alert.description,
+                  content: richContent,
                   date: alert.publishDate || alert.pubDate,
                   link: alert.link
                 }
@@ -121,7 +136,8 @@ export default function HomeScreen() {
                 <Text style={styles.cardDate}>{alert.publishDate || alert.pubDate}</Text>
               </View>
             </TouchableOpacity>
-          ))
+          );
+         })
         ) : (
           <Text style={{ textAlign: 'center', marginTop: 10, color: '#666' }}>No active alerts.</Text>
         )}
@@ -132,20 +148,37 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>{i18n.recentScans}</Text>
           {recentScans.map((scan, index) => (
             <View key={index} style={styles.card}>
-              <Text style={styles.cardTitle}>{scan.itemCode} - {scan.itemName}</Text>
-              <Button 
-                title={i18n.view} 
-                onPress={() => router.push({
-                  pathname: '/product-details',
-                  params: { 
-                    itemName: scan.itemName, 
-                    itemCode: scan.itemCode, 
-                    nutritionInformation: scan.nutritionInformation,
-                    warning: scan.warning,
-                    healthAnalysis: scan.healthAnalysis
-                  }
-                })} 
-              />
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flex: 1, paddingRight: 10}}>
+                   <Text style={{fontSize: 12, color: '#8c867a', marginBottom: 4}}>{scan.itemCode}</Text>
+                   <Text style={{fontSize: 16, fontWeight: 'bold', color: '#2d5a27'}} numberOfLines={1}>{scan.itemName}</Text>
+                </View>
+                <TouchableOpacity 
+                   style={{
+                      backgroundColor: '#2d5a27',
+                      paddingVertical: 8,
+                      paddingHorizontal: 16,
+                      borderRadius: 20,
+                      shadowColor: '#2d5a27',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 2,
+                   }}
+                   onPress={() => router.push({
+                    pathname: '/product-details',
+                    params: { 
+                      itemName: scan.itemName, 
+                      itemCode: scan.itemCode, 
+                      nutritionInformation: scan.nutritionInformation,
+                      warning: scan.warning,
+                      healthAnalysis: scan.healthAnalysis
+                    }
+                  })} 
+                >
+                  <Text style={{color: '#fbf5e5', fontWeight: 'bold', fontSize: 14}}>{i18n.view}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
           {history.length > 3 && (
