@@ -193,6 +193,11 @@ export default function AnalysisScreen() {
             renderItem={renderHistoryItem}
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={styles.list}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>
+                {i18n.noFoodItemFound || "No food item found"}
+              </Text>
+            }
           />
         </>
       ) : (
@@ -302,4 +307,5 @@ const styles = StyleSheet.create({
   recText: { marginLeft: 10, flex: 1, fontSize: 16, color: '#5d574a' },
   reportButton: { backgroundColor: '#2d5a27', padding: 15, borderRadius: 25, alignItems: 'center' },
   reportButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  emptyText: { textAlign: 'center', marginTop: 50, color: '#888', fontSize: 16 },
 });

@@ -95,6 +95,7 @@ export const translations = {
     chickenSalad: 'Low Salt Chicken Salad',
     chickenSaladDesc: 'High Protein · 15 mins · Nut-free',
     vipExclusive: 'VIP Exclusive',
+    noFoodItemFound: 'No food item found',
     // Calorie & Analysis
     calorieTitle: 'Calorie Counting',
     todayIntake: 'Today Intake / Target',
@@ -361,6 +362,7 @@ export const translations = {
     chickenSalad: '低鹽雞胸沙拉',
     chickenSaladDesc: '高蛋白 · 15分鐘 · 無堅果',
     vipExclusive: 'VIP 專享',
+    noFoodItemFound: '未找到任何食物項目',
     // Calorie & Analysis
     calorieTitle: '卡路里計算',
     todayIntake: '今日已攝取 / 目標',
