@@ -6,9 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useHistory } from '../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
-import { API_URL, POE_API_KEY } from '@env';
-
-const POE_BOT_NAME = 'gemini-3-pro';
+import { API_URL, POE_API_KEY, POE_BOT_NAME } from '@env';
 
 export default function ProductDetailsScreen() {
   const { i18n, language } = useLanguage();
@@ -51,7 +49,7 @@ export default function ProductDetailsScreen() {
           itemName,
           itemCode,
           nutritionInformation,
-          userId: user ? user.userId : 'anonymous',
+          userId: user ? (user.userId || user.username) : 'anonymous',
           warning: warningMsg,
           healthAnalysis: JSON.stringify(analysisResult)
         }),
@@ -137,23 +135,37 @@ export default function ProductDetailsScreen() {
         })
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error('Poe API returned non-JSON response:', rawText);
+        throw new Error(`AI service returned invalid response (HTTP ${response.status})`);
+      }
+
+      if (!response.ok || data.error) {
+        const apiError = data?.error?.message || `HTTP ${response.status}`;
+        throw new Error(`AI Service Failed: ${apiError}`);
+      }
       
       if (data.choices && data.choices.length > 0) {
         const content = data.choices[0].message.content;
         
         let result = null;
         try {
-          
-          const firstOpen = content.indexOf('{');
-          const lastClose = content.lastIndexOf('}');
+          const cleanContent = typeof content === 'string'
+            ? content.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
+            : '';
+
+          const firstOpen = cleanContent.indexOf('{');
+          const lastClose = cleanContent.lastIndexOf('}');
           
           if (firstOpen !== -1 && lastClose !== -1 && lastClose > firstOpen) {
-            const jsonString = content.substring(firstOpen, lastClose + 1);
+            const jsonString = cleanContent.substring(firstOpen, lastClose + 1);
             result = JSON.parse(jsonString);
           } else {
-            
-            result = JSON.parse(content);
+            result = JSON.parse(cleanContent);
           }
         } catch (e) {
           console.log("JSON Parse failed, falling back to raw text", e);

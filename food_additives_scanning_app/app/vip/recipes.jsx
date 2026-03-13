@@ -4,9 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { POE_API_KEY } from '@env';
-
-const POE_BOT_NAME = 'gemini-3-pro';
+import { POE_API_KEY, POE_BOT_NAME } from '@env';
 
 export default function RecipesScreen() {
   const { i18n, language } = useLanguage();

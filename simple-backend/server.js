@@ -73,34 +73,49 @@ const Comment = mongoose.model('Comment', CommentSchema, 'comments');
 
 app.get('/api/GetProduct', async (req, res) => {
   const barcode = req.query.barcode;
+  const userId = req.query.userId || "anonymous";
 
   if (!barcode) {
     return res.status(400).send("Please pass a barcode on the query string");
   }
 
-  console.log(`Searching for barcode: ${barcode}`);
+  console.log(`Searching for barcode: ${barcode} for user: ${userId}`);
 
   try {
-    let product = await Product.findOne({ "item code": barcode });
-    let source = 'FoodLabelBarCodeScan';
+    // 1. Try to find the user's specific scan history first
+    let userProduct = await ScanHistory.findOne({ "item code": barcode, "user id": userId });
 
-    if (!product) {
-      product = await ScanHistory.findOne({ "item code": barcode });
-      source = 'ScanHistory';
+    if (userProduct) {
+      console.log(`Product found in ScanHistory for user ${userId}:`, userProduct["item name"]);
+      return res.json({
+        itemName: userProduct["item name"],
+        itemCode: userProduct["item code"],
+        nutritionInformation: userProduct["nutrition information"],
+        warning: userProduct["warning"],
+        healthAnalysis: userProduct["health analysis"]
+      });
     }
 
-    if (product) {
-      console.log(`Product found in ${source}:`, product["item name"]);
-      res.json({
-        itemName: product["item name"],
-        itemCode: product["item code"],
-        nutritionInformation: product["nutrition information"],
-        warning: product["warning"],
-        healthAnalysis: product["health analysis"]
+    // 2. If not found in user's history, check base DB or any other user's history
+    let baseProduct = await Product.findOne({ "item code": barcode });
+
+    if (!baseProduct) {
+      baseProduct = await ScanHistory.findOne({ "item code": barcode });
+    }
+
+    if (baseProduct) {
+      console.log(`Base Product found (no history for this user yet):`, baseProduct["item name"]);
+      return res.json({
+        itemName: baseProduct["item name"],
+        itemCode: baseProduct["item code"],
+        nutritionInformation: baseProduct["nutrition information"],
+        // IMPORTANT: Set warning and healthAnalysis to null so frontend generates a new tailored report
+        warning: null,
+        healthAnalysis: null
       });
     } else {
       console.log('Product not found in either collection');
-      res.status(404).send("Product not found");
+      return res.status(404).send("Product not found");
     }
   } catch (error) {
     console.error("Database error:", error);
@@ -154,6 +169,13 @@ app.post('/api/SaveComment', async (req, res) => {
     return res.status(400).send("Missing required fields");
   }
 
+  // Generate universal ID to link English and Chinese comments together permanently
+  let universalNewsId = newsId;
+  const match = newsId.match(/whatsnew_fa\/(.*\.html)/);
+  if (match) {
+    universalNewsId = match[1];
+  }
+
   try {
     const newComment = new Comment({
       "user id": userId || "anonymous",
@@ -161,11 +183,11 @@ app.post('/api/SaveComment', async (req, res) => {
       "comments": comments,
       "time": time || new Date().toLocaleString(),
       "district": district || "Unknown",
-      "news id": newsId
+      "news id": universalNewsId
     });
 
     await newComment.save();
-    console.log('Comment saved for news:', newsId);
+    console.log('Comment saved for news:', universalNewsId);
     res.status(201).json({ message: "Comment saved successfully", data: newComment });
   } catch (error) {
     console.error("Error saving comment:", error);
@@ -180,8 +202,20 @@ app.get('/api/GetComments', async (req, res) => {
     return res.status(400).send("Please pass a newsId on the query string");
   }
 
+  // Generate equivalent IDs to share comments across languages
+  let searchIds = [newsId];
+  const match = newsId.match(/whatsnew_fa\/(.*\.html)/);
+  if (match) {
+    const filename = match[1];
+    searchIds.push(`http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/${filename}`);
+    searchIds.push(`http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/${filename}`);
+    searchIds.push(`https://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/${filename}`);
+    searchIds.push(`https://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/${filename}`);
+    searchIds.push(filename);
+  }
+
   try {
-    const comments = await Comment.find({ "news id": newsId }).sort({ _id: -1 });
+    const comments = await Comment.find({ "news id": { $in: searchIds } }).sort({ _id: -1 });
     res.json(comments.map(c => ({
       id: c._id,
       userId: c["user id"],
@@ -197,14 +231,14 @@ app.get('/api/GetComments', async (req, res) => {
 });
 
 app.delete('/api/DeleteScanHistory', async (req, res) => {
-  const { itemCode } = req.query;
+  const { itemCode, userId } = req.query;
 
   if (!itemCode) {
     return res.status(400).send("Missing itemCode");
   }
 
   try {
-    const result = await ScanHistory.deleteOne({ "item code": itemCode });
+    const result = await ScanHistory.deleteOne({ "item code": itemCode, "user id": userId || "anonymous" });
     
     if (result.deletedCount > 0) {
       console.log(`Deleted history for code: ${itemCode}`);
@@ -240,10 +274,63 @@ const UserSchema = new mongoose.Schema({
   favoritePosts: [String],
   resetOTP: String,
   resetOTPExpires: Date,
+  dailyScans: { type: Number, default: 0 },
+  lastScanDate: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now }
 });
 
 const User = mongoose.model('User', UserSchema, 'users');
+
+app.get('/api/GetScanQuota', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId || userId === "anonymous") return res.json({ vip: false, remaining: 5 });
+  
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) return res.json({ vip: false, remaining: 5 });
+    if (user.isVip) return res.json({ vip: true, remaining: -1 });
+
+    const todayDate = new Date().toISOString().split('T')[0];
+    if (user.lastScanDate !== todayDate) {
+      user.dailyScans = 0;
+      user.lastScanDate = todayDate;
+      await user.save();
+    }
+
+    const remaining = Math.max(0, 5 - user.dailyScans);
+    res.json({ vip: false, remaining });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/UseScanQuota', async (req, res) => {
+  const { userId } = req.body;
+  if (!userId || userId === "anonymous") return res.json({ allowed: true, remaining: 4 });
+  
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) return res.json({ allowed: true, remaining: 4 });
+    if (user.isVip) return res.json({ allowed: true, remaining: -1 });
+
+    const todayDate = new Date().toISOString().split('T')[0];
+    if (user.lastScanDate !== todayDate) {
+      user.dailyScans = 0;
+      user.lastScanDate = todayDate;
+    }
+
+    if (user.dailyScans >= 5) {
+      return res.json({ allowed: false, remaining: 0 });
+    }
+
+    user.dailyScans += 1;
+    await user.save();
+    
+    res.json({ allowed: true, remaining: 5 - user.dailyScans });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post('/api/register', async (req, res) => {
   const { email, username, password, dob, age, height, weight, allergies, dietPreferences, healthStatus } = req.body;
@@ -311,7 +398,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.userId, isVip: user.isVip },
+      { userId: user.userId || user._id.toString(), isVip: user.isVip },
       JWT_SECRET,
       { expiresIn: '30m' }
     );
@@ -320,7 +407,7 @@ app.post('/api/login', async (req, res) => {
       message: "Login successful",
       token,
       user: {
-        userId: user.userId,
+        userId: user.userId || user._id.toString(),
         username: user.username,
         email: user.email,
         dob: user.dob,

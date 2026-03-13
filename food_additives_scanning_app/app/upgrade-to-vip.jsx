@@ -157,6 +157,9 @@ export default function UpgradeToVipScreen() {
             <Text style={styles.bannerTitle}>{i18n.vipFeatures} | VIP Features</Text>
           </View>
           <Text style={styles.bannerSubtitle}>{i18n.vipSubtitle}</Text>
+          <Text style={[styles.bannerSubtitle, { marginTop: 8, fontWeight: 'bold', color: '#ffefc2' }]}>
+            {i18n.unlimitedScans}
+          </Text>
         </View>
 
         

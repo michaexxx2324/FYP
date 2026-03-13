@@ -42,20 +42,17 @@ const updateAlerts = async (newRssContent, language = 'tc') => {
             );
 
             if (!isDuplicate) {
-                // New item logic (already implemented)
-                 if (isWithinLast7Days(item.pubDate)) {
-                    // Fetch details from the link
-                    if (item.link) {
-                        try {
-                            const details = await scraper.fetchAlertDetails(item.link);
-                            Object.assign(item, details);
-                        } catch (err) {
-                            logger.warn(`Failed to fetch details for ${item.link}: ${err.message}`);
-                        }
+                // Fetch details from the link
+                if (item.link) {
+                    try {
+                        const details = await scraper.fetchAlertDetails(item.link);
+                        Object.assign(item, details);
+                    } catch (err) {
+                        logger.warn(`Failed to fetch details for ${item.link}: ${err.message}`);
                     }
-                    existingAlerts.push(item);
-                    addedCount++;
                 }
+                existingAlerts.push(item);
+                addedCount++;
             } else {
                 // Check if existing item needs details (backfill)
                 const existingIndex = existingAlerts.findIndex(
@@ -64,7 +61,7 @@ const updateAlerts = async (newRssContent, language = 'tc') => {
                 
                 if (existingIndex !== -1) {
                     const existingItem = existingAlerts[existingIndex];
-                    if (!existingItem.actionTaken && !existingItem.reason && isWithinLast7Days(existingItem.pubDate)) {
+                    if (!existingItem.actionTaken && !existingItem.reason) {
                          // Missing details, fetch them
                          if (existingItem.link) {
                             try {
@@ -81,11 +78,10 @@ const updateAlerts = async (newRssContent, language = 'tc') => {
             }
         }
 
-        // Clean up old alerts
-        const validAlerts = existingAlerts.filter(alert => isWithinLast7Days(alert.pubDate));
-        
-        // Sort by pubDate desc
-        validAlerts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        // Clean up old alerts - keep the latest 50 instead of filtering by 7 days
+        // Sort by pubDate desc first
+        existingAlerts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        const validAlerts = existingAlerts.slice(0, 50);
 
         saveAlerts(validAlerts);
         logger.info(`Updated alerts: Added ${addedCount}, Total valid: ${validAlerts.length}`);
@@ -98,8 +94,7 @@ const updateAlerts = async (newRssContent, language = 'tc') => {
 
 const getActiveAlerts = () => {
     const alerts = loadAlerts();
-    return alerts.filter(alert => isWithinLast7Days(alert.pubDate))
-                 .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    return alerts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 };
 
 module.exports = {

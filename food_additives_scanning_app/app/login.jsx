@@ -50,10 +50,11 @@ export default function LoginScreen() {
         <TranslateButton />
       </View>
       <View style={styles.card}>
-        <Text style={styles.headerTitle}>{i18n.loginTitle}</Text>
-        
         <View style={styles.formContainer}>
-          <Text style={styles.title}>{i18n.loginTitle}</Text>
+           <View style={styles.titleRow}>
+             <Image source={require('../assets/icon.png')} style={styles.titleIcon} />
+             <Text style={styles.title}>{i18n.loginTitle}</Text>
+           </View>
           
           <Text style={styles.label}>{i18n.emailOrUsername}</Text>
           <TextInput
@@ -122,20 +123,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f0e6d2',
   },
-  headerTitle: {
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#2d5a27',
-  },
   formContainer: {
     marginBottom: 20,
+  },
+  titleRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  titleIcon: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#2d5a27',
     textAlign: 'center',
   },

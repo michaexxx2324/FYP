@@ -6,9 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TranslateButton from '../components/TranslateButton';
 
-import { API_URL, POE_API_KEY } from '@env';
-
-const POE_BOT_NAME = 'gemini-3.1-pro';
+import { API_URL, POE_API_KEY, POE_BOT_NAME } from '@env';
 
 export default function QuizGameScreen() {
   const { i18n, language } = useLanguage();

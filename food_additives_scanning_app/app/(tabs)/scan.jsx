@@ -1,11 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Button, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import { useFocusEffect } from 'expo-router';
 
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { getProductByBarcode } from '../../services/productService';
+import { getProductByBarcode, getScanQuota, useScanQuota } from '../../services/productService';
 import { useHistory } from '../../context/HistoryContext';
 import { scanImage } from '../../services/ocrService'; 
 
@@ -13,6 +15,7 @@ import { useRouter } from 'expo-router';
 
 export default function ScanScreen() {
   const { i18n } = useLanguage();
+  const { user } = useAuth();
   const { addToHistory } = useHistory();
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
@@ -23,7 +26,30 @@ export default function ScanScreen() {
   const [productData, setProductData] = useState(null);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [processingOcr, setProcessingOcr] = useState(false);
+  const [quotaRemaining, setQuotaRemaining] = useState(null);
+  const [isVipSync, setIsVipSync] = useState(false);
   const cameraRef = useRef(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchQuota = async () => {
+        const userId = user ? (user.userId || user.username) : "anonymous";
+        const result = await getScanQuota(userId);
+        if (result) {
+          setIsVipSync(result.vip);
+          if (!result.vip) {
+            setQuotaRemaining(result.remaining);
+          } else {
+            setQuotaRemaining(null);
+          }
+        }
+      };
+      
+      if (user) {
+        fetchQuota();
+      }
+    }, [user])
+  );
 
   if (!permission) return <View />;
   if (!permission.granted) {
@@ -35,8 +61,36 @@ export default function ScanScreen() {
     );
   }
 
+  const checkAndUseQuota = async () => {
+    const userId = user ? (user.userId || user.username) : "anonymous";
+    if (isVipSync || user?.isVip) return true; // VIP skips quota
+    
+    // Quick frontend check
+    if (quotaRemaining !== null && quotaRemaining <= 0) {
+      Alert.alert(i18n.quotaExhaustedTitle || "Quota Exhausted", i18n.quotaExhaustedMsg || "Today's quota is exhausted, please wait until tomorrow!\nQuota will reset at 12:00 AM");
+      return false;
+    }
+
+    const result = await useScanQuota(userId);
+    if (!result || !result.allowed) {
+       Alert.alert(i18n.quotaExhaustedTitle || "Quota Exhausted", i18n.quotaExhaustedMsg || "Today's quota is exhausted, please wait until tomorrow!\nQuota will reset at 12:00 AM");
+       if (result) setQuotaRemaining(0);
+       return false;
+    }
+    
+    setQuotaRemaining(result.remaining);
+    return true;
+  };
+
   const handleBarcodeScanned = async ({ type, data }) => {
     setScanned(true);
+
+    const canScan = await checkAndUseQuota();
+    if (!canScan) {
+      setTimeout(() => setScanned(false), 2000);
+      return;
+    }
+
     setLoadingProduct(true);
     setProductData(null);
 
@@ -54,7 +108,8 @@ export default function ScanScreen() {
         }
       }
       
-      const product = await getProductByBarcode(barcode);
+      const userId = user ? (user.userId || user.username) : "anonymous";
+      const product = await getProductByBarcode(barcode, userId);
       
       if (product) {
         addToHistory(product);
@@ -125,6 +180,9 @@ export default function ScanScreen() {
   };
 
   const processImage = async (base64Image) => {
+    const canScan = await checkAndUseQuota();
+    if (!canScan) return;
+
     setProcessingOcr(true);
     setOcrText(i18n.processing);
     
@@ -148,9 +206,19 @@ export default function ScanScreen() {
       Alert.alert(i18n.error, error.message);
     } finally {
       setProcessingOcr(false);
-      setImageUri(null); 
+      setImageUri(null);
     }
   };
+
+  if (!isVipSync && !user?.isVip && quotaRemaining !== null && quotaRemaining <= 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#fbf5e5', justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={{ fontSize: 18, color: '#2d5a27', textAlign: 'center', lineHeight: 28, fontWeight: 'bold' }}>
+          {i18n.quotaExhaustedMsg || "Today's quota is exhausted, please wait until tomorrow!\nQuota will reset at 12:00 AM"}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -166,6 +234,14 @@ export default function ScanScreen() {
           color={mode === 'ocr' ? '#2d5a27' : '#8c867a'}
         />
       </View>
+
+      {!isVipSync && !user?.isVip && quotaRemaining !== null && (
+        <View style={styles.quotaContainer}>
+          <Text style={styles.quotaText}>
+            {i18n.quotaRemaining || 'Remaining Quota: '} {Math.max(0, quotaRemaining)}/5
+          </Text>
+        </View>
+      )}
 
       
       
@@ -220,6 +296,17 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' }, // Camera needs dark bg usually, but controls need theme
   camera: { flex: 1 },
   controls: { flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: '#fbf5e5' },
+  quotaContainer: {
+    backgroundColor: '#fbf5e5',
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  quotaText: {
+    color: '#000000',
+    fontWeight: 'bold',
+    fontSize: 16
+  },
   buttonContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'transparent', margin: 64, justifyContent: 'center', alignItems: 'flex-end' },
   
   ocrContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fbf5e5', paddingBottom: 50 },

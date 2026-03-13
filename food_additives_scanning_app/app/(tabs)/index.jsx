@@ -16,6 +16,18 @@ export default function HomeScreen() {
   const isVip = user?.isVip || false;
   const [refreshing, setRefreshing] = useState(false);
 
+  const isWithin7Days = (dateString) => {
+    if (!dateString) return false;
+    const alertDate = new Date(dateString);
+    if (isNaN(alertDate.getTime())) return false; // valid date check
+    const now = new Date();
+    // allow recent future just in case of timezone overlap
+    const diffTime = now.getTime() - alertDate.getTime();
+    if (diffTime < -86400000) return false; 
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays >= -1 && diffDays <= 7;
+  };
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchAlerts();
@@ -46,10 +58,13 @@ export default function HomeScreen() {
           style={styles.vipButton}
           onPress={() => router.push('/upgrade-to-vip')}
         >
-          <Ionicons name="star" size={20} color="white" style={{ marginRight: 8 }} />
-          <View>
-            <Text style={styles.vipButtonText}>{i18n.upgradeVIP}</Text>
+          <View style={{ alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="star" size={20} color="white" style={{ marginRight: 8 }} />
+              <Text style={styles.vipButtonText}>{i18n.upgradeVIP}</Text>
+            </View>
             <Text style={styles.vipButtonSubText}>{i18n.unlockFeatures}</Text>
+            <Text style={[styles.vipButtonSubText, { color: '#ffefc2', fontWeight: 'bold' }]}>{i18n.unlimitedScans}</Text>
           </View>
         </TouchableOpacity>
       )}
@@ -96,21 +111,21 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>{i18n.alerts || "Food Alerts"}</Text>
         
         {alerts.length > 0 ? (
-          alerts.map((alert, index) => {
+          alerts.slice(0, 3).map((alert, index) => {
             let richContent = alert.description;
             console.log(`Alert ${index} fields:`, Object.keys(alert));
             if (alert.actionTaken || alert.productDetails) {
                  console.log("Using rich content for alert", index);
                  richContent = `
-                    ${alert.issueDate ? `<p><b>發出日期:</b> ${alert.issueDate}</p>` : ''}
-                    ${alert.source ? `<p><b>資料來源:</b> ${alert.source}</p>` : ''}
-                    ${alert.foodItem ? `<p><b>食品:</b> ${alert.foodItem}</p>` : ''}
-                    ${alert.productDetails ? `<p><b>產品名稱及資料:</b><br/>${alert.productDetails.replace(/\n/g, '<br/>')}</p>` : (alert.description || '')}
-                    ${alert.reason ? `<p><b>發出警報原因:</b><br/>${alert.reason.replace(/\n/g, '<br/>')}</p>` : ''}
-                    ${alert.actionTaken ? `<p><b>食物安全中心採取的行動:</b><br/>${alert.actionTaken.replace(/\n/g, '<br/>')}</p>` : ''}
-                    ${alert.adviceToTrade ? `<p><b>給業界的建議:</b><br/>${alert.adviceToTrade.replace(/\n/g, '<br/>')}</p>` : ''}
-                    ${alert.adviceToConsumers ? `<p><b>給消費者的建議:</b><br/>${alert.adviceToConsumers.replace(/\n/g, '<br/>')}</p>` : ''}
-                    ${alert.moreInfo ? `<p><b>更多資料:</b><br/>${alert.moreInfo.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.issueDate ? `<p><b>${i18n.issueDate}</b> ${alert.issueDate}</p>` : ''}
+                    ${alert.source ? `<p><b>${i18n.source}</b> ${alert.source}</p>` : ''}
+                    ${alert.foodItem ? `<p><b>${i18n.foodItem}</b> ${alert.foodItem}</p>` : ''}
+                    ${alert.productDetails ? `<p><b>${i18n.productDetails}</b><br/>${alert.productDetails.replace(/\n/g, '<br/>')}</p>` : (alert.description || '')}
+                    ${alert.reason ? `<p><b>${i18n.reason}</b><br/>${alert.reason.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.actionTaken ? `<p><b>${i18n.actionTaken}</b><br/>${alert.actionTaken.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.adviceToTrade ? `<p><b>${i18n.adviceToTrade}</b><br/>${alert.adviceToTrade.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.adviceToConsumers ? `<p><b>${i18n.adviceToConsumers}</b><br/>${alert.adviceToConsumers.replace(/\n/g, '<br/>')}</p>` : ''}
+                    ${alert.moreInfo ? `<p><b>${i18n.moreInfo}</b><br/>${alert.moreInfo.replace(/\n/g, '<br/>')}</p>` : ''}
                  `;
             } else {
                  console.log("Using description for alert", index);
@@ -131,14 +146,19 @@ export default function HomeScreen() {
               })}
             >
               <View style={styles.card}>
-                <Text style={styles.cardTitle} numberOfLines={2}>{alert.title}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4}}>
+                  <Text style={[styles.cardTitle, { flex: 1, marginBottom: 0 }]} numberOfLines={2}>{alert.title}</Text>
+                  {isWithin7Days(alert.publishDate || alert.pubDate) && (
+                    <Text style={{color: '#ff4444', fontWeight: 'bold', marginLeft: 8, fontSize: 12}}>{i18n.newAlert || 'New!!'}</Text>
+                  )}
+                </View>
                 <Text style={styles.cardDate}>{alert.publishDate || alert.pubDate}</Text>
               </View>
             </TouchableOpacity>
           );
          })
         ) : (
-          <Text style={{ textAlign: 'center', marginTop: 10, color: '#666' }}>No active alerts.</Text>
+          <Text style={{ textAlign: 'center', marginTop: 10, color: '#666' }}>{i18n.noAlerts || 'No active alerts.'}</Text>
         )}
       </View>
 
@@ -215,11 +235,13 @@ const styles = StyleSheet.create({
     color: '#fbf5e5',
     fontWeight: 'bold',
     fontSize: 18,
+    textAlign: 'center',
   },
   vipButtonSubText: {
     color: '#fbf5e5',
     fontSize: 12,
     opacity: 0.9,
+    textAlign: 'center',
   },
   gameCard: {
     backgroundColor: '#fff',

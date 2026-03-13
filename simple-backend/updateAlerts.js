@@ -45,14 +45,16 @@ const updateAlerts = async () => {
     
     let alerts = loadAlerts();
     const originalCount = alerts.length;
-    alerts = alerts.filter(item => isWithinLast7Days(item.pubDate));
-    const removedCount = originalCount - alerts.length;
     
-    // Sort
+    // Sort before slicing to ensure we keep the latest ones
     alerts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
     
+    // Keep up to 50 alerts instead of 7 days
+    alerts = alerts.slice(0, 50);
+    const removedCount = originalCount - alerts.length;
+
     saveAlerts(alerts);
-    logger.info(`Update complete. Removed (expired): ${removedCount}, Total active: ${alerts.length}`);
+    logger.info(`Update complete. Removed/Trimmed: ${removedCount > 0 ? removedCount : 0}, Total active: ${alerts.length}`);
 };
 
 if (require.main === module) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';

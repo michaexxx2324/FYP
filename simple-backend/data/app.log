@@ -143,3 +143,79 @@
 [2026-02-28T09:08:07.808Z] [INFO] Successfully fetched EN RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
 [2026-02-28T09:08:07.808Z] [INFO] Updating EN from RSS: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
 [2026-02-28T09:08:07.885Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T19:00:00.026Z] [INFO] Starting daily update...
+[2026-03-13T19:00:00.026Z] [INFO] Running scheduled daily update...
+[2026-03-13T19:00:00.773Z] [INFO] Successfully fetched TC RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T19:00:00.773Z] [INFO] Updating TC from RSS: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T19:00:01.017Z] [INFO] Updated alerts: Added 0, Total valid: 0
+[2026-03-13T19:00:01.110Z] [INFO] Updating EN from RSS: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T19:00:01.109Z] [INFO] Successfully fetched EN RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T19:00:01.187Z] [INFO] Updated alerts: Added 0, Total valid: 0
+[2026-03-13T19:00:01.189Z] [INFO] Update complete. Removed (expired): 0, Total active: 0
+[2026-03-13T19:00:01.189Z] [INFO] Scheduled update completed successfully.
+[2026-03-13T20:11:03.938Z] [INFO] Starting daily update...
+[2026-03-13T20:11:04.160Z] [INFO] Successfully fetched TC RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:11:04.161Z] [INFO] Updating TC from RSS: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:11:04.366Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:11:04.443Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_612.html
+[2026-03-13T20:11:04.518Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_611.html
+[2026-03-13T20:11:04.602Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_610.html
+[2026-03-13T20:11:04.701Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_609.html
+[2026-03-13T20:11:04.779Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_608.html
+[2026-03-13T20:11:04.866Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_607.html
+[2026-03-13T20:11:04.969Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_606.html
+[2026-03-13T20:11:05.066Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_605.html
+[2026-03-13T20:11:05.201Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_604.html
+[2026-03-13T20:11:05.309Z] [INFO] Updated alerts: Added 10, Total valid: 10
+[2026-03-13T20:11:05.382Z] [INFO] Successfully fetched EN RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:11:05.383Z] [INFO] Updating EN from RSS: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:11:05.449Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:11:05.537Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_612.html
+[2026-03-13T20:11:05.616Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_611.html
+[2026-03-13T20:11:05.705Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_610.html
+[2026-03-13T20:11:05.798Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_609.html
+[2026-03-13T20:11:05.877Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_608.html
+[2026-03-13T20:11:05.961Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_607.html
+[2026-03-13T20:11:06.039Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_606.html
+[2026-03-13T20:11:06.138Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_605.html
+[2026-03-13T20:11:06.222Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_604.html
+[2026-03-13T20:11:06.312Z] [INFO] Updated alerts: Added 10, Total valid: 20
+[2026-03-13T20:11:06.327Z] [INFO] Update complete. Removed (expired): 20, Total active: 0
+[2026-03-13T20:11:24.448Z] [INFO] Starting daily update...
+[2026-03-13T20:11:24.766Z] [INFO] Successfully fetched TC RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:11:24.766Z] [INFO] Updating TC from RSS: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:11:24.853Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:11:24.908Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_612.html
+[2026-03-13T20:11:24.969Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_611.html
+[2026-03-13T20:11:25.008Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_610.html
+[2026-03-13T20:11:25.045Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_609.html
+[2026-03-13T20:11:25.078Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_608.html
+[2026-03-13T20:11:25.112Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_607.html
+[2026-03-13T20:11:25.146Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_606.html
+[2026-03-13T20:11:25.182Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_605.html
+[2026-03-13T20:11:25.213Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2025_604.html
+[2026-03-13T20:11:25.250Z] [INFO] Updated alerts: Added 10, Total valid: 10
+[2026-03-13T20:11:25.314Z] [INFO] Successfully fetched EN RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:11:25.315Z] [INFO] Updating EN from RSS: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:11:25.336Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:11:25.374Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_612.html
+[2026-03-13T20:11:25.407Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_611.html
+[2026-03-13T20:11:25.440Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_610.html
+[2026-03-13T20:11:25.471Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_609.html
+[2026-03-13T20:11:25.505Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_608.html
+[2026-03-13T20:11:25.535Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_607.html
+[2026-03-13T20:11:25.581Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_606.html
+[2026-03-13T20:11:25.611Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_605.html
+[2026-03-13T20:11:25.644Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2025_604.html
+[2026-03-13T20:11:25.678Z] [INFO] Updated alerts: Added 10, Total valid: 20
+[2026-03-13T20:11:25.696Z] [INFO] Update complete. Removed/Trimmed: 0, Total active: 20
+[2026-03-13T20:29:15.011Z] [INFO] Starting daily update...
+[2026-03-13T20:29:15.342Z] [INFO] Successfully fetched TC RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:29:15.342Z] [INFO] Updating TC from RSS: https://www.cfs.gov.hk/filemanager/foodalert/tc_chi/foodalert_datagovhk.xml
+[2026-03-13T20:29:15.512Z] [INFO] Fetching details from: http://www.cfs.gov.hk/tc_chi/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:29:15.627Z] [INFO] Updated alerts: Added 1, Total valid: 21
+[2026-03-13T20:29:15.709Z] [INFO] Successfully fetched EN RSS/XML URL: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:29:15.709Z] [INFO] Updating EN from RSS: https://www.cfs.gov.hk/filemanager/foodalert/english/foodalert_datagovhk.xml
+[2026-03-13T20:29:15.759Z] [INFO] Fetching details from: http://www.cfs.gov.hk/english/whatsnew/whatsnew_fa/2026_613.html
+[2026-03-13T20:29:15.849Z] [INFO] Updated alerts: Added 1, Total valid: 22
+[2026-03-13T20:29:15.863Z] [INFO] Update complete. Removed/Trimmed: 0, Total active: 22

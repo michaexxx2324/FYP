@@ -15,7 +15,7 @@ export const HistoryProvider = ({ children }) => {
 
   const loadHistory = async () => {
     try {
-      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+      const key = user ? `scanHistory_${user.userId || user.username}` : 'scanHistory_guest';
       const storedHistory = await AsyncStorage.getItem(key);
       if (storedHistory) {
         setHistory(JSON.parse(storedHistory));
@@ -29,11 +29,11 @@ export const HistoryProvider = ({ children }) => {
 
   const addToHistory = async (item) => {
     try {
-      
+
       const newHistory = [item, ...history.filter(h => h.itemCode !== item.itemCode)];
       setHistory(newHistory);
-      
-      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+
+      const key = user ? `scanHistory_${user.userId || user.username}` : 'scanHistory_guest';
       await AsyncStorage.setItem(key, JSON.stringify(newHistory));
     } catch (error) {
       console.error("Failed to save history", error);
@@ -42,17 +42,18 @@ export const HistoryProvider = ({ children }) => {
 
   const removeFromHistory = async (itemCode) => {
     try {
-      
+
       const newHistory = history.filter(h => h.itemCode !== itemCode);
       setHistory(newHistory);
-      
-      const key = user ? `scanHistory_${user.userId}` : 'scanHistory_guest';
+
+      const key = user ? `scanHistory_${user.userId || user.username}` : 'scanHistory_guest';
       await AsyncStorage.setItem(key, JSON.stringify(newHistory));
 
-      
-      
+
+
       try {
-        await fetch(`${API_URL}/DeleteScanHistory?itemCode=${itemCode}`, {
+        const queryUserId = user ? (user.userId || user.username) : 'anonymous';
+        await fetch(`${API_URL}/DeleteScanHistory?itemCode=${itemCode}&userId=${queryUserId}`, {
           method: 'DELETE',
         });
       } catch (serverError) {

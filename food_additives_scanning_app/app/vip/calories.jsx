@@ -4,9 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from '../../context/LanguageContext';
 import { useHistory } from '../../context/HistoryContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { POE_API_KEY } from '@env';
-
-const POE_BOT_NAME = 'gemini-3-pro';
+import { POE_API_KEY, POE_BOT_NAME } from '@env';
 
 export default function CaloriesScreen() {
   const { i18n } = useLanguage();
