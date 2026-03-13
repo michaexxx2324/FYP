@@ -1,8 +1,0 @@
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "",
-    "FUNCTIONS_WORKER_RUNTIME": "node",
-    "COSMOS_DB_CONNECTION_STRING": "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@"
-  }
-}
