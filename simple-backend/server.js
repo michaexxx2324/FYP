@@ -31,10 +31,14 @@ cron.schedule('0 3 * * *', async () => {
 });
 
 
-const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
+// Local MongoDB Connection
+const CONNECTION_STRING = "mongodb://127.0.0.1:27017/foodlabel";
+
+// Azure Cosmos DB Connection (Subscription disabled)
+// const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
 
 mongoose.connect(CONNECTION_STRING)
-  .then(() => console.log('Connected to MongoDB (Cosmos DB)'))
+  .then(() => console.log('Connected to MongoDB (Local)'))
   .catch(err => console.error('Could not connect to MongoDB:', err));
 
 const ProductSchema = new mongoose.Schema({

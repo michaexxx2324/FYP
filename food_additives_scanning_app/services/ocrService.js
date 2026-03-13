@@ -1,6 +1,6 @@
 import { POE_API_KEY } from '@env';
 
-const POE_BOT_NAME = 'gemini-3-pro'; 
+const POE_BOT_NAME = 'gemini-3.1-pro';
 
 /**
  * Scans an image using the Poe AI API (OpenAI-compatible endpoint).

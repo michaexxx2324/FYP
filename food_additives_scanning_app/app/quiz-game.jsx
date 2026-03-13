@@ -8,7 +8,7 @@ import TranslateButton from '../components/TranslateButton';
 
 import { API_URL, POE_API_KEY } from '@env';
 
-const POE_BOT_NAME = 'gemini-3-pro';
+const POE_BOT_NAME = 'gemini-3.1-pro';
 
 export default function QuizGameScreen() {
   const { i18n, language } = useLanguage();
@@ -88,7 +88,9 @@ export default function QuizGameScreen() {
       });
 
       if (!response.ok) {
-        throw new Error("AI Service Failed");
+        const errorText = await response.text();
+        console.error("Poe API Error response:", response.status, errorText);
+        throw new Error(`AI Service Failed: ${response.status} - ${errorText}`);
       }
 
       const text = await response.text();
