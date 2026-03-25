@@ -75,7 +75,7 @@ sequenceDiagram
 ## 3. Scan Workflow (Barcode & OCR)
 
 **Description:**
-The user selects a mode. In **OCR Mode**, an image is analyzed by AI, then the user edits/verifies the text. In **Barcode Mode**, the product is fetched from the server; if not found, the user is redirected to the edit page to manually enter details. Both paths lead to saving the scan history and displaying product details with health analysis.
+The user selects a mode. The app checks the scan quota for non-VIP users. In **OCR Mode**, an image is analyzed by Poe AI, then the user edits the text. In **Barcode Mode**, the product is fetched from the `FoodLabelBarCodeScan` DB. It cross-checks user allergies/diet, logs the scan to `ScanHistory`, and uses a quota.
 
 ```mermaid
 sequenceDiagram
@@ -83,60 +83,63 @@ sequenceDiagram
     participant App as Mobile App
     participant Server as Backend API
     participant DB as Database
-    participant AI as AI Service (OCR/Analysis)
+    participant AI as Poe AI Service
 
     User->>App: Select Mode (Barcode or OCR)
-
-    alt OCR Mode
-        User->>App: Take Photo of Label
-        App->>AI: Call AI: Extract Text
-        AI-->>App: Return Extracted Text
-        App->>App: Navigate to Edit Page
-    else Barcode Mode
-        User->>App: Scan Barcode
-        App->>Server: GET /api/GetProduct?barcode=...
-        Server->>DB: Query Product Collection
-        
-        alt Product Found
-            DB-->>Server: Product Data
-            Server-->>App: Return Data
-            App->>App: Navigate to Product Details
-        else Not Found
-            DB-->>Server: Null
-            Server-->>App: 404 Not Found
-            App-->>User: Alert: "Not found"
+    
+    App->>Server: GET /api/GetScanQuota
+    Server-->>App: Quota Data
+    
+    alt Quota Exceeded & Not VIP
+        App-->>User: Alert: "Scan Quota Exceeded. Upgrade to VIP."
+    else Quota Available or is VIP
+        alt OCR Mode
+            User->>App: Take Photo of Label
+            App->>AI: Call Poe AI API: Extract Text
+            AI-->>App: Return Extracted Text
             App->>App: Navigate to Edit Page
+        else Barcode Mode
+            User->>App: Scan Barcode
+            App->>Server: GET /api/GetProduct?barcode=...
+            Server->>DB: Query 'FoodLabelBarCodeScan'
+            
+            alt Product Found
+                DB-->>Server: Product Data
+                Server-->>App: Return Data
+                App->>App: Navigate to Product Details
+            else Not Found
+                DB-->>Server: Null
+                Server-->>App: 404 Not Found
+                App-->>User: Alert: "Not found"
+                App->>App: Navigate to Edit Page
+            end
         end
-    end
 
-    opt If on Edit Page (OCR or Manual Entry)
-        User->>App: Input Name & Verify Text
-        User->>App: Click 'Save & View'
+        opt If on Edit Page (OCR or Manual Entry)
+            User->>App: Input Name & Verify Text
+            User->>App: Click 'Save & View'
+        end
+
+        Note over App, User: View Product Details & Process Analysis
+        
+        App->>App: Check Analysis (Cross-check allergies/diet)
+        App->>App: Display Analysis Report
+        
         App->>Server: POST /api/SaveScanHistory
-        Server->>DB: Save to ScanHistory
+        Server->>DB: Save to 'ScanHistory'
         DB-->>Server: Success
         Server-->>App: 201 Created
-        App->>App: Navigate to Product Details
-    end
-
-    Note over App, User: View Product Details & Wait for Analysis
-
-    App->>App: Check if Analysis Exists?
-    
-    alt Analysis Does Not Exist
-        App->>AI: Call AI: Analyze Health (Ingredients vs Allergies)
-        AI-->>App: Analysis Report
-        App->>App: Display Analysis Report
-        App->>Server: Update DB with Analysis
-    else Analysis Exists
-        App->>App: Display Analysis Report
+        
+        App->>Server: POST /api/UseScanQuota
+        Server->>DB: Update User Quota
+        Server-->>App: 200 OK
     end
 ```
 
 ## 4. Forgot Password Workflow
 
 **Description:**
-The user requests a password reset by providing their email. The server checks if the email exists in the database. If found, it simulates sending a reset link.
+The user requests a password reset. An OTP is sent and stored in the database (`resetOTP`). The user verifies the OTP and sets a new password.
 
 ```mermaid
 sequenceDiagram
@@ -146,23 +149,37 @@ sequenceDiagram
     participant DB as Database
 
     User->>App: Enter Registered Email
-    User->>App: Click 'Send Reset Link'
+    User->>App: Click 'Send Reset OTP'
 
-    alt Email Empty
-        App-->>User: Alert: "Please enter email"
-    else Email Provided
-        App->>Server: POST /api/reset-password
-        Server->>DB: Find User by Email
+    App->>Server: POST /api/forgot-password
+    Server->>DB: Find User by Email
+    
+    alt User Not Found
+        DB-->>Server: Null
+        Server-->>App: 404 Not Found
+        App-->>User: Alert: "User not found"
+    else User Found
+        Server->>DB: Save resetOTP to User
+        Server-->>App: 200 OK (OTP Sent via Email)
+        App-->>User: Navigate to OTP Verification
         
-        alt User Not Found
-            DB-->>Server: Null
-            Server-->>App: 404 Not Found
-            App-->>User: Alert: "User not found"
-        else User Found
-            DB-->>Server: User Data
-            Server-->>App: 200 OK (Link Sent)
-            App-->>User: Alert: "Reset link sent"
-            App-->>User: Navigate Back to Login
+        User->>App: Enter OTP
+        App->>Server: POST /api/verify-otp
+        Server->>DB: Check resetOTP
+        
+        alt Invalid OTP
+            Server-->>App: 400 Bad Request
+            App-->>User: Alert: "Invalid OTP"
+        else Valid OTP
+            Server-->>App: 200 OK
+            App-->>User: Navigate to New Password Screen
+            
+            User->>App: Enter New Password
+            App->>Server: POST /api/reset-password-final
+            Server->>DB: Update Password & Clear OTP
+            Server-->>App: 200 OK
+            App-->>User: Alert: "Password reset successful"
+            App-->>User: Navigate to Login
         end
     end
 ```
@@ -205,21 +222,7 @@ sequenceDiagram
         User->>App: Click 'View' Button
         App-->>User: Navigate to Product Details
     else Delete Item
-        User->>App: Click Delete Icon
-        User->>App: Confirm Deletion
-        App->>Server: DELETE /api/DeleteScanHistory
-        Server->>DB: Remove Item
-        DB-->>Server: Success
-        Server-->>App: 200 OK
-        App->>App: Remove from Context/Storage
-        App-->>User: Update Displayed List
-    end
-```
-
-## 7. Blog Workflow
-
-**Description:**
-Users can browse community posts, create their own posts, and comment on existing ones.
+        User->>App: Click Delete Iconengage by commenting, liking, and saving favorites.
 
 ```mermaid
 sequenceDiagram
@@ -244,37 +247,70 @@ sequenceDiagram
         DB-->>Server: Success
         Server-->>App: 201 Created
         App-->>User: Navigate to Feed (Refresh)
+    else View & Interact
+        User->>App: Click to View Post (GET /api/blogs/:id)
+        App->>Server: GET /api/blog-comments/:id
+        Server-->>App: Return Comments
+        
+        par User Interactions
+            opt Add Comment
+                User->>App: Enter Comment Text
+                User->>App: Click 'Send'
+                App->>Server: POST /api/blog-comments
+                Server->>DB: Save in 'Blog_comments'
+                Server-->>App: Success
+                App-->>User: Refresh Comment List
+            end
+            opt Like/Dislike
+                User->>App: Click Like
+                App->>Server: POST /api/blog-likes
+                Server->>DB: Add to 'Blog_likes'
+                Server-->>App: Success
+            end
+            opt Favorite
+                User->>App: Click Bookmark
+                App->>Server: POST /api/favorites
+                Server->>DB: Add to 'Favorites'
+                Server-->>App: Success
+            end
+        Server-->>App: 201 Created
+        App-->>User: Navigate to Feed (Refresh)
     else View & Comment
         User->>App: Click to View Post
         App->>Server: GET /api/blog-comments/:id
         Server-->>App: Return Comments
         
-        opt Add Comment
-            User->>App: Enter Comment Text
-            User->>App: Click 'Send'
-            App->>Server: POST /api/blog-comments
-            Server->>DB: Save Comment
-            Server-->>App: Success
-            App-->>User: Refresh Comment List
-        end
-    end
-```
-
-## 8. News Workflow
-
-**Description:**
-Users read news articles and discuss them. The app fetches headlines and manages a separate comment system for news.
+        optfood safety alerts scraped from data.gov.hk. The frontend reads from the local `alerts.json` file, and users can leave comments tied to specific alerts.
 
 ```mermaid
 sequenceDiagram
     actor User
     participant App as Mobile App
     participant Server as Backend API
+    participant LocalFile as alerts.json
     participant DB as Database
 
-    User->>App: Open Home/News Tab
-    App->>Server: Fetch News List (Internal/External)
-    Server-->>App: Return Headlines
+    User->>App: Open Home/News Tab (AlertContext)
+    App->>Server: GET /api/alerts
+    Server->>LocalFile: fs.readFileSync('alerts.json')
+    LocalFile-->>Server: Return Alert Array
+    Server-->>App: Return Headlines Data
+    App-->>User: Display Alerts List
+
+    User->>App: Click Alert Headline
+    App-->>User: Navigate to news-details.jsx
+    App->>Server: GET /api/GetComments?newsId=...
+    Server->>DB: Query 'Comments' Collection
+    DB-->>Server: Returning specific alert comments
+    Server-->>App: Return Comments
+    
+    User->>App: Read Advisory
+    
+    opt Add Comment
+        User->>App: Enter Comment
+        User->>App: Click 'Send'
+        App->>Server: POST /api/SaveComment
+        Server->>DB: Insert into 'Comments'
     App-->>User: Display Headlines
 
     User->>App: Click News Headline
@@ -330,7 +366,7 @@ sequenceDiagram
 ## 10. VIP Upgrade Workflow
 
 **Description:**
-Users can subscribe to a VIP plan. The app interfaces with an external payment flow.
+Users can subscribe to a VIP plan. The app interfaces with an external payment flow. If the user has won a coupon from the Quiz Game, they can apply it to receive a discount before completing the payment.
 
 ```mermaid
 sequenceDiagram
@@ -341,22 +377,29 @@ sequenceDiagram
     participant DB as Database
 
     User->>App: Open Upgrade Screen
+    App->>App: Load User Data & Check Coupons
+    
+    opt Has Coupon
+        User->>App: Select 'Apply Coupon'
+        App->>App: Calculate Discounted Price
+    end
+
     User->>App: Select Plan (Monthly/Yearly)
     User->>App: Click 'Pay Now'
     
-    App->>Payment: Initiate Payment
+    App->>Payment: Initiate Payment Request
     User->>Payment: Complete External Payment
-    Payment-->>App: Payment Success
+    Payment-->>App: Payment Success Confirmation
     
     App->>User: Show Confirmation Dialog
     User->>App: Confirm Payment in App
     
-    App->>Server: PUT /api/user/update (isVip=true)
-    Server->>DB: Update User Status
+    App->>Server: PUT /api/user/update { isVip: true, usedCoupon: true }
+    Server->>DB: db.users.updateOne(Set isVip=true, Remove Used Coupon)
     DB-->>Server: Success
     Server-->>App: 200 OK
     
-    App->>App: Update User Context (isVip=true)
+    App->>App: Update AuthContext (isVip=true)
     App-->>User: Alert: "VIP Activated"
     App-->>User: Navigate to Profile
 ```
@@ -431,4 +474,48 @@ sequenceDiagram
     end
     
     User->>App: Check Coupon Wallet
+```
+
+## 13. Backend Scraper & Alert Update Workflow
+
+**Description:**
+A scheduled automated process where the Node.js backend fetches the latest food safety alerts from the external government API (data.gov.hk / CFS), parses the data, and caches it locally to `alerts.json` to prevent database read overload.
+
+```mermaid
+sequenceDiagram
+    participant Cron as Scheduled Job (initDatabase / Cron)
+    participant Server as Backend API (scraper.js)
+    participant External as External CFS RSS / CKAN API
+    participant LocalFile as alerts.json
+
+    Cron->>Server: Trigger Update Alerts Job
+    Server->>External: GET Latest RSS/XML Feeds
+    External-->>Server: Return XML Source Data
+    
+    Server->>Server: Parse XML & Deduplicate (rssParser.js)
+    Server->>Server: Format & Translate Text
+    
+    Server->>LocalFile: fs.writeFileSync('alerts.json')
+    LocalFile-->>Server: File Write Success
+    Server-->>Cron: Job Completed Successfully
+```
+
+## 14. Multilingual Toggle Workflow
+
+**Description:**
+The user switches the interface language (e.g., English to Traditional Chinese). The application updates the global state via `LanguageContext`, prompting all dependent react components to logically re-render in the selected language.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Button as TranslateButton Component
+    participant Context as LanguageContext
+    participant App as Mobile App UI View
+
+    User->>Button: Click 'Translate' Button
+    Button->>Context: switchLanguage(newLangCode)
+    Context->>Context: Update 'currentLanguage' Global State
+    Context-->>App: Trigger Context Provider Re-render
+    App->>App: Fetch static UI Strings for newLangCode
+    App-->>User: Interface switches to selected language
 ```
