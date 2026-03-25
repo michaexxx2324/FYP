@@ -23,7 +23,6 @@ stateDiagram-v2
         Checking_Status --> LoggedIn_VIP : isVip = true
         
         LoggedIn_Free --> VIP_Checkout : Clicks Upgrade
-        VIP_Checkout --> VIP_Checkout : Applies Coupon
         VIP_Checkout --> VIP_Processing : Submits Payment Info
         VIP_Checkout --> LoggedIn_Free : Cancels Checkout
         
@@ -93,16 +92,21 @@ stateDiagram-v2
 
 ---
 
-## 4. Discount Quiz & Coupon Gamification State
+## 4. AI Quiz Game & Mock Coupon State
 
 **Description:**
-This models the state of the user's interactive discount quiz, their resulting win/loss condition, and the subsequent lifecycle of the awarded coupon until it is consumed during a VIP upgrade.
+This models the state of the user's interactive AI quiz session and the subsequent awarding of a mock coupon. The coupon is awarded for gamification purposes and saved to the user's profile, though it is not redeemable for real transactions within the app.
 
 ```mermaid
 stateDiagram-v2
     [*] --> Quiz_Not_Started
     
-    Quiz_Not_Started --> Playing_Quiz : User Initiates Game
+    Quiz_Not_Started --> Generating_Questions : User Initiates Game
+    Generating_Questions --> Playing_Quiz : AI API Returns Questions
+    Generating_Questions --> Quiz_Error : API Failure
+    
+    Quiz_Error --> Quiz_Not_Started : Retry
+    
     Playing_Quiz --> Evaluating_Score : Answers Submitted
     
     Evaluating_Score --> Failed : Score too low
@@ -110,12 +114,8 @@ stateDiagram-v2
     
     Failed --> Quiz_Not_Started : Retry
     
-    Won_Coupon --> Active_Coupon : Insert to User Profile
+    Won_Coupon --> Saved_To_Account : Insert to User Profile
     
-    Active_Coupon --> Pending_Redemption : User Enters VIP Checkout
-    Pending_Redemption --> Active_Coupon : Checkout Cancelled
-    Pending_Redemption --> Consumed : Payment Completes
-    
-    Consumed --> [*]
+    Saved_To_Account --> [*] : Remains as Mock Reward
 ```
 
