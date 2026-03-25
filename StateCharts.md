@@ -44,7 +44,7 @@ stateDiagram-v2
 ## 2. Blog Post Lifecycle State
 
 **Description:**
-This diagram shows the states a Community Blog Post goes through within the system—from draft creation to publication, and how it handles user interactions like comments, likes, and favorites before potential deletion.
+This diagram shows the states a Community Blog Post goes through within the system—from draft creation to publication, and how it handles user interactions like comments, likes, and favorites.
 
 ```mermaid
 stateDiagram-v2
