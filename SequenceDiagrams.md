@@ -222,7 +222,21 @@ sequenceDiagram
         User->>App: Click 'View' Button
         App-->>User: Navigate to Product Details
     else Delete Item
-        User->>App: Click Delete Iconengage by commenting, liking, and saving favorites.
+        User->>App: Click Delete Icon
+        User->>App: Confirm Deletion
+        App->>Server: DELETE /api/DeleteScanHistory
+        Server->>DB: Remove Item
+        DB-->>Server: Success
+        Server-->>App: 200 OK
+        App->>App: Remove from Context/Storage
+        App-->>User: Update Displayed List
+    end
+```
+
+## 7. Blog Workflow
+
+**Description:**
+Users can browse community posts, create their own posts, and engage by commenting, liking, and saving favorites.
 
 ```mermaid
 sequenceDiagram
@@ -273,14 +287,14 @@ sequenceDiagram
                 Server->>DB: Add to 'Favorites'
                 Server-->>App: Success
             end
-        Server-->>App: 201 Created
-        App-->>User: Navigate to Feed (Refresh)
-    else View & Comment
-        User->>App: Click to View Post
-        App->>Server: GET /api/blog-comments/:id
-        Server-->>App: Return Comments
-        
-        optfood safety alerts scraped from data.gov.hk. The frontend reads from the local `alerts.json` file, and users can leave comments tied to specific alerts.
+        end
+    end
+```
+
+## 8. News Workflow
+
+**Description:**
+Users read food safety alerts scraped from data.gov.hk. The frontend reads from the local `alerts.json` file, and users can leave comments tied to specific alerts.
 
 ```mermaid
 sequenceDiagram
@@ -311,20 +325,6 @@ sequenceDiagram
         User->>App: Click 'Send'
         App->>Server: POST /api/SaveComment
         Server->>DB: Insert into 'Comments'
-    App-->>User: Display Headlines
-
-    User->>App: Click News Headline
-    App-->>User: Navigate to Details
-    App->>Server: GET /api/GetComments?newsId=...
-    Server-->>App: Return Comments
-    
-    User->>App: Read Article
-    
-    opt Add Comment
-        User->>App: Enter Comment
-        User->>App: Click 'Send'
-        App->>Server: POST /api/SaveComment
-        Server->>DB: Save News Comment
         Server-->>App: Success
         App-->>User: Refresh Comment List
     end
