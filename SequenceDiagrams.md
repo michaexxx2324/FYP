@@ -366,7 +366,7 @@ sequenceDiagram
 ## 10. VIP Upgrade Workflow
 
 **Description:**
-Users can subscribe to a VIP plan. The app interfaces with an external payment flow. If the user has won a coupon from the Quiz Game, they can apply it to receive a discount before completing the payment.
+Users can subscribe to a VIP plan. The app interfaces with an external payment flow to process the transaction. Once the payment is verified, the user's status is upgraded in the database.
 
 ```mermaid
 sequenceDiagram
@@ -377,13 +377,6 @@ sequenceDiagram
     participant DB as Database
 
     User->>App: Open Upgrade Screen
-    App->>App: Load User Data & Check Coupons
-    
-    opt Has Coupon
-        User->>App: Select 'Apply Coupon'
-        App->>App: Calculate Discounted Price
-    end
-
     User->>App: Select Plan (Monthly/Yearly)
     User->>App: Click 'Pay Now'
     
@@ -394,8 +387,8 @@ sequenceDiagram
     App->>User: Show Confirmation Dialog
     User->>App: Confirm Payment in App
     
-    App->>Server: PUT /api/user/update { isVip: true, usedCoupon: true }
-    Server->>DB: db.users.updateOne(Set isVip=true, Remove Used Coupon)
+    App->>Server: PUT /api/user/update { isVip: true }
+    Server->>DB: db.users.updateOne(Set isVip=true)
     DB-->>Server: Success
     Server-->>App: 200 OK
     
@@ -440,17 +433,20 @@ sequenceDiagram
 ## 12. Discount Game Workflow
 
 **Description:**
-A gamified feature where users answer trivia questions to win coupons.
+A gamified feature where users answer dynamically generated trivia questions focused on food safety or additives to win coupons. The system uses an AI service to dynamically generate the quiz questions.
 
 ```mermaid
 sequenceDiagram
     actor User
     participant App as Mobile App
     participant Server as Backend API
+    participant AI as AI Service (Poe API)
     participant DB as Database
 
     User->>App: Open Quiz Game
     App->>Server: GET /api/quiz/questions
+    Server->>AI: Prompt AI to generate food safety questions
+    AI-->>Server: Return dynamically generated questions
     Server-->>App: Return Questions
     
     loop For Each Question
@@ -464,7 +460,7 @@ sequenceDiagram
     alt Score High Enough (Win)
         App->>App: Generate Coupon Code
         App->>Server: POST /api/user/coupon
-        Server->>DB: Add Coupon to User
+        Server->>DB: db.users.updateOne(Add Coupon to User)
         DB-->>Server: Success
         Server-->>App: 200 OK
         App->>App: Update User Context (Add Coupon)
@@ -472,8 +468,6 @@ sequenceDiagram
     else Score Low
         App-->>User: View Final Score (No Coupon)
     end
-    
-    User->>App: Check Coupon Wallet
 ```
 
 ## 13. Backend Scraper & Alert Update Workflow
