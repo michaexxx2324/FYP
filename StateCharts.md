@@ -64,8 +64,7 @@ stateDiagram-v2
         Comment_Added --> Viewing : Comment Saved
     }
     
-    Published --> Deleted : Author Triggers Delete
-    Deleted --> [*]
+    Published --> [*] : Remains in Community
 ```
 
 ---
