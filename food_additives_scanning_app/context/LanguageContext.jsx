@@ -14,7 +14,7 @@ export const translations = {
     infoScreen: 'Info Screen',
     historyScreen: 'History Screen',
     profileScreen: 'My Profile Screen',
-    // OCR / Scan keys (HEAD)
+    // OCR
     scanMode: 'Scan Mode',
     ocrMode: 'Text Mode',
     permissionNeeded: 'Camera permission is needed',
@@ -26,7 +26,7 @@ export const translations = {
     processing: 'Processing...',
     noTextFound: 'No text found',
     scanAgain: 'Scan Again',
-    // VIP / Other keys (Incoming)
+    // VIP 
     upgradeVIP: 'Upgrade VIP',
     unlockFeatures: 'Unlock recipes and calorie calculation',
     quickScan: 'Quick Scan',
@@ -296,7 +296,7 @@ export const translations = {
     infoScreen: '資訊畫面',
     historyScreen: '歷史記錄畫面',
     profileScreen: '個人資料畫面',
-    // OCR / Scan keys (HEAD)
+    // OCR 
     scanMode: '掃描模式',
     ocrMode: '文字模式',
     permissionNeeded: '需要相機權限',
@@ -308,7 +308,7 @@ export const translations = {
     processing: '處理中...',
     noTextFound: '未發現文字',
     scanAgain: '重新掃描',
-    // VIP / Other keys (Incoming)
+    // VIP 
     upgradeVIP: '升級 VIP',
     unlockFeatures: '解鎖食譜推薦與卡路里計算',
     quickScan: '快速掃描',

@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#2d5a27', // Primary
+    color: '#2d5a27', 
   },
   searchInput: {
     backgroundColor: '#fff',

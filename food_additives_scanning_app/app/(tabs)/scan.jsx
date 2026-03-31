@@ -293,7 +293,7 @@ export default function ScanScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' }, // Camera needs dark bg usually, but controls need theme
+  container: { flex: 1, backgroundColor: '#000' }, 
   camera: { flex: 1 },
   controls: { flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: '#fbf5e5' },
   quotaContainer: {
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{translateX: -50}, {translateY: -50}],
-    backgroundColor: 'rgba(93, 87, 74, 0.9)', // Charcoal with transparency
+    backgroundColor: 'rgba(93, 87, 74, 0.9)',
     padding: 25,
     borderRadius: 20,
     alignItems: 'center',

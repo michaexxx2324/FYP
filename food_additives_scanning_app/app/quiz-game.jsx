@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#4CAF50', // Keeps green for success/coupon feel
+    borderColor: '#4CAF50', 
     width: '100%',
     alignItems: 'center',
     borderStyle: 'dashed',

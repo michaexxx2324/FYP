@@ -1,10 +1,5 @@
 import { POE_API_KEY, POE_BOT_NAME } from '@env';
 
-/**
- * Scans an image using the Poe AI API (OpenAI-compatible endpoint).
- * @param {string} base64Image - The base64 encoded image string.
- * @returns {Promise<string|null>} - The extracted text or null.
- */
 export const scanImage = async (base64Image) => {
   try {
     const response = await fetch('https://api.poe.com/v1/chat/completions', {

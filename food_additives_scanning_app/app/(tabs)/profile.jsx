@@ -23,7 +23,7 @@ export default function ProfileScreen() {
         email: user.email || '',
         height: user.height || '',
         weight: user.weight || '',
-        dob: user.dob || '', // Date selection logic might be complex in edit, maybe just read-only/text input for now
+        dob: user.dob || '', 
         allergies: user.allergies || [],
         dietPreferences: user.dietPreferences || [],
         healthStatus: user.healthStatus || [],
@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      // Recalculate age if DOB is changed? user inputs DOB as string here for simplicity or date picker? 
+     
       
       const response = await fetch(`${API_URL}/user/update`, {
         method: 'POST',
@@ -156,7 +156,7 @@ export default function ProfileScreen() {
                 value={String(editData.age || '')} 
                 onChangeText={t => setEditData({...editData, age: t})} 
                 keyboardType="numeric"
-                editable={false} // Mostly readonly as calculated from DOB
+                editable={false}
               />
             </View>
              <View style={styles.infoItem}>
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   editButtonText: {
-    color: '#2d5a27', // Primary
+    color: '#2d5a27',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   },
   vipBadge: {
     flexDirection: 'row',
-    backgroundColor: '#D97943', // Accent
+    backgroundColor: '#D97943', 
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 20,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#8c867a', // Muted
+    color: '#8c867a', 
     marginBottom: 5,
     fontWeight: '600',
   },
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   tag: {
-    backgroundColor: '#fbf5e5', // Cream
+    backgroundColor: '#fbf5e5', 
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,

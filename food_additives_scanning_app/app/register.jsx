@@ -14,7 +14,7 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Privacy Policy Modal State
+  
   const [showPrivacyModal, setShowPrivacyModal] = useState(true);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
 
@@ -433,13 +433,11 @@ export default function RegisterScreen() {
           </View>
         </Modal>
 
-        {/* Privacy Policy Modal */}
         <Modal
           visible={showPrivacyModal}
           animationType="slide"
           transparent={true}
           onRequestClose={() => {
-            // Cannot close without agreement
           }}
         >
           <View style={styles.modalOverlay}>
@@ -612,7 +610,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 20, // Increased
+    borderRadius: 20, 
     padding: 25,
     shadowColor: '#5d574a',
     shadowOffset: { width: 0, height: 4 },
@@ -627,7 +625,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#2d5a27', // Primary
+    color: '#2d5a27', 
   },
   formContainer: {
     flex: 1,
@@ -714,7 +712,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   addItemText: {
-    color: '#D97943', // Accent
+    color: '#D97943', 
     marginLeft: 5,
     fontWeight: '600',
   },
@@ -749,7 +747,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(93, 87, 74, 0.6)', // Dimmed charcoal
+    backgroundColor: 'rgba(93, 87, 74, 0.6)', 
     justifyContent: 'center',
     alignItems: 'center',
   },

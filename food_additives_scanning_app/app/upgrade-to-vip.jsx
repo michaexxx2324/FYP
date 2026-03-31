@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   banner: {
-    backgroundColor: '#D97943', // Accent
+    backgroundColor: '#D97943', 
     borderRadius: 20,
     padding: 25,
     marginBottom: 25,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     borderColor: '#e6dfcf',
   },
   activeTab: {
-    backgroundColor: '#2d5a27', // Primary
+    backgroundColor: '#2d5a27', 
     borderColor: '#2d5a27',
   },
   tabText: {
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   bottomContainer: {
-    // Unused in provided snippet but good to style just in case
+    
     position: 'absolute',
     bottom: 0,
     left: 0,

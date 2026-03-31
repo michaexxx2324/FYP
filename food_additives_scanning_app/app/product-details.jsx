@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     borderColor: '#f0e6d2',
   },
   warningCard: {
-    backgroundColor: '#D32F2F', // Overridden dynamically
+    backgroundColor: '#D32F2F', 
     padding: 20,
     borderRadius: 20,
     elevation: 5,
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 12,
-    color: '#2d5a27', // Primary
+    color: '#2d5a27', 
   },
   value: {
     fontSize: 16,
     marginBottom: 12,
-    color: '#5d574a', // Text
+    color: '#5d574a', 
     lineHeight: 22,
   },
   sectionTitle: {
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 15,
     marginBottom: 8,
-    color: '#D97943', // Accent
+    color: '#D97943', 
   },
   infoSection: {
     marginBottom: 15,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   disclaimerTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#8c867a', // Muted
+    color: '#8c867a', 
     marginBottom: 5,
   },
   disclaimerText: {

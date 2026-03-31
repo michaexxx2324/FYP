@@ -121,18 +121,18 @@ export default function CaloriesScreen() {
             if (data.choices && data.choices.length > 0) {
                 const content = data.choices[0].message.content;
                 
-                // Try to find JSON in the content
+                
                 const jsonMatch = content.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
                    const jsonResult = JSON.parse(jsonMatch[0]);
                    totalCalories = parseInt(jsonResult.calories);
                 } else {
-                   // Fallback to simple number match if JSON fails, but look for the last number
-                   // usually the result comes at the end if it's chatting
+                   
+                   
                    const matches = content.match(/\d+/g);
                    if (matches && matches.length > 0) {
-                       // Try to pick the most reasonable number (not 100 from 'per 100g')
-                       // This is a last resort fallback
+                       
+                       
                        totalCalories = parseInt(matches[matches.length - 1]);
                    }
                 }
@@ -143,7 +143,7 @@ export default function CaloriesScreen() {
         }
       } catch (e) {
           console.warn("Falling back to demo mode:", e);
-          totalCalories = Math.floor((parseInt(grams) || 100) * 1.5); // Rough estimate fallback
+          totalCalories = Math.floor((parseInt(grams) || 100) * 1.5); 
           Alert.alert("Demo Mode", "AI Service unavailable. Estimated calories added.");
       }
 

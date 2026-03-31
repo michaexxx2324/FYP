@@ -22,35 +22,25 @@ export default function NewsDetailsScreen() {
   const [newComment, setNewComment] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  // Initial load and language switch handler
+ 
   useEffect(() => {
     if (params.newsId) {
-        // Find the alert that matches the original ID or find equivalent in current language
-        // Since alerts in context are already in the current language, we just need to find the matching one.
-        // We can match by index if passed, or stricter matching.
-        // But params.newsId is the link. The link changes between languages.
-        // "http://.../tc_chi/..." vs "http://.../english/..."
         
-        // Strategy: 
-        // 1. Try to find alert exactly by link (if params.newsId matches current language list)
-        // 2. If not found, try to find by switching the language in the link
         
         const langCode = language === 'zh' ? 'tc_chi' : 'english';
         const otherLangCode = language === 'zh' ? 'english' : 'tc_chi';
         
-        // Normalize params.newsId to match current language expectation
         let targetLink = params.newsId;
 
           if (language === 'zh') {
-              // Convert English link to Chinese link format
-              // Case 1: /english/ -> /tc_chi/
+              
               targetLink = targetLink.replace('/english/', '/tc_chi/');
-              // Case 2: _e.html -> _c.html (common in CFS filenames)
+             
               targetLink = targetLink.replace('_e.html', '_c.html');
-              // Case 3: _en.html -> _tc.html
+       
               targetLink = targetLink.replace('_en.html', '_tc.html');
           } else {
-              // Convert Chinese link to English link format
+              
               targetLink = targetLink.replace('/tc_chi/', '/english/');
               targetLink = targetLink.replace('_c.html', '_e.html');
               targetLink = targetLink.replace('_tc.html', '_en.html');
@@ -58,10 +48,10 @@ export default function NewsDetailsScreen() {
 
         let found = alerts.find(a => a.link === targetLink);
         
-        // If exact link match fails, try relaxed matching (e.g. filename only)
+
         if (!found) {
             const desiredFilename = targetLink.split('/').pop();
-            // Also need to be careful with query params if any
+ 
             const cleanFilename = desiredFilename.split('?')[0];
             found = alerts.find(a => {
                 if (!a.link) return false;
@@ -79,11 +69,7 @@ export default function NewsDetailsScreen() {
         if (found) {
             setCurrentAlert(found);
         } else {
-             // Link conversion failed or alert not found in new language list.
-             // Try to force finding strictly by index if possible? No, unreliable.
-             
-             // If we just switched language, we ideally want to show *something* in the new language.
-             // But if we can't find the matching alert, we are stuck with old data.
+        
              
              console.log('[NewsDetails] Could not find matching alert in new language.');
         }
@@ -95,7 +81,7 @@ const getRichContent = () => {
       const alert = currentAlert;
       if (alert.actionTaken || alert.productDetails) {
         
-        // Helper to render a section with a label, content, and a separator line
+      
         const renderSection = (label, content) => `
           <div style="margin-bottom: 15px;">
             <div style="margin-bottom: 10px; font-size: 16px; color: #333; line-height: 1.6;">

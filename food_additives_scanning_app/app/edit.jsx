@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   scanButton: {
-    backgroundColor: '#D97943', // Accent
+    backgroundColor: '#D97943', 
     padding: 12,
     borderRadius: 12,
     justifyContent: 'center',

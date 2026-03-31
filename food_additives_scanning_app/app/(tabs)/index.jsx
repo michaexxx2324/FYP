@@ -19,9 +19,8 @@ export default function HomeScreen() {
   const isWithin7Days = (dateString) => {
     if (!dateString) return false;
     const alertDate = new Date(dateString);
-    if (isNaN(alertDate.getTime())) return false; // valid date check
+    if (isNaN(alertDate.getTime())) return false;
     const now = new Date();
-    // allow recent future just in case of timezone overlap
     const diffTime = now.getTime() - alertDate.getTime();
     if (diffTime < -86400000) return false; 
     const diffDays = diffTime / (1000 * 60 * 60 * 24);

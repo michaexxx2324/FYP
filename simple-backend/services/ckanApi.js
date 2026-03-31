@@ -1,4 +1,4 @@
-// simple-backend/services/ckanApi.js
+
 const axios = require('axios');
 const logger = require('../utils/logger');
 
@@ -10,7 +10,7 @@ const fetchRssUrl = async (language = 'tc') => {
         const data = response.data;
 
         if (data.success && data.result && data.result.resources) {
-            // Find resource based on language
+            
             const resource = data.result.resources.find(r => {
                 const format = r.format.toUpperCase();
                 if (format !== 'RSS' && format !== 'XML') return false;
@@ -29,7 +29,7 @@ const fetchRssUrl = async (language = 'tc') => {
                 logger.info(`Successfully fetched ${language.toUpperCase()} RSS/XML URL: ${resource.url}`);
                 return resource.url;
             } else {
-                // Fallback or specific error
+                
                 logger.warn(`No suitable RSS/XML resource found for language: ${language}`);
                 return null;
             }

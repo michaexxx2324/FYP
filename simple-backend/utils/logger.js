@@ -1,4 +1,4 @@
-// simple-backend/utils/logger.js
+
 const fs = require('fs');
 const path = require('path');
 
@@ -10,7 +10,7 @@ const log = (level, message) => {
     
     console.log(logMessage);
 
-    // Optional: Write to file
+    
     fs.appendFile(logFilePath, logMessage + '\n', (err) => {
         if (err) console.error('Failed to write log to file:', err);
     });

@@ -31,7 +31,7 @@ export const getProductByBarcode = async (barcode, userId = "anonymous") => {
     
     if (!response.ok) {
       if (response.status === 404) {
-        return null; // Product not found
+        return null;
       }
       const errorText = await response.text();
       throw new Error(`Server error: ${response.status} - ${errorText}`);

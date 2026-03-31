@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use('/api/alerts', alertsRouter);
 
-// Schedule daily update at 3:00 am
+
 cron.schedule('0 3 * * *', async () => {
     logger.info('Running scheduled daily update...');
     try {
@@ -31,11 +31,11 @@ cron.schedule('0 3 * * *', async () => {
 });
 
 
-// Local MongoDB Connection
+
 const CONNECTION_STRING = "mongodb://127.0.0.1:27017/foodlabel";
 
-// Azure Cosmos DB Connection (Subscription disabled)
-// const CONNECTION_STRING = "mongodb://faifai0818:4rqANRenpgTzZDbsDWfgfr9LYsUn0OTbtA6Vxgnuzsf51MpFgiv5z8GpOQdjNidt4dKV4nliyyi3ACDbYCkrfw%3D%3D@faifai0818.mongo.cosmos.azure.com:10255/foodlabel?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@faifai0818@";
+
+
 
 mongoose.connect(CONNECTION_STRING)
   .then(() => console.log('Connected to MongoDB (Local)'))
@@ -82,7 +82,7 @@ app.get('/api/GetProduct', async (req, res) => {
   console.log(`Searching for barcode: ${barcode} for user: ${userId}`);
 
   try {
-    // 1. Try to find the user's specific scan history first
+    
     let userProduct = await ScanHistory.findOne({ "item code": barcode, "user id": userId });
 
     if (userProduct) {
@@ -96,7 +96,7 @@ app.get('/api/GetProduct', async (req, res) => {
       });
     }
 
-    // 2. If not found in user's history, check base DB or any other user's history
+    
     let baseProduct = await Product.findOne({ "item code": barcode });
 
     if (!baseProduct) {
@@ -109,7 +109,7 @@ app.get('/api/GetProduct', async (req, res) => {
         itemName: baseProduct["item name"],
         itemCode: baseProduct["item code"],
         nutritionInformation: baseProduct["nutrition information"],
-        // IMPORTANT: Set warning and healthAnalysis to null so frontend generates a new tailored report
+        
         warning: null,
         healthAnalysis: null
       });
@@ -169,7 +169,7 @@ app.post('/api/SaveComment', async (req, res) => {
     return res.status(400).send("Missing required fields");
   }
 
-  // Generate universal ID to link English and Chinese comments together permanently
+  
   let universalNewsId = newsId;
   const match = newsId.match(/whatsnew_fa\/(.*\.html)/);
   if (match) {
@@ -202,7 +202,7 @@ app.get('/api/GetComments', async (req, res) => {
     return res.status(400).send("Please pass a newsId on the query string");
   }
 
-  // Generate equivalent IDs to share comments across languages
+  
   let searchIds = [newsId];
   const match = newsId.match(/whatsnew_fa\/(.*\.html)/);
   if (match) {
@@ -588,7 +588,7 @@ app.post('/api/reset-password', async (req, res) => {
   res.json({ message: "Please use the new Forgot Password flow." });
 });
 
-// Quiz Questions Endpoint (Simulating AI generation)
+
 app.get('/api/quiz/questions', (req, res) => {
   const allQuestions = [
     {
@@ -723,7 +723,7 @@ const FavoriteSchema = new mongoose.Schema({
 
 const Favorite = mongoose.model('Favorite', FavoriteSchema, 'favorites');
 
-// Blog Like Schema
+
 const BlogLikeSchema = new mongoose.Schema({
   "post id": String,
   "user id": String,
@@ -853,7 +853,7 @@ app.get('/api/blog-comments/:postId', async (req, res) => {
   }
 });
 
-// Add to Favorites
+
 app.post('/api/favorites', async (req, res) => {
   const { userId, postId } = req.body;
   try {
