@@ -200,10 +200,10 @@ export default function RegisterScreen() {
           { text: i18n.loginButton, onPress: () => router.replace('/login') }
         ]);
       } else {
-        Alert.alert('Registration Failed', data.message || 'Something went wrong');
+        Alert.alert(i18n.registrationFailed || 'Registration Failed', data.message || i18n.updateFailed || 'Something went wrong');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to server');
+      Alert.alert(i18n.error || 'Error', i18n.serverConnectionFailed || 'Failed to connect to server');
       console.error(error);
     } finally {
       setLoading(false);
@@ -391,19 +391,19 @@ export default function RegisterScreen() {
         <Modal visible={showCustomAllergy} transparent animationType="fade">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Add Allergy</Text>
+              <Text style={styles.modalTitle}>{i18n.addAllergy || "Add Allergy"}</Text>
               <TextInput 
                 style={styles.input} 
-                placeholder="Enter allergy name"
+                placeholder={i18n.enterAllergy || "Enter allergy name"}
                 value={customAllergyText}
                 onChangeText={setCustomAllergyText}
               />
               <View style={styles.modalButtons}>
                 <TouchableOpacity onPress={() => setShowCustomAllergy(false)} style={styles.modalCancel}>
-                  <Text>Cancel</Text>
+                  <Text>{i18n.cancel || "Cancel"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={addCustomAllergy} style={styles.modalAdd}>
-                  <Text style={{color: 'white'}}>Add</Text>
+                  <Text style={{color: 'white'}}>{i18n.add || "Add"}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -414,19 +414,19 @@ export default function RegisterScreen() {
         <Modal visible={showCustomDiet} transparent animationType="fade">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Add Diet Preference</Text>
+              <Text style={styles.modalTitle}>{i18n.addDietPreference || "Add Diet Preference"}</Text>
               <TextInput 
                 style={styles.input} 
-                placeholder="Enter diet preference"
+                placeholder={i18n.enterDiet || "Enter diet preference"}
                 value={customDietText}
                 onChangeText={setCustomDietText}
               />
               <View style={styles.modalButtons}>
                 <TouchableOpacity onPress={() => setShowCustomDiet(false)} style={styles.modalCancel}>
-                  <Text>Cancel</Text>
+                  <Text>{i18n.cancel || "Cancel"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={addCustomDiet} style={styles.modalAdd}>
-                  <Text style={{color: 'white'}}>Add</Text>
+                  <Text style={{color: 'white'}}>{i18n.add || "Add"}</Text>
                 </TouchableOpacity>
               </View>
             </View>

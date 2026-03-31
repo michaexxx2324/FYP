@@ -51,13 +51,13 @@ export default function ProfileScreen() {
         const data = await response.json();
         updateUser(data.user);
         setIsEditing(false);
-        Alert.alert(i18n.success, i18n.profileUpdated || "Profile Updated");
+        Alert.alert(i18n.success || "Success", i18n.profileUpdated || "Profile Updated");
       } else {
-        Alert.alert("Error", "Failed to update profile");
+        Alert.alert(i18n.error || "Error", i18n.failedToUpdateProfile || "Failed to update profile");
       }
     } catch (e) {
       console.error(e);
-      Alert.alert("Error", "Network error");
+      Alert.alert(i18n.error || "Error", i18n.networkError || "Network error");
     } finally {
       setLoading(false);
     }

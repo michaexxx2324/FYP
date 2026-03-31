@@ -62,7 +62,7 @@ export default function CaloriesScreen() {
       await AsyncStorage.setItem('user_calorie_goal', newGoal.toString());
       setGoalModalVisible(false);
     } else {
-      Alert.alert("Invalid Input", "Please enter a valid calorie goal.");
+      Alert.alert(i18n.invalidInput || "Invalid Input", i18n.invalidColorieGoal || "Please enter a valid calorie goal.");
     }
   };
 
@@ -144,7 +144,7 @@ export default function CaloriesScreen() {
       } catch (e) {
           console.warn("Falling back to demo mode:", e);
           totalCalories = Math.floor((parseInt(grams) || 100) * 1.5); 
-          Alert.alert("Demo Mode", "AI Service unavailable. Estimated calories added.");
+          Alert.alert(i18n.demoMode || "Demo Mode", i18n.aiServiceUnavailable || "AI Service unavailable. Estimated calories added.");
       }
 
       const newEntry = {
@@ -271,7 +271,7 @@ export default function CaloriesScreen() {
       <Modal visible={goalModalVisible} animationType="fade" transparent={true}>
         <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Set Daily Calorie Goal</Text>
+                <Text style={styles.modalTitle}>{i18n.setDailyCalorieGoal || "Set Daily Calorie Goal"}</Text>
                 <TextInput
                     style={styles.input}
                     value={tempGoal}
@@ -279,10 +279,10 @@ export default function CaloriesScreen() {
                     keyboardType="numeric"
                 />
                  <TouchableOpacity style={styles.confirmButton} onPress={handleUpdateGoal}>
-                  <Text style={styles.confirmButtonText}>Save Goal</Text>
+                  <Text style={styles.confirmButtonText}>{i18n.saveGoal || "Save Goal"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.closeButton} onPress={() => setGoalModalVisible(false)}>
-                  <Text style={styles.closeButtonText}>Cancel</Text>
+                  <Text style={styles.closeButtonText}>{i18n.cancel || "Cancel"}</Text>
                 </TouchableOpacity>
             </View>
         </View>

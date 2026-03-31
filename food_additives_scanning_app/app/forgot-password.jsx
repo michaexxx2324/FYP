@@ -37,13 +37,13 @@ export default function ForgotPasswordScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert("Success", "OTP sent to your email.");
+        Alert.alert(i18n.success || "Success", i18n.otpSent || "OTP sent to your email.");
         setStage(STAGE_OTP);
       } else {
-        Alert.alert("Error", data.message || "Failed to send OTP");
+        Alert.alert(i18n.error || "Error", data.message || i18n.failedToSendOtp || "Failed to send OTP");
       }
     } catch (error) {
-      Alert.alert("Error", "Network error");
+      Alert.alert(i18n.error || "Error", i18n.networkError || "Network error");
       console.error(error);
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export default function ForgotPasswordScreen() {
 
   const handleVerifyOTP = async () => {
     if (!otp || otp.length !== 6) {
-      Alert.alert("Error", "Please enter a valid 6-digit OTP");
+      Alert.alert(i18n.error || "Error", i18n.enterValidOtp || "Please enter a valid 6-digit OTP");
       return;
     }
 
@@ -70,10 +70,10 @@ export default function ForgotPasswordScreen() {
       if (response.ok) {
         setStage(STAGE_NEW_PASSWORD);
       } else {
-        Alert.alert("Error", data.message || "Invalid OTP");
+        Alert.alert(i18n.error || "Error", data.message || i18n.invalidOtp || "Invalid OTP");
       }
     } catch (error) {
-      Alert.alert("Error", "Network error");
+      Alert.alert(i18n.error || "Error", i18n.networkError || "Network error");
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function ForgotPasswordScreen() {
  
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+      Alert.alert(i18n.error || "Error", i18n.passwordMinLength || "Password must be at least 6 characters");
       return;
     }
 
@@ -97,14 +97,14 @@ export default function ForgotPasswordScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert("Success", "Password reset successfully. Please login.", [
-            { text: "OK", onPress: () => router.replace('/login') }
+        Alert.alert(i18n.success || "Success", i18n.passwordResetSuccess || "Password reset successfully. Please login.", [
+            { text: i18n.ok || "OK", onPress: () => router.replace('/login') }
         ]);
       } else {
-        Alert.alert("Error", data.message || "Failed to reset password");
+        Alert.alert(i18n.error || "Error", data.message || i18n.failedToReset || "Failed to reset password");
       }
     } catch (error) {
-      Alert.alert("Error", "Network error");
+      Alert.alert(i18n.error || "Error", i18n.networkError || "Network error");
     } finally {
       setLoading(false);
     }
@@ -129,20 +129,20 @@ export default function ForgotPasswordScreen() {
                     editable={!loading}
                   />
                   <TouchableOpacity style={styles.resetButton} onPress={handleRequestOTP} disabled={loading}>
-                    {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>Get OTP</Text>}
+                    {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>{i18n.getOtp || "Get OTP"}</Text>}
                   </TouchableOpacity>
                 </>
               );
           case STAGE_OTP:
               return (
                 <>
-                  <Text style={styles.title}>Enter Code</Text>
-                  <Text style={styles.subtitle}>Enter the 6-digit code sent to {email}</Text>
+                  <Text style={styles.title}>{i18n.enterCode || "Enter Code"}</Text>
+                  <Text style={styles.subtitle}>{i18n.enter6DigitCode || "Enter the 6-digit code sent to "} {email}</Text>
                   
-                  <Text style={styles.label}>OTP Code</Text>
+                  <Text style={styles.label}>{i18n.otpCode || "OTP Code"}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="6-digit OTP code"
+                    placeholder="123456"
                     value={otp}
                     onChangeText={setOtp}
                     keyboardType="numeric"
@@ -150,20 +150,20 @@ export default function ForgotPasswordScreen() {
                     editable={!loading}
                   />
                   <TouchableOpacity style={styles.resetButton} onPress={handleVerifyOTP} disabled={loading}>
-                    {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>Verify Code</Text>}
+                    {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>{i18n.verifyCode || "Verify Code"}</Text>}
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.textButton} onPress={() => setStage(STAGE_EMAIL)}>
-                      <Text style={styles.textButtonText}>Change Email</Text>
+                      <Text style={styles.textButtonText}>{i18n.changeEmail || "Change Email"}</Text>
                   </TouchableOpacity>
                 </>
               );
           case STAGE_NEW_PASSWORD:
               return (
                 <>
-                  <Text style={styles.title}>New Password</Text>
-                  <Text style={styles.subtitle}>Create a new strong password.</Text>
+                  <Text style={styles.title}>{i18n.newPassword || "New Password"}</Text>
+                  <Text style={styles.subtitle}>{i18n.createStrongPassword || "Create a new strong password."}</Text>
                   
-                  <Text style={styles.label}>New Password</Text>
+                  <Text style={styles.label}>{i18n.newPassword || "New Password"}</Text>
                   <TextInput
                     style={styles.input}
                     placeholder="******"
@@ -173,7 +173,7 @@ export default function ForgotPasswordScreen() {
                     editable={!loading}
                   />
                   <TouchableOpacity style={styles.resetButton} onPress={handleResetPassword} disabled={loading}>
-                     {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>Set Password</Text>}
+                     {loading ? <ActivityIndicator color="white" /> : <Text style={styles.resetButtonText}>{i18n.setPassword || "Set Password"}</Text>}
                   </TouchableOpacity>
                 </>
               );

@@ -17,7 +17,6 @@ chore: 建構程序或輔助工具的變動 (maintain)。
 revert: 撤銷回覆先前的 commit 例如：revert: type(scope): subject (回覆版本：xxxx)。
 i18n: 翻譯/多語言更新 (Internationalization and localization)。
 
-poe api key:kyUmyep70nikyCi7RnLPIdPqanivHp6omXaV3-Y7MEk
 
 vip deep mode:
 1. 增加“添加剂等级划分” (Additive Classification)

@@ -186,7 +186,7 @@ export default function SettingsScreen() {
         
         const passwordRegex = /^(?=.*[a-zA-Z]).{8,}$/;
         if (!passwordRegex.test(formData.password)) {
-          Alert.alert('Weak Password', 'Password must be at least 8 characters long and contain at least one English letter.');
+          Alert.alert(i18n.weakPasswordTitle || 'Weak Password', i18n.weakPasswordMsg || 'Password must be at least 8 characters long and contain at least one English letter.');
           setLoading(false);
           return;
         }
@@ -203,14 +203,14 @@ export default function SettingsScreen() {
 
       if (response.ok) {
         updateUser(data.user);
-        Alert.alert('Success', 'Profile updated successfully', [
-          { text: 'OK', onPress: () => router.back() }
+        Alert.alert(i18n.success || 'Success', i18n.profileUpdatedSuccessfully || 'Profile updated successfully', [
+          { text: i18n.ok || 'OK', onPress: () => router.back() }
         ]);
       } else {
-        Alert.alert('Update Failed', data.message || 'Something went wrong');
+        Alert.alert(i18n.updateFailed || 'Update Failed', data.message || 'Something went wrong');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to server');
+      Alert.alert(i18n.error || 'Error', i18n.serverConnectionFailed || 'Failed to connect to server');
       console.error(error);
     } finally {
       setLoading(false);
@@ -365,19 +365,19 @@ export default function SettingsScreen() {
       <Modal visible={showCustomAllergy} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Allergy</Text>
+            <Text style={styles.modalTitle}>{i18n.addAllergy || "Add Allergy"}</Text>
             <TextInput 
               style={styles.input} 
-              placeholder="Enter allergy name"
+              placeholder={i18n.enterAllergy || "Enter allergy name"}
               value={customAllergyText}
               onChangeText={setCustomAllergyText}
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity onPress={() => setShowCustomAllergy(false)} style={styles.modalCancel}>
-                <Text>Cancel</Text>
+                <Text>{i18n.cancel || "Cancel"}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={addCustomAllergy} style={styles.modalAdd}>
-                <Text style={{color: 'white'}}>Add</Text>
+                <Text style={{color: 'white'}}>{i18n.add || "Add"}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -388,19 +388,19 @@ export default function SettingsScreen() {
       <Modal visible={showCustomDiet} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Diet Preference</Text>
+            <Text style={styles.modalTitle}>{i18n.addDietPreference || "Add Diet Preference"}</Text>
             <TextInput 
               style={styles.input} 
-              placeholder="Enter diet preference"
+              placeholder={i18n.enterDiet || "Enter diet preference"}
               value={customDietText}
               onChangeText={setCustomDietText}
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity onPress={() => setShowCustomDiet(false)} style={styles.modalCancel}>
-                <Text>Cancel</Text>
+                <Text>{i18n.cancel || "Cancel"}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={addCustomDiet} style={styles.modalAdd}>
-                <Text style={{color: 'white'}}>Add</Text>
+                <Text style={{color: 'white'}}>{i18n.add || "Add"}</Text>
               </TouchableOpacity>
             </View>
           </View>
