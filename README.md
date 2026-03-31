@@ -18,31 +18,7 @@ revert: 撤銷回覆先前的 commit 例如：revert: type(scope): subject (回�
 i18n: 翻譯/多語言更新 (Internationalization and localization)。
 
 
-vip deep mode:
-1. 增加“添加剂等级划分” (Additive Classification)
-不要只给一个 High/Low。深度模式应该能识别添加剂的类型。
-
-建议方向：将添加剂细分为：人工色素、防腐剂、增味剂、甜味剂。
-
-增强点：引用国际标准（如欧盟 E-numbers 或 FDA 标准）。
-
-2. 引入“加工水平评估” (NOVA Classification)
-这是目前营养学界非常流行的标准，用于判断食品是“天然”还是“超加工食品 (Ultra-processed foods)”。
-
-深度点：识别该食品属于 NOVA 1（未加工）到 NOVA 4（超加工）中的哪一级。超加工食品通常与更高的健康风险挂钩。
-
-3. 精确的“过敏原交叉比对” (Hidden Allergen Detection)
-普通模式可能只看明显的单词，深度模式应能识别隐藏过敏原。
-
-例子：如果用户对“牛奶”过敏，深度模式应能识别出 Casein (酪蛋白) 或 Whey (乳清) 也是危险的。
-
-4. 营养配比建议 (Macronutrient Balance)
-根据用户的身高体重，计算该食品占用户每日建议摄入量 (GDA/RDI) 的百分比。
-
-
-// Example: 'https://my-food-app.azurewebsites.net/api/GetProduct'
-// For local testing with Expo Go, use your computer's IP: 'http://192.168.1.100:7071/api/GetProduct'
-// const API_URL = 'http://192.168.50.124:3000/api/GetProduct'; 
+//API_URL = 'http://192.168.50.124:3000/api/GetProduct'; 
 
 //way to kill all the backend port:
 Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Process -Force
